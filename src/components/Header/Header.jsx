@@ -39,9 +39,9 @@ const Header = () => {
 
   return (
     <header className="border-b border-gray-200">
-      <div className="flex items-center justify-between h-16 px-8">
+      <div className="flex items-center justify-between h-16 px-4 lg:px-8">
         {/* Left Section: Navigation Links */}
-        <div className="flex space-x-6 text-sm font-medium text-gray-700">
+        <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-700">
           <a href="#" className="hover:text-black">
             Shop
           </a>
@@ -57,16 +57,20 @@ const Header = () => {
         </div>
 
         {/* Center Section: Logo */}
-        <div 
-        className="text-xl font-bold cursor-pointer"
-        onClick={()=>{navigate("/")}}
-        >SKYN</div>
+        <div
+          className="text-xl font-bold cursor-pointer"
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          SKYN
+        </div>
 
         {/* Right Section: Icons */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-4 lg:space-x-6">
           {/* Search Icon and Input */}
           <div
-            className="relative flex items-center w-[160px] justify-end"
+            className="relative flex items-center w-32 md:w-40 justify-end"
             ref={searchRef}
             onClick={(e) => e.stopPropagation()}
           >
@@ -96,8 +100,8 @@ const Header = () => {
 
           {/* Favorite Icon */}
           <FaHeart className="text-lg cursor-pointer" />
-          {/* User Icon */}
 
+          {/* User Icon */}
           <div className="relative" ref={dropdownRef}>
             <FaUserAlt
               className="text-lg cursor-pointer"
@@ -105,27 +109,33 @@ const Header = () => {
             />
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg border border-gray-200 rounded-md z-50">
-              <button
-                className="w-full px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md shadow-md transition-all duration-200 ease-in-out"
-                onClick={() => {
-                  setShowDropdown(false); // Ẩn dropdown
-                  navigate("/login"); // Chuyển đến trang đăng nhập
-                }}
-              >
-                Đăng nhập
-              </button>
-            </div>
+                <button
+                  className="w-full px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    navigate("/login");
+                  }}
+                >
+                  Đăng nhập
+                </button>
+              </div>
             )}
           </div>
+
           {/* Cart Icon */}
           <div className="relative">
             <BsBag className="text-lg cursor-pointer" />
-            {/* Cart Count */}
             <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
               2
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="flex items-center justify-between md:hidden py-2 px-4">
+        <button className="text-sm font-medium hover:text-black">Menu</button>
+        <button className="text-sm font-medium hover:text-black">Shop</button>
       </div>
     </header>
   );
