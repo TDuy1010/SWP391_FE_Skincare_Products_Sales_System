@@ -1,32 +1,28 @@
-import React from "react";
-import HeaderComponent from "../components/Header";
-import FooterComponent from "../components/Footer";
 import { Carousel } from "antd";
 
 const LangdingPage = () => {
   return (
-    <div className="flex flex-col">
-      <HeaderComponent />
+    <div className="flex flex-col">      
       {/* HeroSection  */}
       <Carousel autoplay>
         <div>
           <h3 className="h-[500px] text-white font-bold text-center bg-black">
-            Test
+            Test1
           </h3>
         </div>
         <div>
           <h3 className="h-[500px] text-white font-bold text-center bg-black">
-            Test
+            Test2
           </h3>
         </div>
         <div>
           <h3 className="h-[500px] text-white font-bold text-center bg-black">
-            Test
+            Test3
           </h3>
         </div>
         <div>
           <h3 className="h-[500px] text-white font-bold text-center bg-black">
-            Test
+            Test4
           </h3>
         </div>
       </Carousel>
@@ -63,8 +59,7 @@ const LangdingPage = () => {
       <div className="h-max-screen h-screen">Container</div>
       {/* List Product  */}
       
-      {/* Footer  */}
-      <FooterComponent />
+
     </div>
   );
 };

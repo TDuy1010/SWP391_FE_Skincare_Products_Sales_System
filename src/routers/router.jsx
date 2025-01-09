@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../layout/RootLayout";
-
-import LangdingPage from "../page/LandingPage";
+import LoginPage from "../page/LoginPage/LoginPage" ;
+import LangdingPage from "../page/LandingPage/LandingPage";
 
 export const router = createBrowserRouter ([
   {
@@ -12,6 +12,10 @@ export const router = createBrowserRouter ([
         path: "",
         element: <LangdingPage />,
       },
+      {
+        path: "/login",
+        element: <LoginPage/>
+      }
     ],
   },
 ]);
