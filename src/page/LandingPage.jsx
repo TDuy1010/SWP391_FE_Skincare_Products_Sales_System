@@ -2,6 +2,7 @@ import React from "react";
 import HeaderComponent from "../components/Header";
 import FooterComponent from "../components/Footer";
 import { Carousel } from "antd";
+import imgProduct from '../assets/product-ex.jpg';
 
 const LangdingPage = () => {
   return (
@@ -38,7 +39,7 @@ const LangdingPage = () => {
             <img
               src="https://media.cnn.com/api/v1/images/stellar/prod/210803094851-best-skincare-products-over-40-dr-loretta.jpg?q=w_1600,h_902,x_0,y_0,c_fill"
               alt="Skincare product"
-              className="rounded-md shadow-md"
+              className="rounded-md"
             />
           </div>
 
@@ -60,9 +61,42 @@ const LangdingPage = () => {
           </div>
         </div>
       </div>
-      <div className="h-max-screen h-screen">Container</div>
       {/* List Product  */}
-      
+      <div>
+      <p>Parsley Seed Skin Care</p>
+      <h2>Supreme Skin Fortification</h2>
+      <p>Discover our potent antioxidiant-rich Parsley Seed Skin Care, perfect for all skin types.</p>
+      <div className="flex justify-center m-4">
+      <div className="grid grid-cols-4 gap-4 max-w-7xl">
+        <div className="cursor-pointer hover:bg-black">
+        <img
+              src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1721749856-1721299452-allies-of-skin-peptides-firming-daily-treatment-6698f1b735c1e.png?crop=0.625xw:0.785xh;0.191xw,0.215xh&resize=980:*"
+              alt="Skincare product"
+            />
+        </div>
+        <div className="cursor-pointer hover:bg-black">
+        <img
+              src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1721749856-1721299452-allies-of-skin-peptides-firming-daily-treatment-6698f1b735c1e.png?crop=0.625xw:0.785xh;0.191xw,0.215xh&resize=980:*"
+              alt="Skincare product"
+            />
+        </div>
+        <div className="cursor-pointer hover:bg-stone-200">
+        <img
+              src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1721749856-1721299452-allies-of-skin-peptides-firming-daily-treatment-6698f1b735c1e.png?crop=0.625xw:0.785xh;0.191xw,0.215xh&resize=980:*"
+              alt="Skincare product"
+              className="w-full"
+            />
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora ullam totam at quisquam aliquam quo, excepturi nisi sequi doloribus iure voluptatum nam commodi facere assumenda placeat consequuntur ab explicabo tempore.</p>
+        </div>
+        <div className="cursor-pointer hover:bg-black">
+        <img
+              src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1721749856-1721299452-allies-of-skin-peptides-firming-daily-treatment-6698f1b735c1e.png?crop=0.625xw:0.785xh;0.191xw,0.215xh&resize=980:*"
+              alt="Skincare product"
+            />
+        </div>
+      </div>
+      </div>
+      </div>
       {/* Footer  */}
       <FooterComponent />
     </div>
