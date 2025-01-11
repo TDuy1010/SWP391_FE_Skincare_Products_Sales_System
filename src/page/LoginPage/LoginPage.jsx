@@ -1,151 +1,211 @@
-import { useState } from "react";
-import img1 from "../../assets/hero-photo.png";
+import React, { useState, useEffect } from 'react';
+import img1 from '../../assets/img/hero-photo.png';
 
-const LoginPage = () => {
+const LoginModal = ({ isOpen, onClose }) => {
   const [showCreateAccount, setShowCreateAccount] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  // Reset states when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setShowCreateAccount(false);
+      setShowForgotPassword(false);
+    }
+  }, [isOpen]);
+
+  // Handle close with reset
+  const handleClose = () => {
+    onClose();
+    setShowCreateAccount(false);
+    setShowForgotPassword(false);
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="flex flex-col lg:flex-row h-min bg-gray-50">
-      {/* Image Carousel Section */}
-      <div className="hidden lg:flex w-full lg:w-1/2 h-auto items-center justify-center bg-gray-200">
-        <img
-          src={img1}
-          alt="Discover our products"
-          className="w-full h-full object-cover"
-        />
-      </div>
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Overlay */}
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        onClick={handleClose}
+      />
+      
+      {/* Modal */}
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="relative bg-white w-full max-w-5xl rounded-lg shadow-xl flex overflow-hidden">
+          {/* Left Side - Image */}
+          <div className="hidden lg:block w-1/2 relative">
+            <img
+              src={img1}
+              alt="Beauty Product"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
 
-      {/* Login or Create Account Form Section */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-10 bg-white">
-        <div className="w-full max-w-md">
-          {!showCreateAccount ? (
-            <>
-              {/* Login Form */}
-              <h2 className="mb-8 text-3xl font-semibold text-gray-900 text-center lg:text-left">
-                Log in to your account
-              </h2>
-              <form action="/login" method="POST">
-                {/* Email Input */}
-                <div className="relative mb-6">
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter Email"
-                    className="w-full border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-                    required
-                  />
+          {/* Right Side - Forms */}
+          <div className="w-full lg:w-1/2 p-8">
+            {/* Close button */}
+            <button 
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-500"
+              onClick={handleClose}
+            >
+              <span className="text-2xl">&times;</span>
+            </button>
+
+            {!showCreateAccount && !showForgotPassword ? (
+              // Login Form
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold text-gray-900">Log in to your account</h2>
+                
+                <form className="space-y-6">
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Enter Email"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <input
+                      type="password"
+                      placeholder="Enter Password"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+
+                  <div className="text-right">
+                    <button 
+                      type="button" 
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      Forgotten password?
+                    </button>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition"
+                  >
+                    Login
+                  </button>
+                </form>
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-4">New to SKYN?</p>
+                  <button
+                    onClick={() => setShowCreateAccount(true)}
+                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+                  >
+                    Create account
+                    <span className="ml-2">→</span>
+                  </button>
                 </div>
-
-                {/* Password Input */}
-                <div className="relative mb-6">
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter Password"
-                    className="w-full border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-                    required
-                  />
-                </div>
-
-                {/* Forgotten Password */}
-                <div className="mb-8 text-right">
-                  <a href="#" className="text-sm text-gray-600 hover:underline">
-                    Forgotten password?
-                  </a>
-                </div>
-
-                {/* Login Button */}
-                <button
-                  type="submit"
-                  className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition mb-6"
-                >
-                  Login
-                </button>
-              </form>
-
-              {/* New Account Section */}
-              <div className="text-sm text-gray-600 text-center">
-                <p className="mb-4">New to CEIN.?</p>
-                <button
-                  onClick={() => setShowCreateAccount(true)}
-                  className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
-                >
-                  Create account
-                  <span className="ml-2 text-gray-500">→</span>
-                </button>
               </div>
-            </>
-          ) : (
-            <>
-              {/* Create Account Form */}
-              <h2 className="mb-8 text-3xl font-semibold text-gray-900 text-center lg:text-left">
-                Create your account
-              </h2>
-              <form action="/register" method="POST">
-                <div className="relative mb-6">
-                  <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Full Name"
-                    className="w-full border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-                    required
-                  />
+            ) : showCreateAccount ? (
+              // Create Account Form
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold text-gray-900">Create your account</h2>
+                
+                <form className="space-y-6">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Full Name"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="password"
+                      placeholder="Create Password"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="confirm password"
+                      placeholder="Confirm Password"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition"
+                  >
+                    Create Account
+                  </button>
+                </form>
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-4">Already have an account?</p>
+                  <button
+                    onClick={() => setShowCreateAccount(false)}
+                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+                  >
+                    Back to login
+                    <span className="ml-2">→</span>
+                  </button>
                 </div>
-
-                <div className="relative mb-6">
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter Email"
-                    className="w-full border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-                    required
-                  />
-                </div>
-
-                <div className="relative mb-6">
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Create Password"
-                    className="w-full border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-                    required
-                  />
-                </div>
-
-                <div className="relative mb-6">
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Confirm Password"
-                    className="w-full border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition mb-6"
-                >
-                  Create Account
-                </button>
-              </form>
-
-              <div className="text-sm text-gray-600 text-center">
-                <p className="mb-4">Already have an account?</p>
-                <button
-                  onClick={() => setShowCreateAccount(false)}
-                  className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
-                >
-                  Back to login
-                  <span className="ml-2 text-gray-500">→</span>
-                </button>
               </div>
-            </>
-          )}
+            ) : (
+              // Forgot Password Form
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold text-gray-900">Reset your password</h2>
+                <p className="text-sm text-gray-600">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+                
+                <form className="space-y-6">
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition"
+                  >
+                    Send Reset Link
+                  </button>
+                </form>
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-4">Remember your password?</p>
+                  <button
+                    onClick={() => setShowForgotPassword(false)}
+                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+                  >
+                    Back to login
+                    <span className="ml-2">→</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default LoginModal;
