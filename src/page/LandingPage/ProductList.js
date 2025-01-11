@@ -1,4 +1,4 @@
-import imgProduct from '../../assets/product-ex.jpg'
+import imgProduct from '../../assets/img/product-landingPage.jpg'
 
 export const products = [{
     tag: "BESTSELLER",
@@ -6,7 +6,7 @@ export const products = [{
     description: "A Vitamin C-rich layering serum",
     size: "60 ml",
     price: 94,
-    imgSrc: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpnSYUlTdAR1nqMMklbTPA5L_NF7AkE5br0w&s',
+    imgSrc: imgProduct,
   },
   {
     tag: "NEW FORMULA",
@@ -14,19 +14,19 @@ export const products = [{
     description: "Hand cream with sunscreen SPF10",
     size: "50 ml",
     price: 22,
-    imgSrc: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpnSYUlTdAR1nqMMklbTPA5L_NF7AkE5br0w&s",
+    imgSrc: imgProduct,
   },
   {
     name: "Gentle Balancing Toner",
     description: "Balancing Toner",
     size: "200 ml",
     price: 32,
-    imgSrc: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpnSYUlTdAR1nqMMklbTPA5L_NF7AkE5br0w&s",
+    imgSrc: imgProduct,
   },
   {
     name: "Sublime Replenishing Night Masque",
     description: "Overnight redeemer with Vitamins B",
     size: "60 ml",
     price: 100,
-    imgSrc: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpnSYUlTdAR1nqMMklbTPA5L_NF7AkE5br0w&s",
+    imgSrc: imgProduct,
   },];

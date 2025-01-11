@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { motion } from "framer-motion";
 import img1 from "../../assets/img/hero-photo.png";
+import heroImg from "../../assets/img/hero-landingPage.png";
 
 const LangdingPage = () => {
   const fadeIn = {
@@ -134,8 +135,7 @@ const LangdingPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url('https://oakessentials.com/cdn/shop/files/mobile-plp-hero-skincare.jpg')",
+            backgroundImage: `url(${heroImg})`
           }}
         ></div>
 
