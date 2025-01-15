@@ -1,6 +1,7 @@
 import ProductCard from "../LandingPage/ProductCard";
 import { products } from "../LandingPage/ProductList";
 import { motion } from "framer-motion";
+import HeroSection from "../../components/HeroSection/HeroSection";
 
 
 
@@ -13,26 +14,18 @@ const ShopPagce = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center mb-20">
-        <div className="relative w-full">
-          <img src="https://placehold.co/1920x600" alt="Close-up of a dropper applying oil to skin" className="w-full h-96 object-cover" />
-          <div className="absolute top-1/4 left-1/4 text-white">
-            <h1 className="text-4xl font-semibold">Skin Care</h1>
-            <p className="mt-4 text-lg">The skin is constantly changing, influenced by the environment, lifestyle, and diet. Our range is crafted with this in consideration, addressing various preferences and needs to help you achieve optimal skin health.</p>
-          </div>
-        </div>
-        <div className="bg-gray-100 w-full py-4">
-          <div className="flex justify-center space-x-4">
-            <button className="px-4 py-2 border-b-2 border-black">Shop All</button>
-            <button className="px-4 py-2">Cleanse</button>
-            <button className="px-4 py-2">Exfoliate</button>
-            <button className="px-4 py-2">Treat & Masque</button>
-            <button className="px-4 py-2">Tone</button>
-            <button className="px-4 py-2">Hydrate</button>
-            <button className="px-4 py-2">Eyes & Lips</button>
-            <button className="px-4 py-2">Sun Care</button>
-            <button className="px-4 py-2">Shave</button>
-          </div>
+      <HeroSection />
+      <div className="bg-gray-100 w-full py-4">
+        <div className="flex justify-center space-x-4">
+          <button className="px-4 py-2 border-b-2 border-black">Shop All</button>
+          <button className="px-4 py-2">Cleanse</button>
+          <button className="px-4 py-2">Exfoliate</button>
+          <button className="px-4 py-2">Treat & Masque</button>
+          <button className="px-4 py-2">Tone</button>
+          <button className="px-4 py-2">Hydrate</button>
+          <button className="px-4 py-2">Eyes & Lips</button>
+          <button className="px-4 py-2">Sun Care</button>
+          <button className="px-4 py-2">Shave</button>
         </div>
       </div>
 

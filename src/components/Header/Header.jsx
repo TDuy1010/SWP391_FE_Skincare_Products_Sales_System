@@ -14,6 +14,9 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showShopMenu, setShowShopMenu] = useState(false);
+  const shopMenuRef = useRef(null);
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
+  const shopButtonRef = useRef(null);
 
   const handleSearch = () => {
     if (searchValue.trim()) {
@@ -52,6 +55,24 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (shopMenuRef.current && !shopMenuRef.current.contains(event.target)) {
+        setShowShopMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleShopClick = (e) => {
+    e.stopPropagation();
+    setIsShopDropdownOpen(!isShopDropdownOpen);
+  };
+
   return (
     <>
       {isScrolled && <div className="h-16" />}
@@ -67,20 +88,20 @@ const Header = () => {
             {/* Left Section: Navigation Links */}
             <nav className="flex-1 hidden md:flex text-sm font-medium text-gray-700">
               {/* Shop Button with Dropdown */}
-              <div className="relative group">
+              <div className="relative" ref={shopMenuRef}>
                 <button
-                  className="relative px-6 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200"
-                  onClick={() => setShowShopMenu(!showShopMenu)}
+                  ref={shopButtonRef}
+                  onClick={handleShopClick}
+                  className="relative px-6 py-5 h-16 hover:text-black hover:bg-gray-100 transition-colors duration-200 text-gray-700 group"
                 >
                   Shop
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </button>
-                {showShopMenu && (
-                  <ShopDropdown 
-                    isOpen={showShopMenu} 
-                    onClose={() => setShowShopMenu(false)} 
-                  />
-                )}
+                <ShopDropdown 
+                  isOpen={isShopDropdownOpen} 
+                  onClose={() => setIsShopDropdownOpen(false)}
+                  shopButtonRef={shopButtonRef}
+                />
               </div>
 
               <div className="relative group">

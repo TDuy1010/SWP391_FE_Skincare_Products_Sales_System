@@ -1,13 +1,13 @@
-import { Carousel } from "antd";
-import { products } from "./ProductList";
-import ProductCard from "./ProductCard";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { products } from "./ProductList";
+import ProductCard from "./ProductCard";
+import HeroSection from "../../components/HeroSection/HeroSection";
 import img1 from "../../assets/img/hero-photo.png";
 import heroImg from "../../assets/img/hero-landingPage.png";
 
-const LangdingPage = () => {
+const LandingPage = () => {
   const fadeIn = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
@@ -21,23 +21,7 @@ const LangdingPage = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <Carousel autoplay>
-        {[
-          "https://media.hcdn.vn/hsk/1732069393web.jpg",
-          "https://www.larocheposay.vn/-/media/project/loreal/brand-sites/lrp/apac/vn/simple-page/landing-page/spotscan-plus/entry-points/lrpspotscansitecoredesktopbanner1440x450pxzoe.jpg",
-          "https://jda.com.vn/wp-content/uploads/2024/12/J27L-J64-J115-web-copy-1-1400x455.jpg",
-        ].map((src, index) => (
-          <motion.div
-            key={index}
-            className="h-[500px] text-white font-bold text-center bg-black"
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-          >
-            <img className="w-full h-full" src={src} alt={`hero-${index}`} />
-          </motion.div>
-        ))}
-      </Carousel>
+      <HeroSection />
 
       {/* Product's Content */}
       <motion.div
@@ -214,4 +198,4 @@ const LangdingPage = () => {
   );
 };
 
-export default LangdingPage;
+export default LandingPage;
