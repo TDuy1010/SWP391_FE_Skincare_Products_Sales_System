@@ -6,6 +6,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { Link} from "react-router-dom";
 import LoginModal from '../../page/LoginPage/LoginPage';
 import ShopDropdown from './ShopDropdown';
+import { FiUser } from 'react-icons/fi';
 
 const Header = () => {
   const [showSearch, setShowSearch] = useState(false);
@@ -17,6 +18,9 @@ const Header = () => {
   const shopMenuRef = useRef(null);
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   const shopButtonRef = useRef(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [user, setUser] = useState(null);
+  const menuRef = useRef(null);
 
   const handleSearch = () => {
     if (searchValue.trim()) {
@@ -68,9 +72,37 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleShopClick = (e) => {
     e.stopPropagation();
     setIsShopDropdownOpen(!isShopDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setShowUserMenu(false);
+  };
+
+  const handleProfileClick = () => {
+    setShowUserMenu(false);
   };
 
   return (
@@ -183,15 +215,43 @@ const Header = () => {
                 </Link>
               </div>
 
-              {/* Login Button */}
-              <div className="relative group">
-                <button 
-                  onClick={() => setShowLoginModal(true)}
-                  className="relative h-16 px-4 flex items-center hover:bg-gray-100 transition-colors duration-200 text-sm font-medium text-gray-700 hover:text-black"
-                >
-                  Login
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </button>
+              {/* Login/User Button */}
+              <div className="relative group" ref={menuRef}>
+                {user ? (
+                  <div className="relative">
+                    <button 
+                      className="relative h-16 px-4 flex items-center hover:bg-gray-100 transition-colors duration-200"
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                    >
+                      <FiUser size={20} className="text-gray-700 hover:text-black" />
+                    </button>
+                    
+                    {showUserMenu && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                        <Link 
+                          to="/profile" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={handleProfileClick}
+                        >
+                          Profile
+                        </Link>
+                        <button 
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setShowLoginModal(true)}
+                    className="relative h-16 px-4 flex items-center hover:bg-gray-100 transition-colors duration-200 text-sm font-medium text-gray-700 hover:text-black"
+                  >
+                    Login
+                  </button>
+                )}
               </div>
 
               {/* Cart Link */}

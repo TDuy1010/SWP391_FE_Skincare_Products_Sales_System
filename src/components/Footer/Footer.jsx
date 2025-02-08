@@ -1,7 +1,7 @@
 const Footer = () => {
   return (
-    <footer className="bg-black text-white py-8">
-      <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+    <footer className="bg-black text-white py-8 mt-auto">
+      <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
         {/* Logo and Social Links */}
         <div className="col-span-2 md:col-span-1">
           <h2 className="text-xl font-bold">SKYN.</h2>
