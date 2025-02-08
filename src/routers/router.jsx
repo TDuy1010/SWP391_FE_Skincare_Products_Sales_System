@@ -7,6 +7,7 @@ import BlogPage from "../page/BlogPage/BlogPage";
 import CartPage from "../page/CartPage/CartPage";
 import ShopPagce from "../page/ShopPage/ShopPagce";
 import HelpPage from "../page/HelpPage/HelpPage";
+import AdminPage from "../page/Admin/AdminPage";
 
 export const router = createBrowserRouter ([
   {
@@ -44,5 +45,9 @@ export const router = createBrowserRouter ([
 
     ],
   },
+  {
+    path :"/admin",
+    element: <AdminPage/>
+  }
 ]);
 
