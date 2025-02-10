@@ -1,8 +1,13 @@
 import { motion } from 'framer-motion';
 import { blogPosts, featuredArticles } from './BlogPost';
 import img3 from '../../assets/img/hero-landingPage.png';
+import { useEffect } from "react";
 
 const BlogPage = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const containerAnimation = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }

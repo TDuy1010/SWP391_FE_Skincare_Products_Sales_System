@@ -7,6 +7,9 @@ import BlogPage from "../page/BlogPage/BlogPage";
 import CartPage from "../page/CartPage/CartPage";
 import ShopPagce from "../page/ShopPage/ShopPagce";
 import HelpPage from "../page/HelpPage/HelpPage";
+import AdminPage from "../page/Admin/AdminPage";
+import Payment from "../page/PaymentPage/Payment";
+import ProfilePage from "../page/Profile/ProfilePage";
 
 export const router = createBrowserRouter ([
   {
@@ -31,7 +34,8 @@ export const router = createBrowserRouter ([
       },
       {
         path: "/cart",
-        element: <CartPage/>
+        element: <CartPage/>,
+
       },
       {
         path: "/shop",
@@ -40,9 +44,21 @@ export const router = createBrowserRouter ([
       {
         path: "/helps",
         element: <HelpPage/>
+      },
+      {
+        path:"/payment",
+        element:<Payment/>
+      },
+      {
+        path:"/profile",
+        element:<ProfilePage/>
       }
 
     ],
   },
+  {
+    path :"/admin",
+    element: <AdminPage/>
+  }
 ]);
 

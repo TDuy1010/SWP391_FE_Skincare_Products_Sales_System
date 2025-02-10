@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import img1 from '../../assets/img/hero-photo.png';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+  // Tài khoản demo
+  const DEMO_ACCOUNT = {
+    email: 'duy',
+    password: '123456',
+    fullName: 'Demo User',
+  };
 
   // Reset states when modal closes
   useEffect(() => {
@@ -18,6 +30,19 @@ const LoginModal = ({ isOpen, onClose }) => {
     onClose();
     setShowCreateAccount(false);
     setShowForgotPassword(false);
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    if (formData.email === DEMO_ACCOUNT.email && 
+        formData.password === DEMO_ACCOUNT.password) {
+      localStorage.setItem('user', JSON.stringify(DEMO_ACCOUNT));
+      onClose();
+      window.location.reload(); // Reload để cập nhật header
+    } else {
+      alert('Invalid email or password');
+    }
   };
 
   if (!isOpen) return null;
@@ -64,6 +89,8 @@ const LoginModal = ({ isOpen, onClose }) => {
                       placeholder="Enter Email"
                       className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
                       required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
                   </div>
 
@@ -73,6 +100,8 @@ const LoginModal = ({ isOpen, onClose }) => {
                       placeholder="Enter Password"
                       className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
                       required
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
                   </div>
 
@@ -89,6 +118,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition"
+                    onClick={handleLogin}
                   >
                     Login
                   </button>

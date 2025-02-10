@@ -1,11 +1,15 @@
 import ProductCard from "../LandingPage/ProductCard";
 import { products } from "../LandingPage/ProductList";
 import { motion } from "framer-motion";
-import HeroSection from "../../components/HeroSection/HeroSection";
+import img3 from '../../assets/img/hero-landingPage.png';
+import { useEffect } from "react";
 
 
 
 const ShopPagce = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 50 },
@@ -14,7 +18,22 @@ const ShopPagce = () => {
 
   return (
     <>
-      <HeroSection />
+    
+    <div className="relative h-[500px] w-full">
+        <img 
+          src={img3}
+          alt="Skin Care" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center">
+          <div className="container mx-auto px-4">
+            <h1 className="text-white text-5xl font-light">Skin Care</h1>
+            <p className="text-white mt-4 max-w-xl">
+              The skin is constantly changing, influenced by the environment, lifestyle, and diet. Our range is crafted with this in consideration, addressing various prevention and needs to help you achieve optimal skin health.
+            </p>
+          </div>
+        </div>
+      </div>
       <div className="bg-gray-100 w-full py-4">
         <div className="flex justify-center space-x-4">
           <button className="px-4 py-2 border-b-2 border-black">Shop All</button>

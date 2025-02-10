@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FindRoutine from './FindRoutine/FindRoutine';
 import Determine from './Determine/Determine';
 
 const HelpPage = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const topics = [
     { icon: "🔍", title: "Determine your skin type", id: "determine" },

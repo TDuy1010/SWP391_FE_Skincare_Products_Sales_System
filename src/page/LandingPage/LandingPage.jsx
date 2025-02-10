@@ -6,8 +6,13 @@ import ProductCard from "./ProductCard";
 import HeroSection from "../../components/HeroSection/HeroSection";
 import img1 from "../../assets/img/hero-photo.png";
 import heroImg from "../../assets/img/hero-landingPage.png";
+import { useEffect } from "react";
 
 const LandingPage = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const fadeIn = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
