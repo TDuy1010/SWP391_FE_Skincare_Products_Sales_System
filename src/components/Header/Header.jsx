@@ -170,7 +170,7 @@ const Header = () => {
             {/* Center Section: Logo */}
             <Link 
               to="/"
-              className="flex-1 text-center text-xl font-bold cursor-pointer"
+              className="flex-1 text-center text-3xl font-bold cursor-pointer"
             >
               SKYN
             </Link>

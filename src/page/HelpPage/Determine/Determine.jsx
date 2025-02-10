@@ -55,7 +55,7 @@ const Determine = () => {
 
   return (
     <motion.div
-      className="h-[calc(100vh-64px)] bg-white overflow-y-auto"
+      className="min-h-[calc(100vh-64px)] bg-white overflow-y-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -63,79 +63,61 @@ const Determine = () => {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {!result ? (
           <>
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="h-1 bg-gray-200 rounded-full">
-                <motion.div
-                  className="h-full bg-black rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${(step / Object.keys(skinTypeQuestions).length) * 100}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-              <div className="mt-2 text-sm text-gray-500 text-right">
-                {step}/{Object.keys(skinTypeQuestions).length}
-              </div>
-            </div>
-
-            {/* Question Section */}
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
-              <h2 className="text-3xl font-semibold mb-4">{skinTypeQuestions[step].title}</h2>
-              <p className="text-gray-600 mb-8">Vui lòng chọn một đáp án</p>
+            <h1 className="text-3xl font-semibold mb-8 text-center">Xác định loại da của bạn</h1>
+            
+            {/* Hiển thị tất cả câu hỏi */}
+            {Object.entries(skinTypeQuestions).map(([questionNumber, question]) => {
+              const questionKey = Object.keys(answers)[questionNumber - 1];
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                {skinTypeQuestions[step].options.map((option) => (
-                  <motion.button
-                    key={option.id}
-                    onClick={() => {
-                      const currentQuestion = Object.keys(answers)[step-1];
-                      handleAnswer(currentQuestion, option.id);
-                    }}
-                    className={`
-                      p-6 rounded-xl transition-all duration-200
-                      ${answers[Object.keys(answers)[step-1]] === option.id 
-                        ? 'bg-black text-white border-2 border-black shadow-lg' 
-                        : 'bg-white border-2 border-gray-200 hover:border-black'}
-                    `}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex flex-col items-center justify-center">
-                      <span className="text-lg font-medium">{option.label}</span>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
+              return (
+                <motion.div
+                  key={questionNumber}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-12 p-6 border rounded-xl"
+                >
+                  <h2 className="text-xl font-semibold mb-4">Câu {questionNumber}: {question.title}</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {question.options.map((option) => (
+                      <motion.button
+                        key={option.id}
+                        onClick={() => handleAnswer(questionKey, option.id)}
+                        className={`
+                          p-4 rounded-xl transition-all duration-200
+                          ${answers[questionKey] === option.id 
+                            ? 'bg-black text-white border-2 border-black shadow-lg' 
+                            : 'bg-white border-2 border-gray-200 hover:border-black'}
+                        `}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <span className="text-lg font-medium">{option.label}</span>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
 
-            {/* Navigation Buttons */}
-            <div className="mt-12 flex justify-between max-w-2xl mx-auto">
-              {step > 1 && (
-                <motion.button
-                  onClick={() => setStep(prev => prev - 1)}
-                  className="px-8 py-3 rounded-lg border-2 border-black hover:bg-black hover:text-white transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Quay lại
-                </motion.button>
-              )}
-              {step === Object.keys(skinTypeQuestions).length && (
-                <motion.button
-                  onClick={handleSeeResult}
-                  className="px-8 py-3 rounded-lg bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors ml-auto"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Xem kết quả
-                </motion.button>
-              )}
+            {/* Nút xem kết quả */}
+            <div className="text-center mt-8">
+              <motion.button
+                onClick={handleSeeResult}
+                disabled={Object.values(answers).some(answer => answer === '')}
+                className={`
+                  px-8 py-3 rounded-lg border-2 border-black
+                  ${Object.values(answers).some(answer => answer === '')
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-black text-white hover:bg-white hover:text-black transition-colors'}
+                `}
+                whileHover={{ scale: Object.values(answers).some(answer => answer === '') ? 1 : 1.02 }}
+                whileTap={{ scale: Object.values(answers).some(answer => answer === '') ? 1 : 0.98 }}
+              >
+                Xem kết quả
+              </motion.button>
             </div>
           </>
         ) : (
