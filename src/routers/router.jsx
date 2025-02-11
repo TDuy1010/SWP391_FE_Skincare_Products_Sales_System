@@ -10,6 +10,7 @@ import HelpPage from "../page/HelpPage/HelpPage";
 import AdminPage from "../page/Admin/AdminPage";
 import Payment from "../page/PaymentPage/Payment";
 import ProfilePage from "../page/Profile/ProfilePage";
+import ProductDetail from "../page/ProductPage/ProductDetail";
 
 export const router = createBrowserRouter ([
   {
@@ -39,12 +40,17 @@ export const router = createBrowserRouter ([
       },
       {
         path: "/shop",
-        element: <ShopPagce/>
+        element: <ShopPagce/>,
+      },
+      {
+        path: "/product-detail",
+        element: <ProductDetail/>
       },
       {
         path: "/helps",
         element: <HelpPage/>
       },
+
       {
         path:"/payment",
         element:<Payment/>
