@@ -6,12 +6,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(imgProduct);
   const [openSection, setOpenSection] = useState(null);
-  const thumbnailImages = [
-    imgProduct,
-    "/path-to-thumbnail1.jpg",
-    "/path-to-thumbnail2.jpg",
-    "/path-to-thumbnail3.jpg",
-  ];
+  const thumbnailImages = [imgProduct, imgProduct, imgProduct, imgProduct];
 
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
