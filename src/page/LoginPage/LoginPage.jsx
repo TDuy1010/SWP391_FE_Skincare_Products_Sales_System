@@ -33,7 +33,6 @@ const LoginModal = ({ isOpen, onClose }) => {
     try {
       const response = await login(formData.username, formData.password);
       console.log("API Response:", response);
-
       if (response?.error) {
         setError(response.message);
         return;
@@ -41,11 +40,13 @@ const LoginModal = ({ isOpen, onClose }) => {
 
       if (response?.code === 200) {
         const token = response.result.token;
+        const username = formData.username;
         console.log("token", token);
         localStorage.setItem("token", token);
+        localStorage.setItem("username", username);
         onClose();
         navigate("/");
-        // window.location.reload();
+        window.location.reload();
       } else {
         setError(response.message || "Invalid username or password");
       }

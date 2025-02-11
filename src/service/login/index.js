@@ -9,6 +9,7 @@ export const login = async (username, password) => {
 
     console.log(response); // Kiểm tra response có dữ liệu hay không
     localStorage.setItem("token", response.result.token);
+    localStorage.setItem("username", username);
     return response; // ✅ Return response nếu thành công
   } catch (error) {
     console.error("Login error:", error);
