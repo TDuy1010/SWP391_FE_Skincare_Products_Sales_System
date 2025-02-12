@@ -40,3 +40,27 @@ export const questions = {
       ]
     }
   };
+
+export const routineSteps = {
+  basic: [
+    { step: 1, name: 'Sữa rửa mặt', description: 'Làm sạch da' },
+    { step: 2, name: 'Kem dưỡng ẩm', description: 'Cung cấp độ ẩm cho da' },
+    { step: 3, name: 'Kem chống nắng', description: 'Bảo vệ da khỏi tác hại của ánh nắng' }
+  ],
+  moderate: [
+    { step: 1, name: 'Sữa rửa mặt', description: 'Làm sạch da' },
+    { step: 2, name: 'Toner', description: 'Cân bằng độ pH' },
+    { step: 3, name: 'Serum', description: 'Điều trị các vấn đề về da' },
+    { step: 4, name: 'Kem dưỡng ẩm', description: 'Cung cấp độ ẩm cho da' },
+    { step: 5, name: 'Kem chống nắng', description: 'Bảo vệ da khỏi tác hại của ánh nắng' }
+  ],
+  advanced: [
+    { step: 1, name: 'Tẩy trang', description: 'Loại bỏ lớp trang điểm và bụi bẩn' },
+    { step: 2, name: 'Sữa rửa mặt', description: 'Làm sạch da' },
+    { step: 3, name: 'Toner', description: 'Cân bằng độ pH' },
+    { step: 4, name: 'Essence', description: 'Dưỡng ẩm và tái tạo da' },
+    { step: 5, name: 'Serum', description: 'Điều trị các vấn đề về da' },
+    { step: 6, name: 'Kem dưỡng ẩm', description: 'Cung cấp độ ẩm cho da' },
+    { step: 7, name: 'Kem chống nắng', description: 'Bảo vệ da khỏi tác hại của ánh nắng' }
+  ]
+};

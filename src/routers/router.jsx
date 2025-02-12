@@ -8,6 +8,9 @@ import CartPage from "../page/CartPage/CartPage";
 import ShopPagce from "../page/ShopPage/ShopPagce";
 import HelpPage from "../page/HelpPage/HelpPage";
 import AdminPage from "../page/Admin/AdminPage";
+import Payment from "../page/PaymentPage/Payment";
+import ProfilePage from "../page/Profile/ProfilePage";
+import ProductDetail from "../page/ProductPage/ProductDetail";
 import UserManagement from "../page/Admin/User/UserManagement";
 import Dashboard from "../page/Admin/Dashboard/Dashboard";
 import OrderManagement from "../page/Admin/Order/OrderManagement";
@@ -36,15 +39,29 @@ export const router = createBrowserRouter ([
       },
       {
         path: "/cart",
-        element: <CartPage/>
+        element: <CartPage/>,
+
       },
       {
         path: "/shop",
-        element: <ShopPagce/>
+        element: <ShopPagce/>,
+      },
+      {
+        path: "/product-detail",
+        element: <ProductDetail/>
       },
       {
         path: "/helps",
         element: <HelpPage/>
+      },
+
+      {
+        path:"/payment",
+        element:<Payment/>
+      },
+      {
+        path:"/profile",
+        element:<ProfilePage/>
       }
 
     ],
