@@ -7,16 +7,16 @@ export const login = async (username, password) => {
       password,
     });
 
-    console.log(response); // Kiểm tra response có dữ liệu hay không
+    console.log(response);
     localStorage.setItem("token", response.result.token);
     localStorage.setItem("username", username);
-    return response; // ✅ Return response nếu thành công
+    return response;
   } catch (error) {
     console.error("Login error:", error);
 
     return {
       error: true,
-      message: error.response?.message || "Login failed",
-    }; // ✅ Return error object
+      message: error.response?.data?.message || "Login failed!",
+    };
   }
 };

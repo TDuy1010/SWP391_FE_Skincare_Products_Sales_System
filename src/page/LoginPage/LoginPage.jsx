@@ -6,24 +6,28 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import { login } from "../../service/login/index"; // Import API login
 
 const LoginModal = ({ isOpen, onClose }) => {
-  const [showCreateAccount, setShowCreateAccount] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [activeForm, setActiveForm] = useState("login"); // "login", "register", "forgotPassword"
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOpen) {
-      setShowCreateAccount(false);
-      setShowForgotPassword(false);
+      setActiveForm("login");
       setError("");
+      setFormData({ username: "", password: "" });
     }
   }, [isOpen]);
 
+  const handleFormChange = (form) => {
+    setError("");
+    setActiveForm(form);
+  };
+
   const handleClose = () => {
     onClose();
-    setShowCreateAccount(false);
-    setShowForgotPassword(false);
+    setActiveForm("login");
+    setError("");
   };
 
   const handleLogin = async (e) => {
@@ -33,41 +37,33 @@ const LoginModal = ({ isOpen, onClose }) => {
     try {
       const response = await login(formData.username, formData.password);
       console.log("API Response:", response);
-      if (response?.error) {
+
+      if (response?.error || response?.code !== 200) {
         setError(response.message);
         return;
       }
 
-      if (response?.code === 200) {
-        const token = response.result.token;
-        const username = formData.username;
-        console.log("token", token);
-        localStorage.setItem("token", token);
-        localStorage.setItem("username", username);
-        onClose();
-        navigate("/");
-        window.location.reload();
-      } else {
-        setError(response.message || "Invalid username or password");
-      }
+      localStorage.setItem("token", response.result.token);
+      localStorage.setItem("username", formData.username);
+      onClose();
+      navigate("/");
+      window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please check your credentials.");
     }
   };
+
   if (!isOpen) return null;
 
   const renderForm = () => {
-    if (showCreateAccount) {
-      return <RegisterForm onBackToLogin={() => setShowCreateAccount(false)} />;
-    }
-    if (showForgotPassword) {
+    if (activeForm === "register")
+      return <RegisterForm onBackToLogin={() => handleFormChange("login")} />;
+    if (activeForm === "forgotPassword")
       return (
-        <ForgotPasswordForm
-          onBackToLogin={() => setShowForgotPassword(false)}
-        />
+        <ForgotPasswordForm onBackToLogin={() => handleFormChange("login")} />
       );
-    }
+
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold text-gray-900">
@@ -75,42 +71,35 @@ const LoginModal = ({ isOpen, onClose }) => {
         </h2>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <form className="space-y-6" onSubmit={handleLogin}>
-          <div>
-            <input
-              type="text"
-              placeholder="Enter Username"
-              className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-              required
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <input
-              type="password"
-              placeholder="Enter Password"
-              className="w-full p-3 border-b border-gray-300 bg-transparent text-gray-800 focus:outline-none focus:border-gray-900 placeholder-gray-500"
-              required
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-            />
-          </div>
-
+          <input
+            type="text"
+            placeholder="Enter Username"
+            className="w-full p-3 border-b border-gray-300 bg-transparent focus:outline-none"
+            required
+            value={formData.username}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
+          />
+          <input
+            type="password"
+            placeholder="Enter Password"
+            className="w-full p-3 border-b border-gray-300 bg-transparent focus:outline-none"
+            required
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+          />
           <div className="text-right">
             <button
               type="button"
-              onClick={() => setShowForgotPassword(true)}
+              onClick={() => handleFormChange("forgotPassword")}
               className="text-sm text-gray-600 hover:text-gray-900"
             >
               Forgotten password?
             </button>
           </div>
-
           <button
             type="submit"
             className="w-full px-4 py-3 bg-black text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition"
@@ -118,15 +107,13 @@ const LoginModal = ({ isOpen, onClose }) => {
             Login
           </button>
         </form>
-
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 mb-4">New to SKYN?</p>
           <button
-            onClick={() => setShowCreateAccount(true)}
-            className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+            onClick={() => handleFormChange("register")}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
           >
-            Create account
-            <span className="ml-2">→</span>
+            Create account →
           </button>
         </div>
       </div>
