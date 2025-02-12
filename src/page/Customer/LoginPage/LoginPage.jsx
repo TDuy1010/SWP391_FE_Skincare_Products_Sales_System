@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import img1 from "../../../assets/img/hero-photo.png";
 import RegisterForm from "./RegisterForm";
@@ -7,9 +7,13 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import { login } from "../../../service/login/index"; // Import API login
 
 const LoginModal = ({ isOpen, onClose }) => {
-  const [activeForm, setActiveForm] = useState("login"); // "login", "register", "forgotPassword"
+  const [activeForm, setActiveForm] = useState("login");
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const [errors, setErrors] = useState({ username: "", password: "", general: "" });
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    general: "",
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,7 +85,10 @@ const LoginModal = ({ isOpen, onClose }) => {
       window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
-      setErrors({ ...errors, general: "Login failed. Please check your credentials." });
+      setErrors({
+        ...errors,
+        general: "Login failed. Please check your credentials.",
+      });
     }
   };
 
@@ -100,7 +107,9 @@ const LoginModal = ({ isOpen, onClose }) => {
         <h2 className="text-2xl font-semibold text-gray-900">
           Log in to your account
         </h2>
-        {errors.general && <p className="text-red-500 text-sm">{errors.general}</p>}
+        {errors.general && (
+          <p className="text-red-500 text-sm">{errors.general}</p>
+        )}
         <form className="space-y-6" onSubmit={handleLogin}>
           <div>
             <input

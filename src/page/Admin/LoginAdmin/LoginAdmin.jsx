@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../../service/login/index"; // Import API login
 
@@ -9,6 +9,14 @@ const LoginAdmin = () => {
     password: "",
   });
   const [error, setError] = useState("");
+
+  // ✅ Kiểm tra nếu admin đã đăng nhập, chuyển hướng về Dashboard
+  useEffect(() => {
+    const adminUser = JSON.parse(localStorage.getItem("adminUser"));
+    if (adminUser?.token) {
+      navigate("/admin");
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,9 +44,7 @@ const LoginAdmin = () => {
           })
         );
 
-        // Điều hướng về trang admin dashboard
         navigate("/admin");
-        window.location.reload(); // Reload để cập nhật giao diện
       } else {
         setError("Tên đăng nhập hoặc mật khẩu không đúng");
       }

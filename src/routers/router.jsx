@@ -19,7 +19,7 @@ import AdminPage from "../page/Admin/AdminPage";
 import LoginAdmin from "../page/Admin/LoginAdmin/LoginAdmin";
 import { ProtectedAdminRoute } from "./ProtectedAdminRoute";
 
-export const router = createBrowserRouter ([
+export const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
@@ -30,43 +30,41 @@ export const router = createBrowserRouter ([
       },
       {
         path: "/login",
-        element: <LoginModal/>
+        element: <LoginModal />,
       },
       {
         path: "/about-us",
-        element: <AboutUsPage/>
+        element: <AboutUsPage />,
       },
       {
         path: "/blog",
-        element: <BlogPage/>
+        element: <BlogPage />,
       },
       {
         path: "/cart",
-        element: <CartPage/>,
-
+        element: <CartPage />,
       },
       {
         path: "/shop",
-        element: <ShopPagce/>,
+        element: <ShopPagce />,
       },
       {
         path: "/product-detail",
-        element: <ProductDetail/>
+        element: <ProductDetail />,
       },
       {
         path: "/helps",
-        element: <HelpPage/>
+        element: <HelpPage />,
       },
 
       {
-        path:"/payment",
-        element:<Payment/>
+        path: "/payment",
+        element: <Payment />,
       },
       {
-        path:"/profile",
-        element:<ProfilePage/>
-      }
-
+        path: "/profile",
+        element: <ProfilePage />,
+      },
     ],
   },
   {
@@ -75,25 +73,28 @@ export const router = createBrowserRouter ([
   },
   {
     path: "/admin",
-    element: <ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>,
+    element: (
+      <ProtectedAdminRoute>
+        <AdminPage />
+      </ProtectedAdminRoute>
+    ),
     children: [
       {
         path: "",
-        element: <Dashboard/>
+        element: <Dashboard />,
       },
       {
         path: "user",
-        element: <UserManagement/>
+        element: <UserManagement />,
       },
       {
         path: "order",
-        element: <OrderManagement/>
+        element: <OrderManagement />,
       },
       {
         path: "product",
-        element: <ProductManagement/>
-      }
-    ]
-  }
+        element: <ProductManagement />,
+      },
+    ],
+  },
 ]);
-
