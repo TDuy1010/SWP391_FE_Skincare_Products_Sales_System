@@ -73,28 +73,33 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: (
-      <ProtectedAdminRoute>
-        <AdminPage />
-      </ProtectedAdminRoute>
-    ),
     children: [
       {
+        path: "login",
+        element: <LoginAdmin />
+      },
+      {
         path: "",
-        element: <Dashboard />,
-      },
-      {
-        path: "user",
-        element: <UserManagement />,
-      },
-      {
-        path: "order",
-        element: <OrderManagement />,
-      },
-      {
-        path: "product",
-        element: <ProductManagement />,
-      },
-    ],
-  },
+        element: <ProtectedAdminRoute><AdminPage /></ProtectedAdminRoute>,
+        children: [
+          {
+            path: "",
+            element: <Dashboard />
+          },
+          {
+            path: "user",
+            element: <UserManagement />
+          },
+          {
+            path: "order",
+            element: <OrderManagement />
+          },
+          {
+            path: "product",
+            element: <ProductManagement />
+          }
+        ]
+      }
+    ]
+  }
 ]);
