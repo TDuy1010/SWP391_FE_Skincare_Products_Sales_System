@@ -16,6 +16,8 @@ import HelpPage from "../page/Customer/HelpPage/HelpPage";
 import Payment from "../page/Customer/PaymentPage/Payment";
 import ProfilePage from "../page/Customer/Profile/ProfilePage";
 import AdminPage from "../page/Admin/AdminPage";
+import LoginAdmin from "../page/Admin/LoginAdmin/LoginAdmin";
+import { ProtectedAdminRoute } from "./ProtectedAdminRoute";
 
 export const router = createBrowserRouter ([
   {
@@ -68,8 +70,12 @@ export const router = createBrowserRouter ([
     ],
   },
   {
-    path :"/admin",
-    element: <AdminPage/>,
+    path: "/admin/login",
+    element: <LoginAdmin />,
+  },
+  {
+    path: "/admin",
+    element: <ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>,
     children: [
       {
         path: "",

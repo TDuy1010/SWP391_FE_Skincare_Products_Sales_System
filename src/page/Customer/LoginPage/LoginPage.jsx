@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import img1 from "../../../assets/img/hero-photo.png";
 import RegisterForm from "./RegisterForm";
@@ -8,38 +9,68 @@ import { login } from "../../../service/login/index"; // Import API login
 const LoginModal = ({ isOpen, onClose }) => {
   const [activeForm, setActiveForm] = useState("login"); // "login", "register", "forgotPassword"
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({ username: "", password: "", general: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOpen) {
       setActiveForm("login");
-      setError("");
+      setErrors({ username: "", password: "", general: "" });
       setFormData({ username: "", password: "" });
     }
   }, [isOpen]);
 
   const handleFormChange = (form) => {
-    setError("");
+    setErrors({ username: "", password: "", general: "" });
     setActiveForm(form);
   };
 
   const handleClose = () => {
     onClose();
     setActiveForm("login");
-    setError("");
+    setErrors({ username: "", password: "", general: "" });
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { username: "", password: "", general: "" };
+
+    // Validate username
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+      isValid = false;
+    } else if (formData.username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters";
+      isValid = false;
+    }
+
+    // Validate password - chỉ kiểm tra khi password chưa đủ 6 ký tự
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (formData.password.length > 0 && formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrors({ username: "", password: "", general: "" });
+
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       const response = await login(formData.username, formData.password);
       console.log("API Response:", response);
 
       if (response?.error || response?.code !== 200) {
-        setError(response.message);
+        setErrors({ ...errors, general: response.message || "Login failed" });
         return;
       }
 
@@ -50,7 +81,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
-      setError("Login failed. Please check your credentials.");
+      setErrors({ ...errors, general: "Login failed. Please check your credentials." });
     }
   };
 
@@ -69,28 +100,40 @@ const LoginModal = ({ isOpen, onClose }) => {
         <h2 className="text-2xl font-semibold text-gray-900">
           Log in to your account
         </h2>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {errors.general && <p className="text-red-500 text-sm">{errors.general}</p>}
         <form className="space-y-6" onSubmit={handleLogin}>
-          <input
-            type="text"
-            placeholder="Enter Username"
-            className="w-full p-3 border-b border-gray-300 bg-transparent focus:outline-none"
-            required
-            value={formData.username}
-            onChange={(e) =>
-              setFormData({ ...formData, username: e.target.value })
-            }
-          />
-          <input
-            type="password"
-            placeholder="Enter Password"
-            className="w-full p-3 border-b border-gray-300 bg-transparent focus:outline-none"
-            required
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Enter Username"
+              className={`w-full p-3 border-b ${
+                errors.username ? "border-red-500" : "border-gray-300"
+              } bg-transparent focus:outline-none`}
+              value={formData.username}
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
+            />
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Enter Password"
+              className={`w-full p-3 border-b ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } bg-transparent focus:outline-none`}
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+          </div>
           <div className="text-right">
             <button
               type="button"

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import  { useState } from "react";
 import { register } from "../../../service/register/index"; // Import API đăng ký
+import NotificationModal from "../../../components/Nofication/NotificationModal";
 
 const RegisterForm = ({ onBackToLogin }) => {
   const [registerData, setRegisterData] = useState({
@@ -14,6 +16,11 @@ const RegisterForm = ({ onBackToLogin }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState(""); // Lỗi khi xác nhận mật khẩu không trùng
+  const [modalInfo, setModalInfo] = useState({
+    isOpen: false,
+    message: "",
+    type: "success"
+  });
 
   const isFormValid =
     registerData.username &&
@@ -43,7 +50,11 @@ const RegisterForm = ({ onBackToLogin }) => {
       const response = await register(requestData);
 
       if (response?.code === 201) {
-        setSuccess("Account created successfully! Please log in.");
+        setModalInfo({
+          isOpen: true,
+          message: "Tạo tài khoản thành công! Vui lòng đăng nhập.",
+          type: "success"
+        });
         setRegisterData({
           username: "",
           password: "",
@@ -51,11 +62,22 @@ const RegisterForm = ({ onBackToLogin }) => {
           dateOfBirth: "",
           gender: "",
         });
+        setTimeout(() => {
+          onBackToLogin();
+        }, 2000);
       } else {
-        setError(response.message || "Registration failed.");
+        setModalInfo({
+          isOpen: true,
+          message: response.message || "Đăng ký thất bại!",
+          type: "error"
+        });
       }
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      setModalInfo({
+        isOpen: true,
+        message: "Đăng ký thất bại. Vui lòng thử lại!",
+        type: "error"
+      });
     } finally {
       setLoading(false);
     }
@@ -63,6 +85,17 @@ const RegisterForm = ({ onBackToLogin }) => {
 
   return (
     <div className="space-y-6">
+      <NotificationModal
+        isOpen={modalInfo.isOpen}
+        message={modalInfo.message}
+        type={modalInfo.type}
+        onClose={() => {
+          setModalInfo({ ...modalInfo, isOpen: false });
+          if (modalInfo.type === "success") {
+            onBackToLogin();
+          }
+        }}
+      />
       <h2 className="text-2xl font-semibold text-gray-900">
         Create your account
       </h2>

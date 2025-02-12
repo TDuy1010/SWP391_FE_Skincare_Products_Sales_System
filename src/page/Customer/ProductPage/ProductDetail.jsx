@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Minus, Plus, Heart, ChevronDown } from "lucide-react";
 import imgProduct from "../../../assets/Rectangle 3.png";
 
