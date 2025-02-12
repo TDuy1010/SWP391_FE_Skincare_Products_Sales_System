@@ -7,11 +7,11 @@ export const logout = async (token) => {
     });
     return response;
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Logout error:", error);
 
     return {
       error: true,
-      message: error.response?.message || "Login failed",
+      message: error.response?.data?.message || "Logout failed",
     };
   }
 };

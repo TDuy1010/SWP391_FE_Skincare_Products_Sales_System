@@ -6,12 +6,6 @@ export const instance = axios.create({
   withCredentials: true,
 });
 
-instance.interceptors.response.use(
-  function (response) {
-    return response.data;
-  },
-  function (error) {
-    console.error("API Error:", error);
-    return Promise.reject(error); // Đảm bảo lỗi vẫn được ném ra
-  }
-);
+instance.interceptors.response.use(function (response) {
+  return response.data;
+});
