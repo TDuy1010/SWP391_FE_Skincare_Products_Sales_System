@@ -1,7 +1,7 @@
 import ProductCard from "../LandingPage/ProductCard";
 import { products } from "../LandingPage/ProductList";
 import { motion } from "framer-motion";
-import img3 from '../../assets/img/hero-landingPage.png';
+import img3 from '../../../assets/img/hero-landingPage.png';
 import { useEffect } from "react";
 
 

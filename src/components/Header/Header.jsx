@@ -4,7 +4,7 @@ import { FaHeart } from "react-icons/fa";
 import { BsBag } from "react-icons/bs";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import LoginModal from "../../page/LoginPage/LoginPage";
+import LoginModal from "../../page/Customer/LoginPage/LoginPage";
 import ShopDropdown from "./ShopDropdown";
 import { FiUser } from "react-icons/fi";
 import { logout } from "../../service/logout";

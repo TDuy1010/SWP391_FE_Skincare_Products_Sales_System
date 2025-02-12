@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
-import img1 from "../../assets/img/product-1.png";
+import img1 from "../../../assets/img/product-1.png";
 import { Link } from "react-router-dom";
 
 const CartPage = () => {

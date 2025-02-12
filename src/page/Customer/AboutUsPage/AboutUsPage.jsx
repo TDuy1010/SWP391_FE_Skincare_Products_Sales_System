@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
-import img1 from '../../assets/img/hero-photo.png';
-import aboutImg2 from '../../assets/img/product-1.png';
-import aboutImg3 from '../../assets/img/trial-image.png';
+import img1 from '../../../assets/img/hero-photo.png';
+import aboutImg2 from '../../../assets/img/product-1.png';
+import aboutImg3 from '../../../assets/img/trial-image.png';
 
 const AboutUsPage = () => {
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { register } from "../../service/register/index"; // Import API đăng ký
+import { register } from "../../../service/register/index"; // Import API đăng ký
 
 const RegisterForm = ({ onBackToLogin }) => {
   const [registerData, setRegisterData] = useState({

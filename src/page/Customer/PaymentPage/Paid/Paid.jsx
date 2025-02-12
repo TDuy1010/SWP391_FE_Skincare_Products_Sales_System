@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import visaicon from '../../../assets/img/visa.png';
-import mastercardicon from '../../../assets/img/mastercard.png';
+import visaicon from '../../../../assets/img/visa.png';
+import mastercardicon from '../../../../assets/img/mastercard.png';
 
 const Paid = ({ onNext }) => {
   return (

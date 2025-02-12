@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import img1 from "../../assets/img/hero-photo.png";
+import img1 from "../../../assets/img/hero-photo.png";
 import RegisterForm from "./RegisterForm";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import { login } from "../../service/login/index"; // Import API login
+import { login } from "../../../service/login/index"; // Import API login
 
 const LoginModal = ({ isOpen, onClose }) => {
   const [activeForm, setActiveForm] = useState("login"); // "login", "register", "forgotPassword"

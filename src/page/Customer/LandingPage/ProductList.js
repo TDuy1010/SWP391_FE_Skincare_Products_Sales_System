@@ -1,4 +1,4 @@
-import imgProduct from '../../assets/img/product-landingPage.jpg'
+import imgProduct from '../../../assets/img/product-landingPage.jpg'
 
 export const products = [{
     tag: "BESTSELLER",

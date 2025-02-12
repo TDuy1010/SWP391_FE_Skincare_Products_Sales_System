@@ -1,9 +1,9 @@
-import Journal1 from '../../assets/img/journal1.png';
-import Journal2 from '../../assets/img/journal2.png';
-import Journal3 from '../../assets/img/journal3.png';
-import Journal4 from '../../assets/img/journal4.png';
-import img4 from '../../assets/img/hero-photo.png';
-import featuredImg2 from '../../assets/img/hero-landingPage.png';
+import Journal1 from '../../../assets/img/journal1.png';
+import Journal2 from '../../../assets/img/journal2.png';
+import Journal3 from '../../../assets/img/journal3.png';
+import Journal4 from '../../../assets/img/journal4.png';
+import img4 from '../../../assets/img/hero-photo.png';
+import featuredImg2 from '../../../assets/img/hero-landingPage.png';
     
 export const blogPosts = [
   {

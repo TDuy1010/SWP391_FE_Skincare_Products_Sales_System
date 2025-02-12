@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FiEdit2, FiX } from 'react-icons/fi';
-import avatar from '../../assets/img/hero-photo.png';
+import avatar from '../../../assets/img/hero-photo.png';
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('profile');

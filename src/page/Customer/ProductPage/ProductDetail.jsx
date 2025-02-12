@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Minus, Plus, Heart, ChevronDown } from "lucide-react";
-import imgProduct from "../../assets/Rectangle 3.png";
+import imgProduct from "../../../assets/Rectangle 3.png";
 
 const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);

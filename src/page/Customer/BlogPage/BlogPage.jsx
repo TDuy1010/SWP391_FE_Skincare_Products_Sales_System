@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { blogPosts, featuredArticles } from './BlogPost';
-import img3 from '../../assets/img/hero-landingPage.png';
+import img3 from '../../../assets/img/hero-landingPage.png';
 import { useEffect } from "react";
 
 const BlogPage = () => {

@@ -1,20 +1,21 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../layout/RootLayout";
-import LoginPage from "../page/LoginPage/LoginPage" ;
-import LangdingPage from "../page/LandingPage/LandingPage";
-import AboutUsPage from "../page/AboutUsPage/AboutUsPage";
-import BlogPage from "../page/BlogPage/BlogPage";
-import CartPage from "../page/CartPage/CartPage";
-import ShopPagce from "../page/ShopPage/ShopPagce";
-import HelpPage from "../page/HelpPage/HelpPage";
-import AdminPage from "../page/Admin/AdminPage";
-import Payment from "../page/PaymentPage/Payment";
-import ProfilePage from "../page/Profile/ProfilePage";
-import ProductDetail from "../page/ProductPage/ProductDetail";
+
 import UserManagement from "../page/Admin/User/UserManagement";
 import Dashboard from "../page/Admin/Dashboard/Dashboard";
 import OrderManagement from "../page/Admin/Order/OrderManagement";
 import ProductManagement from "../page/Admin/Product/ProductManagement";
+import LandingPage from "../page/Customer/LandingPage/LandingPage";
+import LoginModal from "../page/Customer/LoginPage/LoginPage";
+import AboutUsPage from "../page/Customer/AboutUsPage/AboutUsPage";
+import BlogPage from "../page/Customer/BlogPage/BlogPage";
+import CartPage from "../page/Customer/CartPage/CartPage";
+import ShopPagce from "../page/Customer/ShopPage/ShopPagce";
+import ProductDetail from "../page/Customer/ProductPage/ProductDetail";
+import HelpPage from "../page/Customer/HelpPage/HelpPage";
+import Payment from "../page/Customer/PaymentPage/Payment";
+import ProfilePage from "../page/Customer/Profile/ProfilePage";
+import AdminPage from "../page/Admin/AdminPage";
 
 export const router = createBrowserRouter ([
   {
@@ -23,11 +24,11 @@ export const router = createBrowserRouter ([
     children: [
       {
         path: "",
-        element: <LangdingPage />,
+        element: <LandingPage />,
       },
       {
         path: "/login",
-        element: <LoginPage/>
+        element: <LoginModal/>
       },
       {
         path: "/about-us",
