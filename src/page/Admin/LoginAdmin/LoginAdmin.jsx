@@ -1,56 +1,50 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../../service/login/index"; // Import API login
 
 const LoginAdmin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  // Tài khoản demo
-  const ADMIN_ACCOUNTS = [
-    {
-      username: 'admin',
-      password: '1',
-      role: 'admin',
-      fullName: 'Administrator'
-    },
-    {
-      username: 'staff1',
-      password: '1',
-      role: 'staff',
-      fullName: 'Staff Member 1'
-    },
-    {
-      username: 'staff2',
-      password: '1',
-      role: 'staff',
-      fullName: 'Staff Member 2'
-    }
-  ];
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const user = ADMIN_ACCOUNTS.find(
-      account => account.username === formData.username && 
-                account.password === formData.password
-    );
+    setError("");
 
-    if (user) {
-      // Lưu thông tin đăng nhập
-      localStorage.setItem('adminUser', JSON.stringify({
-        username: user.username,
-        role: user.role,
-        fullName: user.fullName
-      }));
-      
-      // Chuyển hướng đến trang admin
-      navigate('/admin');
-    } else {
-      setError('Tên đăng nhập hoặc mật khẩu không đúng');
+    try {
+      const response = await login(formData.username, formData.password);
+
+      if (response?.error) {
+        setError(response.message || "Đăng nhập thất bại");
+        return;
+      }
+
+      if (response?.code === 200) {
+        const { token, role, fullName } = response.result;
+
+        // Lưu thông tin đăng nhập vào localStorage
+        localStorage.setItem(
+          "adminUser",
+          JSON.stringify({
+            username: formData.username,
+            role,
+            fullName,
+            token,
+          })
+        );
+
+        // Điều hướng về trang admin dashboard
+        navigate("/admin");
+        window.location.reload(); // Reload để cập nhật giao diện
+      } else {
+        setError("Tên đăng nhập hoặc mật khẩu không đúng");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
     }
   };
 
@@ -66,31 +60,37 @@ const LoginAdmin = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300">Username</label>
+            <label className="block text-sm font-medium text-gray-300">
+              Username
+            </label>
             <input
               type="text"
               required
               className="mt-1 block w-full px-3 py-2 bg-slate-600 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               value={formData.username}
-              onChange={(e) => setFormData({...formData, username: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300">Password</label>
+            <label className="block text-sm font-medium text-gray-300">
+              Password
+            </label>
             <input
               type="password"
               required
               className="mt-1 block w-full px-3 py-2 bg-slate-600 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
             />
           </div>
 
           {error && (
-            <div className="text-center text-sm text-red-400">
-              {error}
-            </div>
+            <div className="text-center text-sm text-red-400">{error}</div>
           )}
 
           <button
