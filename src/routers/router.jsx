@@ -11,6 +11,10 @@ import AdminPage from "../page/Admin/AdminPage";
 import Payment from "../page/PaymentPage/Payment";
 import ProfilePage from "../page/Profile/ProfilePage";
 import ProductDetail from "../page/ProductPage/ProductDetail";
+import UserManagement from "../page/Admin/User/UserManagement";
+import Dashboard from "../page/Admin/Dashboard/Dashboard";
+import OrderManagement from "../page/Admin/Order/OrderManagement";
+import ProductManagement from "../page/Admin/Product/ProductManagement";
 
 export const router = createBrowserRouter ([
   {
@@ -64,7 +68,25 @@ export const router = createBrowserRouter ([
   },
   {
     path :"/admin",
-    element: <AdminPage/>
+    element: <AdminPage/>,
+    children: [
+      {
+        path: "",
+        element: <Dashboard/>
+      },
+      {
+        path: "user",
+        element: <UserManagement/>
+      },
+      {
+        path: "order",
+        element: <OrderManagement/>
+      },
+      {
+        path: "product",
+        element: <ProductManagement/>
+      }
+    ]
   }
 ]);
 
