@@ -1,66 +1,66 @@
 export const questions = {
     1: {
-      title: "Loại da của bạn?",
+      title: "What's your skin type?",
       multiple: false,
       options: [
-        { id: 'dry', label: 'Da khô' },
-        { id: 'oily', label: 'Da dầu' },
-        { id: 'combination', label: 'Da hỗn hợp' },
-        { id: 'normal', label: 'Da thường' },
-        { id: 'sensitive', label: 'Da nhạy cảm' }
+        { id: 'dry', label: 'Dry Skin' },
+        { id: 'oily', label: 'Oily Skin' },
+        { id: 'combination', label: 'Combination Skin' },
+        { id: 'normal', label: 'Normal Skin' },
+        { id: 'sensitive', label: 'Sensitive Skin' }
       ]
     },
     2: {
-      title: "Vấn đề da bạn đang gặp phải?",
+      title: "What skin concerns do you have?",
       multiple: true,
       options: [
-        { id: 'acne', label: 'Mụn' },
-        { id: 'dark_spots', label: 'Thâm nám' },
-        { id: 'wrinkles', label: 'Nếp nhăn' },
-        { id: 'sensitive', label: 'Da xỉn màu' },
-        { id: 'large_pores', label: 'Lỗ chân lông to' }
+        { id: 'acne', label: 'Acne' },
+        { id: 'dark_spots', label: 'Dark Spots' },
+        { id: 'wrinkles', label: 'Wrinkles' },
+        { id: 'sensitive', label: 'Dull Skin' },
+        { id: 'large_pores', label: 'Large Pores' }
       ]
     },
     3: {
-      title: "Độ tuổi của bạn?",
+      title: "What's your age?",
       options: [
-        { id: 'under20', label: 'Dưới 20' },
+        { id: 'under20', label: 'Under 20' },
         { id: '20-25', label: '20-25' },
         { id: '26-30', label: '26-30' },
         { id: '31-40', label: '31-40' },
-        { id: 'over40', label: 'Trên 40' }
+        { id: 'over40', label: 'Over 40' }
       ]
     },
     4: {
-      title: "Bạn muốn một routine như thế nào?",
+      title: "What type of routine do you prefer?",
       options: [
-        { id: 'basic', label: 'Cơ bản (3 bước)' },
-        { id: 'moderate', label: 'Trung bình (5 bước)' },
-        { id: 'advanced', label: 'Nâng cao (7 bước)' }
+        { id: 'basic', label: 'Basic (3 steps)' },
+        { id: 'moderate', label: 'Moderate (5 steps)' },
+        { id: 'advanced', label: 'Advanced (7 steps)' }
       ]
     }
-  };
+};
 
 export const routineSteps = {
   basic: [
-    { step: 1, name: 'Sữa rửa mặt', description: 'Làm sạch da' },
-    { step: 2, name: 'Kem dưỡng ẩm', description: 'Cung cấp độ ẩm cho da' },
-    { step: 3, name: 'Kem chống nắng', description: 'Bảo vệ da khỏi tác hại của ánh nắng' }
+    { step: 1, name: 'Cleanser', description: 'Clean your skin' },
+    { step: 2, name: 'Moisturizer', description: 'Hydrate your skin' },
+    { step: 3, name: 'Sunscreen', description: 'Protect from sun damage' }
   ],
   moderate: [
-    { step: 1, name: 'Sữa rửa mặt', description: 'Làm sạch da' },
-    { step: 2, name: 'Toner', description: 'Cân bằng độ pH' },
-    { step: 3, name: 'Serum', description: 'Điều trị các vấn đề về da' },
-    { step: 4, name: 'Kem dưỡng ẩm', description: 'Cung cấp độ ẩm cho da' },
-    { step: 5, name: 'Kem chống nắng', description: 'Bảo vệ da khỏi tác hại của ánh nắng' }
+    { step: 1, name: 'Cleanser', description: 'Clean your skin' },
+    { step: 2, name: 'Toner', description: 'Balance pH levels' },
+    { step: 3, name: 'Serum', description: 'Treat skin concerns' },
+    { step: 4, name: 'Moisturizer', description: 'Hydrate your skin' },
+    { step: 5, name: 'Sunscreen', description: 'Protect from sun damage' }
   ],
   advanced: [
-    { step: 1, name: 'Tẩy trang', description: 'Loại bỏ lớp trang điểm và bụi bẩn' },
-    { step: 2, name: 'Sữa rửa mặt', description: 'Làm sạch da' },
-    { step: 3, name: 'Toner', description: 'Cân bằng độ pH' },
-    { step: 4, name: 'Essence', description: 'Dưỡng ẩm và tái tạo da' },
-    { step: 5, name: 'Serum', description: 'Điều trị các vấn đề về da' },
-    { step: 6, name: 'Kem dưỡng ẩm', description: 'Cung cấp độ ẩm cho da' },
-    { step: 7, name: 'Kem chống nắng', description: 'Bảo vệ da khỏi tác hại của ánh nắng' }
+    { step: 1, name: 'Makeup Remover', description: 'Remove makeup and impurities' },
+    { step: 2, name: 'Cleanser', description: 'Clean your skin' },
+    { step: 3, name: 'Toner', description: 'Balance pH levels' },
+    { step: 4, name: 'Essence', description: 'Hydrate and repair' },
+    { step: 5, name: 'Serum', description: 'Treat skin concerns' },
+    { step: 6, name: 'Moisturizer', description: 'Hydrate your skin' },
+    { step: 7, name: 'Sunscreen', description: 'Protect from sun damage' }
   ]
 };

@@ -63,7 +63,7 @@ const Determine = () => {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {!result ? (
           <>
-            <h1 className="text-3xl font-semibold mb-8 text-center">Xác định loại da của bạn</h1>
+            <h1 className="text-3xl font-semibold mb-8 text-center">Determine Your Skin Type</h1>
             
             {/* Hiển thị tất cả câu hỏi */}
             {Object.entries(skinTypeQuestions).map(([questionNumber, question]) => {
@@ -77,7 +77,7 @@ const Determine = () => {
                   transition={{ duration: 0.5 }}
                   className="mb-12 p-6 border rounded-xl"
                 >
-                  <h2 className="text-xl font-semibold mb-4">Câu {questionNumber}: {question.title}</h2>
+                  <h2 className="text-xl font-semibold mb-4">Question {questionNumber}: {question.title}</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {question.options.map((option) => (
                       <motion.button
@@ -116,7 +116,7 @@ const Determine = () => {
                 whileHover={{ scale: Object.values(answers).some(answer => answer === '') ? 1 : 1.02 }}
                 whileTap={{ scale: Object.values(answers).some(answer => answer === '') ? 1 : 0.98 }}
               >
-                Xem kết quả
+                See Results
               </motion.button>
             </div>
           </>
@@ -131,7 +131,7 @@ const Determine = () => {
             <p className="text-lg text-gray-600 mb-8">{skinTypeDescriptions[result].description}</p>
             
             <div className="bg-gray-50 p-6 rounded-xl mb-8">
-              <h3 className="text-xl font-semibold mb-4">Lời khuyên cho bạn:</h3>
+              <h3 className="text-xl font-semibold mb-4">Tips for you:</h3>
               <ul className="text-left">
                 {skinTypeDescriptions[result].tips.map((tip, index) => (
                   <li key={index} className="mb-2 flex items-start">
@@ -157,7 +157,7 @@ const Determine = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              Làm lại bài test
+              Take Test Again
             </motion.button>
           </motion.div>
         )}

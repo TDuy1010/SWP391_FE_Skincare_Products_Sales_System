@@ -51,7 +51,7 @@ const FindRoutine = () => {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {!showResult ? (
           <>
-            <h1 className="text-3xl font-semibold mb-8 text-center">Tìm quy trình chăm sóc da phù hợp</h1>
+            <h1 className="text-3xl font-semibold mb-8 text-center">Find Your Perfect Skincare Routine</h1>
 
             {Object.entries(questions).map(([questionNumber, question]) => {
               const questionId = Object.keys(answers)[questionNumber - 1];
@@ -66,7 +66,7 @@ const FindRoutine = () => {
                 >
                   <h2 className="text-2xl font-semibold mb-4">{question.title}</h2>
                   <p className="text-gray-600 mb-6">
-                    {question.multiple ? "Bạn có thể chọn nhiều đáp án" : "Vui lòng chọn một đáp án"}
+                    {question.multiple ? "You can select multiple options" : "Please select one option"}
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -91,7 +91,7 @@ const FindRoutine = () => {
                         <div className="flex flex-col items-center justify-center">
                           <span className="text-lg font-medium">{option.label}</span>
                           {questionId === 'concerns' && answers.concerns.includes(option.id) && (
-                            <span className="text-sm mt-2">✓ Đã chọn</span>
+                            <span className="text-sm mt-2">✓ Selected</span>
                           )}
                         </div>
                       </motion.button>
@@ -118,7 +118,7 @@ const FindRoutine = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Xem kết quả
+                See Results
               </motion.button>
             </div>
           </>
@@ -128,18 +128,18 @@ const FindRoutine = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl font-semibold mb-8 text-center">Quy trình chăm sóc da được đề xuất</h2>
+            <h2 className="text-3xl font-semibold mb-8 text-center">Recommended Skincare Routine</h2>
             
             <div className="mb-8 p-6 bg-gray-50 rounded-xl">
-              <h3 className="text-xl font-semibold mb-4">Thông tin của bạn:</h3>
+              <h3 className="text-xl font-semibold mb-4">Your Information:</h3>
               <ul className="space-y-2">
-                <li><span className="font-medium">Loại da:</span> {questions[1].options.find(opt => opt.id === answers.skinType)?.label}</li>
+                <li><span className="font-medium">Skin Type:</span> {questions[1].options.find(opt => opt.id === answers.skinType)?.label}</li>
                 <li>
-                  <span className="font-medium">Vấn đề về da:</span>{' '}
+                  <span className="font-medium">Skin Concerns:</span>{' '}
                   {answers.concerns.map(c => questions[2].options.find(opt => opt.id === c)?.label).join(', ')}
                 </li>
-                <li><span className="font-medium">Độ tuổi:</span> {questions[3].options.find(opt => opt.id === answers.age)?.label}</li>
-                <li><span className="font-medium">Loại routine:</span> {questions[4].options.find(opt => opt.id === answers.routine)?.label}</li>
+                <li><span className="font-medium">Age:</span> {questions[3].options.find(opt => opt.id === answers.age)?.label}</li>
+                <li><span className="font-medium">Routine Type:</span> {questions[4].options.find(opt => opt.id === answers.routine)?.label}</li>
               </ul>
             </div>
 
@@ -180,7 +180,7 @@ const FindRoutine = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Làm lại bài test
+                Take Test Again
               </motion.button>
             </div>
           </motion.div>
