@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FaUserEdit } from 'react-icons/fa';
 import { FaRegTrashCan } from 'react-icons/fa6';
+import AddUser from './AddUser';
 
 const UserManagement = () => {
 
@@ -10,6 +11,13 @@ const UserManagement = () => {
       ]);
     
     const roles = ['Admin', 'User', 'Staff'];
+    
+    // Update 15/02
+    const [showAddUser, setShowAddUser] = useState(false); 
+    const handleAddUser = (newUser) => {
+    setUsers([...users, newUser]);
+    setShowAddUser(false); 
+  };
 
     return (
         <>
@@ -25,7 +33,7 @@ const UserManagement = () => {
                                 ))}
                             </select>
                         </div>
-                        <button className="bg-purple-600 text-white p-2 rounded-lg">+ Add User</button>
+                        <button className="bg-purple-600 text-white p-2 rounded-lg" onClick={() => setShowAddUser(true)}>+ Add User</button>
                     </div>
                     <table className="w-full text-left">
                         <thead>
@@ -60,6 +68,10 @@ const UserManagement = () => {
                     </table>
                 </div>
             </div>
+             {/* Hiển thị form AddUser */}
+      {showAddUser && (
+        <AddUser onClose={() => setShowAddUser(false)} onAddUser={handleAddUser} />
+      )}
         </>
     )
 }

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { FaRegEdit } from 'react-icons/fa';
 import { FaRegTrashCan } from 'react-icons/fa6';
-import img5 from '../../../assets/img/product-1.png'
+import img5 from '../../../assets/img/product-1.png';
+
+import AddProduct from './AddProduct';
 
 const ProductManagement = () => {
 
@@ -11,6 +13,13 @@ const ProductManagement = () => {
     ]);
 
     const types = [1, 2, 3];
+
+// *update15/02*
+    const [showAddProduct, setShowAddProduct] = useState(false); 
+  const handleAddProduct = (newProduct) => {
+    setProducts([...products, newProduct]);
+    setShowAddProduct(false); 
+  };
 
     return (
         <>
@@ -25,8 +34,9 @@ const ProductManagement = () => {
                                     <option key={index}>{type}</option>
                                 ))}
                             </select>
+                            {/*update15/02*/}
                         </div>
-                        <button className="bg-purple-600 text-white p-2 rounded-lg">+ Add Product</button>
+                        <button className="bg-purple-600 text-white p-2 rounded-lg" onClick={() => setShowAddProduct(true)}> + Add Product </button>
                     </div>
                     <table className="w-full text-left">
                         <thead>
@@ -63,6 +73,10 @@ const ProductManagement = () => {
                     </table>
                 </div>
             </div>
+            
+      {showAddProduct && (
+        <AddProduct onClose={() => setShowAddProduct(false)} onAddProduct={handleAddProduct} />
+      )}
         </>
     )
 }
