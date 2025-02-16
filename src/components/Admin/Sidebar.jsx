@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
@@ -70,18 +71,26 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
         left: 0,
       }}
     >
-      {!collapsed && (
-        <div className="p-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="text-2xl font-bold text-white flex items-center">
-              <div className="flex items-end">
-                <span>SKYN</span>
-                <span className="text-sm text-gray-400 ml-2 mb-1">ADMIN</span>
+      <div className="p-4 flex items-center justify-center">
+        <div className={`transition-all duration-300 ease-in-out ${
+          collapsed ? 'w-12 h-12' : 'w-full'
+        }`}>
+          {collapsed ? (
+            <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center">
+              <span className="text-2xl font-bold text-white">S</span>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <div className="text-2xl font-bold text-white flex items-center">
+                <div className="flex items-end">
+                  <span>SKYN</span>
+                  <span className="text-sm text-gray-400 ml-2 mb-1">ADMIN</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       <Menu
         theme="dark"
