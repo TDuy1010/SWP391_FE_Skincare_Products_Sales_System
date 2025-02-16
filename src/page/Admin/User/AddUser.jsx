@@ -1,10 +1,10 @@
-import { Select } from "antd";
 import { useState } from "react";
 
 const AddUser = ({ onClose }) => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+    fullname: "",
     role: "Admin/User",
     phone: "",
     email: "",
@@ -12,6 +12,8 @@ const AddUser = ({ onClose }) => {
   });
 
   const [errors, setErrors] = useState({});
+
+  const [showNotification, setShowNotification] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,7 +38,14 @@ const AddUser = ({ onClose }) => {
     }
 
     console.log("User Data:", formData);
-    onClose(); 
+
+    setShowNotification(true);
+
+   
+    setTimeout(() => {
+      setShowNotification(false);
+      onClose();
+    }, 3000);
   };
 
   return (
@@ -47,13 +56,13 @@ const AddUser = ({ onClose }) => {
         <form onSubmit={handleSubmit}>
           {/* User Name */}
           <div className="mb-3">
-            <label className="block text-sm">User name</label>
+            <label className="block text-sm font-bold">User name</label>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className="w-[180px] p-1 border bg-[#182237] rounded text-white focus:ring focus:ring-blue-500"
+              className="w-full p-1 border bg-[#182237] rounded text-white focus:ring focus:ring-blue-500"
               required
             />
             {errors.username && <p className="text-red-500 text-xs">{errors.username}</p>}
@@ -61,7 +70,7 @@ const AddUser = ({ onClose }) => {
 
           {/* Password */}
           <div className="mb-3">
-            <label className="block text-sm">Password</label>
+            <label className="block text-sm font-bold">Password</label>
             <input
               type="password"
               name="password"
@@ -72,10 +81,25 @@ const AddUser = ({ onClose }) => {
             />
           </div>
 
+          {/* Full Name */}
+          <div className="mb-3">
+            <label className="block text-sm font-bold">Full name</label>
+            <input
+              type="text"
+              name="fullname"
+              value={formData.fullname}
+              onChange={handleChange}
+              className="w-full p-1 border bg-[#182237] rounded text-white focus:ring focus:ring-blue-500"
+              required
+            />
+            {errors.fullname && <p className="text-red-500 text-xs">{errors.fullname}</p>}
+          </div>
+
+
           {/* Role & Phone */}
           <div className="flex gap-2 mb-3">
             <div className="w-1/2">
-              <label className="block text-sm">Role</label>
+              <label className="block text-sm font-bold">Role</label>
               <select
               name="type"
               value={formData.type}
@@ -89,7 +113,7 @@ const AddUser = ({ onClose }) => {
             </select>
             </div>
             <div className="w-1/2">
-              <label className="block text-sm">Phone number</label>
+              <label className="block text-sm font-bold">Phone number</label>
               <input
                 type="text"
                 name="phone"
@@ -102,7 +126,7 @@ const AddUser = ({ onClose }) => {
 
           {/* Email */}
           <div className="mb-3">
-            <label className="block text-sm">Email</label>
+            <label className="block text-sm font-bold">Email</label>
             <input
               type="email"
               name="email"
@@ -116,7 +140,7 @@ const AddUser = ({ onClose }) => {
 
           {/* Address */}
           <div className="mb-4">
-            <label className="block text-sm">Address</label>
+            <label className="block text-sm font-bold">Address</label>
             <input
               type="text"
               name="address"
@@ -144,6 +168,14 @@ const AddUser = ({ onClose }) => {
           </div>
         </form>
       </div>
+
+    {/* Thông báo thành công */}
+    {showNotification && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1E283A] text-white px-6 py-3 rounded-md shadow-lg">
+          <h3 className="font-bold text-lg text-center">Notification</h3>
+          <p className="text-sm text-center text-gray-1 300">User added successfully!</p>
+        </div>
+      )}
     </div>
   );
 };

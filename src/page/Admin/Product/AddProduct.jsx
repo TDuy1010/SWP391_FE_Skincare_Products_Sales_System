@@ -10,6 +10,8 @@ const AddProduct = ({ onClose }) => {
     imageUrl: "",
   });
 
+  const [showNotification, setShowNotification] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -25,7 +27,13 @@ const AddProduct = ({ onClose }) => {
     e.preventDefault();
     console.log("Product Data:", formData);
     // API
-    onClose();
+    setShowNotification(true);
+
+   
+    setTimeout(() => {
+      setShowNotification(false);
+      onClose();
+    }, 3000);
   };
 
   return (
@@ -36,7 +44,7 @@ const AddProduct = ({ onClose }) => {
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* Name */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Name:</label>
+            <label className="w-1/3 text-sm font-bold">Name:</label>
             <input
               type="text"
               name="name"
@@ -49,7 +57,7 @@ const AddProduct = ({ onClose }) => {
 
           {/* Type */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Type:</label>
+            <label className="w-1/3 text-sm font-bold">Type:</label>
             <select
               name="type"
               value={formData.type}
@@ -65,7 +73,7 @@ const AddProduct = ({ onClose }) => {
 
           {/* Price */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Price:</label>
+            <label className="w-1/3 text-sm font-bold">Price:</label>
             <input
               type="number"
               name="price"
@@ -78,7 +86,7 @@ const AddProduct = ({ onClose }) => {
 
           {/* Quantity */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Quantity:</label>
+            <label className="w-1/3 text-sm font-bold">Quantity:</label>
             <div className="flex items-center w-3/4">
               <button
                 type="button"
@@ -100,7 +108,7 @@ const AddProduct = ({ onClose }) => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm mb-1">Description:</label>
+            <label className="block text-sm mb-1 font-bold">Description:</label>
             <textarea
               name="description"
               value={formData.description}
@@ -112,7 +120,7 @@ const AddProduct = ({ onClose }) => {
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm mb-1">Url Image:</label>
+            <label className="block text-sm mb-1 font-bold">Url Image:</label>
             <input
               type="text"
               name="imageUrl"
@@ -140,6 +148,13 @@ const AddProduct = ({ onClose }) => {
           </div>
         </form>
       </div>
+      {/* Thông báo thành công */}
+    {showNotification && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1E283A] text-white px-6 py-3 rounded-md shadow-lg">
+          <h3 className="font-bold text-lg text-center">Notification</h3>
+          <p className="text-sm text-center text-gray-1 300">New product added successfully!</p>
+        </div>
+      )}
     </div>
   );
 };
