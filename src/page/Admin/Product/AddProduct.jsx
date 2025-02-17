@@ -10,6 +10,8 @@ const AddProduct = ({ onClose }) => {
     imageUrl: "",
   });
 
+  const [showNotification, setShowNotification] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -25,36 +27,42 @@ const AddProduct = ({ onClose }) => {
     e.preventDefault();
     console.log("Product Data:", formData);
     // API
-    onClose();
+    setShowNotification(true);
+
+   
+    setTimeout(() => {
+      setShowNotification(false);
+      onClose();
+    }, 3000);
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-[#182237] text-white p-4 rounded-lg w-[400px] max-h-[500px] shadow-lg overflow-auto">
+      <div className="bg-[#182237] text-gray-300 p-4 rounded-lg w-[400px] max-h-[500px] shadow-lg overflow-auto">
         <h2 className="text-xl font-semibold mb-3">Product Add</h2>
 
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* Name */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Name:</label>
+            <label className="w-1/3 text-sm font-bold">Name:</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-[500px] p-1 border bg-[#182237] rounded text-white focus:ring focus:ring-blue-500"
+              className="w-[500px] p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
               required
             />
           </div>
 
           {/* Type */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Type:</label>
+            <label className="w-1/3 text-sm font-bold">Type:</label>
             <select
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="w-[500px] p-1 border bg-[#182237] rounded text-white focus:ring focus:ring-blue-500"
+              className="w-[500px] p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
               required
             >
               <option value="">Choose</option>
@@ -65,20 +73,20 @@ const AddProduct = ({ onClose }) => {
 
           {/* Price */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Price:</label>
+            <label className="w-1/3 text-sm font-bold">Price:</label>
             <input
               type="number"
               name="price"
               value={formData.price}
               onChange={handleChange}
-              className="w-[500px] p-1 border bg-[#182237] rounded text-white focus:ring focus:ring-blue-500"
+              className="w-[500px] p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
               required
             />
           </div>
 
           {/* Quantity */}
           <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm">Quantity:</label>
+            <label className="w-1/3 text-sm font-bold">Quantity:</label>
             <div className="flex items-center w-3/4">
               <button
                 type="button"
@@ -100,25 +108,25 @@ const AddProduct = ({ onClose }) => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm mb-1">Description:</label>
+            <label className="block text-sm mb-1 font-bold">Description:</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full p-1 border rounded bg-[#182237] text-white focus:ring focus:ring-blue-500"
+              className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
             ></textarea>
           </div>
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm mb-1">Url Image:</label>
+            <label className="block text-sm mb-1 font-bold">Url Image:</label>
             <input
               type="text"
               name="imageUrl"
               value={formData.imageUrl}
               onChange={handleChange}
-              className="w-full p-1 border rounded bg-[#182237] text-white focus:ring focus:ring-blue-500"
+              className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
             />
           </div>
 
@@ -140,6 +148,13 @@ const AddProduct = ({ onClose }) => {
           </div>
         </form>
       </div>
+      {/* Thông báo thành công */}
+    {showNotification && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1E283A] text-gray-300 px-6 py-3 rounded-md shadow-lg">
+          <h3 className="font-bold text-lg text-center">Notification</h3>
+          <p className="text-sm text-center text-gray-1 300">New product added successfully!</p>
+        </div>
+      )}
     </div>
   );
 };
