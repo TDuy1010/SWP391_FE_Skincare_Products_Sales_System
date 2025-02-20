@@ -38,7 +38,8 @@ const ProductManagement = () => {
                         </div>
                         <button className="bg-purple-600 text-white p-2 rounded-lg" onClick={() => setShowAddProduct(true)}> + Add Product </button>
                     </div>
-                    <table className="w-full text-left">
+                    <div className="overflow-x-auto">
+                    <table className="w-full text-left table-auto min-w-full">
                         <thead>
                             <tr className="text-yellow-400">
                                 <th className="p-2">ProductID</th>
@@ -71,6 +72,7 @@ const ProductManagement = () => {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
             

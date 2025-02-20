@@ -1,6 +1,8 @@
 
 import { RouterProvider } from 'react-router-dom'
 import { router } from './routers/router'
+import './page/Admin/ResponsiveAdmin/Responsive.css';
+
 
 function App() {
 
