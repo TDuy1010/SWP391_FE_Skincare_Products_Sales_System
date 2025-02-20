@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, message, Modal, Tag } from "antd";
+import { Button, message, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
   PlusOutlined,
@@ -7,38 +7,21 @@ import {
   DeleteOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import {
-  getAllCategories,
-  deleteCategory,
-} from "../../../service/category/index";
+import { getAllCategories, deleteCategory } from "../../../service/category/index";
 
 const CategoryManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  const fetchCategories = async (params = {}) => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await getAllCategories({
-        page: params.page - 1 || 0,
-        size: params.pageSize || 10,
-      });
-
+      const response = await getAllCategories();
       if (!response.error) {
         setCategories(response.result.categoryResponses);
-        setPagination({
-          current: response.result.pageNumber + 1,
-          pageSize: response.result.pageSize,
-          total: response.result.totalElements,
-        });
       } else {
         message.error(response.message);
       }
@@ -53,13 +36,6 @@ const CategoryManagement = () => {
     fetchCategories();
   }, []);
 
-  const handleTableChange = (newPagination) => {
-    fetchCategories({
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
-  };
-
   const showDeleteConfirm = (category) => {
     setSelectedCategory(category);
     setDeleteModalVisible(true);
@@ -73,10 +49,7 @@ const CategoryManagement = () => {
       const response = await deleteCategory(selectedCategory.id);
       if (!response.error) {
         message.success("Category deleted successfully");
-        await fetchCategories({
-          page: pagination.current,
-          pageSize: pagination.pageSize,
-        });
+        await fetchCategories();
       } else {
         message.error(response.message);
       }
@@ -89,82 +62,86 @@ const CategoryManagement = () => {
     }
   };
 
-  const columns = [
-    {
-      title: "Image",
-      dataIndex: "thumbnail",
-      key: "image",
-      render: (image) => (
-        <img
-          src={image}
-          alt="category"
-          className="w-16 h-16 object-cover rounded"
-        />
-      ),
-    },
-    {
-      title: "Category Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <Tag color={status === "ACTIVE" ? "green" : "red"}>{status}</Tag>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="Edit">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/category/edit/${record.id}`)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => showDeleteConfirm(record)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
-
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen bg-[#182237]">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Category Management</h2>
+        <h2 className="text-2xl font-bold text-white">Category Management</h2>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/admin/category/add")}
+          className="bg-[#0066ff] hover:bg-[#0052cc]"
         >
           Add New Category
         </Button>
       </div>
-      <Table
-        columns={columns}
-        dataSource={categories}
-        rowKey="id"
-        pagination={pagination}
-        loading={loading}
-        onChange={handleTableChange}
-      />
+
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full text-white">
+          <thead className="bg-[#182237] border-b border-gray-700">
+            <tr>
+              <th className="p-4 text-left">Image</th>
+              <th className="p-4 text-left">Category Name</th>
+              <th className="p-4 text-left">Description</th>
+              <th className="p-4 text-left">Status</th>
+              <th className="p-4 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((category) => (
+              <tr key={category.id} className="border-b border-gray-700 hover:bg-[#1e2c48]">
+                <td className="p-4">
+                  {category.thumbnail ? (
+                    <img
+                      src={category.thumbnail}
+                      alt={category.name}
+                      className="w-16 h-16 object-cover rounded"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-image.png';
+                        e.target.onerror = null;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                      <span className="text-gray-500">No image</span>
+                    </div>
+                  )}
+                </td>
+                <td className="p-4">{category.name}</td>
+                <td className="p-4 max-w-xs truncate">{category.description}</td>
+                <td className="p-4">
+                  <span
+                    className={`px-2 py-1 rounded text-sm ${
+                      category.status === "ACTIVE"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {category.status}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/admin/category/edit/${category.id}`)}
+                      className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      <EditOutlined />
+                    </button>
+                    <button
+                      onClick={() => showDeleteConfirm(category)}
+                      className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      <DeleteOutlined />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <Modal
         title={
           <div className="flex items-center gap-2 text-red-600">
@@ -186,16 +163,15 @@ const CategoryManagement = () => {
         }}
         centered
         maskClosable={false}
-        className="confirm-delete-modal"
+        className="[&_.ant-modal-content]:bg-[#182237] [&_.ant-modal-header]:bg-[#182237] [&_.ant-modal-title]:text-white"
       >
         <div className="py-4">
-          <p className="text-lg mb-2">
+          <p className="text-lg mb-2 text-white">
             Are you sure you want to delete category{" "}
             <strong>"{selectedCategory?.name}"</strong>?
           </p>
-          <p className="text-gray-500">
-            This action cannot be undone and will permanently delete the
-            category.
+          <p className="text-gray-400">
+            This action cannot be undone and will permanently delete the category.
           </p>
         </div>
       </Modal>

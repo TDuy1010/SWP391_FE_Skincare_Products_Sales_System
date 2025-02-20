@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, message, Modal } from "antd";
+import { Button, Tooltip, message, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getAllProducts, deleteProduct } from "../../../service/product/index";
@@ -8,30 +8,15 @@ const ProductManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const fetchProducts = async (params = {}) => {
+  const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await getAllProducts({
-        page: params.page - 1 || 0,
-        size: params.pageSize || 10,
-      });
-
+      const response = await getAllProducts();
       if (!response.error) {
         setProducts(response.result.productResponses);
-
-        setPagination({
-          current: response.result.pageNumber + 1,
-          pageSize: response.result.pageSize,
-          total: response.result.totalElements,
-        });
       } else {
         message.error(response.message);
       }
@@ -46,13 +31,6 @@ const ProductManagement = () => {
     fetchProducts();
   }, []);
 
-  const handleTableChange = (newPagination) => {
-    fetchProducts({
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
-  };
-
   const showDeleteConfirm = (product) => {
     setProductToDelete(product);
     setDeleteModalVisible(true);
@@ -65,10 +43,7 @@ const ProductManagement = () => {
       const response = await deleteProduct(productToDelete.id);
       if (!response.error) {
         message.success(response.message);
-        fetchProducts({
-          page: pagination.current,
-          pageSize: pagination.pageSize,
-        });
+        fetchProducts();
       } else {
         message.error(response.message);
       }
@@ -80,97 +55,80 @@ const ProductManagement = () => {
     }
   };
 
-  const columns = [
-    {
-      title: "Thumbnail",
-      dataIndex: "thumbnail",
-      key: "thumbnail",
-      render: (thumbnail) => (
-        <img
-          src={thumbnail}
-          alt="product"
-          style={{ width: "50px", height: "50px", objectFit: "cover" }}
-        />
-      ),
-    },
-    {
-      title: "Product Name",
-      dataIndex: "name",
-      key: "name",
-      ellipsis: true,
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => (price ? `${price.toLocaleString("vi-VN")}đ` : "N/A"),
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <span
-          className={`px-2 py-1 rounded ${
-            status === "ACTIVE"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {status}
-        </span>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="Edit">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/product/edit/${record.id}`)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => showDeleteConfirm(record)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
-
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen bg-[#182237]">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Product Management</h2>
+        <h2 className="text-2xl font-bold text-white">Product Management</h2>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate("/admin/product/add")}
+          className="bg-[#0066ff] hover:bg-[#0052cc]"
         >
           Add New Product
         </Button>
       </div>
-      <Table
-        columns={columns}
-        dataSource={products}
-        rowKey="id"
-        pagination={pagination}
-        loading={loading}
-        onChange={handleTableChange}
-      />
+
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full text-white">
+          <thead className="bg-[#182237] border-b border-gray-700">
+            <tr>
+              <th className="p-4 text-left">Thumbnail</th>
+              <th className="p-4 text-left">Product Name</th>
+              <th className="p-4 text-left">Price</th>
+              <th className="p-4 text-left">Description</th>
+              <th className="p-4 text-left">Status</th>
+              <th className="p-4 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.id} className="border-b border-gray-700 hover:bg-[#1e2c48]">
+                <td className="p-4">
+                  <img
+                    src={product.thumbnail}
+                    alt={product.name}
+                    className="w-12 h-12 object-cover rounded"
+                  />
+                </td>
+                <td className="p-4">{product.name}</td>
+                <td className="p-4">
+                  {product.price?.toLocaleString("vi-VN")}đ
+                </td>
+                <td className="p-4 max-w-xs truncate">{product.description}</td>
+                <td className="p-4">
+                  <span
+                    className={`px-2 py-1 rounded text-sm ${
+                      product.status === "ACTIVE"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {product.status}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/admin/product/edit/${product.id}`)}
+                      className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      <EditOutlined />
+                    </button>
+                    <button
+                      onClick={() => showDeleteConfirm(product)}
+                      className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      <DeleteOutlined />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -182,11 +140,12 @@ const ProductManagement = () => {
         okText="Delete"
         cancelText="Cancel"
         okButtonProps={{ danger: true }}
+        className="[&_.ant-modal-content]:bg-[#182237] [&_.ant-modal-header]:bg-[#182237] [&_.ant-modal-title]:text-white"
       >
-        <p>
+        <p className="text-white">
           Are you sure you want to delete product "{productToDelete?.name}"?
         </p>
-        <p>This action cannot be undone.</p>
+        <p className="text-white">This action cannot be undone.</p>
       </Modal>
     </div>
   );

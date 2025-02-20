@@ -3,6 +3,7 @@ import { Layout } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Admin/Sidebar";
 import AdminHeader from "../../components/Admin/Header";
+import { logout } from "../../service/logout";
 
 const { Content } = Layout;
 
@@ -13,9 +14,26 @@ const AdminPage = () => {
 
   console.log("AdminPage Rendered, User:", adminUser); // ✅ Kiểm tra user có load đúng không
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminUser");
-    navigate("/admin/login");
+  const handleLogout = async () => {
+    try {
+      const token = adminUser?.token;
+      if (token) {
+        const response = await logout(token);
+        if (!response.error) {
+          localStorage.clear();
+          navigate("/admin/login");
+        } else {
+          console.error("Lỗi đăng xuất:", response.message);
+        }
+      } else {
+        localStorage.clear();
+        navigate("/admin/login");
+      }
+    } catch (error) {
+      console.error("Lỗi khi đăng xuất:", error);
+      localStorage.clear();
+      navigate("/admin/login");
+    }
   };
 
   const toggleCollapsed = () => {
