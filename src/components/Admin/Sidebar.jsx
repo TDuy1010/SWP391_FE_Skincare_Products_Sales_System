@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
-import { Layout, Menu } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { Layout, Menu } from "antd";
+import { Link, useLocation } from "react-router-dom";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -10,7 +10,7 @@ import {
   BarChartOutlined,
   GiftOutlined,
   LogoutOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
 const { Sider } = Layout;
 
@@ -19,40 +19,45 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
 
   const menuItems = [
     {
-      key: '/admin',
+      key: "/admin",
       icon: <DashboardOutlined />,
       label: <Link to="/admin">Dashboard</Link>,
     },
     {
-      key: '/admin/user',
+      key: "/admin/user",
       icon: <UserOutlined />,
       label: <Link to="/admin/user">User Management</Link>,
     },
     {
-      key: '/admin/order',
+      key: "/admin/order",
       icon: <ShoppingCartOutlined />,
       label: <Link to="/admin/order">Order Management</Link>,
     },
     {
-      key: '/admin/product',
+      key: "/admin/product",
       icon: <InboxOutlined />,
       label: <Link to="/admin/product">Products</Link>,
     },
     {
-      key: '/admin/reports',
+      key: "/admin/category",
+      icon: <InboxOutlined />,
+      label: <Link to="/admin/category">Category Management</Link>,
+    },
+    {
+      key: "/admin/reports",
       icon: <BarChartOutlined />,
       label: <Link to="/admin/reports">Reports</Link>,
     },
     {
-      key: '/admin/vouchers',
+      key: "/admin/vouchers",
       icon: <GiftOutlined />,
       label: <Link to="/admin/vouchers">Vouchers</Link>,
     },
     {
-      key: 'logout',
+      key: "logout",
       icon: <LogoutOutlined />,
-      label: 'Logout',
-      className: 'mt-auto',
+      label: "Logout",
+      className: "mt-auto",
       danger: true,
       onClick: handleLogout,
     },
@@ -65,16 +70,18 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       collapsed={collapsed}
       width={250}
       style={{
-        background: '#001529',
-        height: '100vh',
-        position: 'fixed',
+        background: "#001529",
+        height: "100vh",
+        position: "fixed",
         left: 0,
       }}
     >
       <div className="p-4 flex items-center justify-center">
-        <div className={`transition-all duration-300 ease-in-out ${
-          collapsed ? 'w-12 h-12' : 'w-full'
-        }`}>
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            collapsed ? "w-12 h-12" : "w-full"
+          }`}
+        >
           {collapsed ? (
             <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center">
               <span className="text-2xl font-bold text-white">S</span>
@@ -103,4 +110,4 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;

@@ -18,6 +18,9 @@ import ProfilePage from "../page/Customer/Profile/ProfilePage";
 import AdminPage from "../page/Admin/AdminPage";
 import LoginAdmin from "../page/Admin/LoginAdmin/LoginAdmin";
 import { ProtectedAdminRoute } from "./ProtectedAdminRoute";
+import CategoryManagement from "../page/Admin/Category/CategoryManagement";
+import AddProduct from "../page/Admin/Product/AddProduct";
+import AddCategory from "../page/Admin/Category/AddCategory";
 
 export const router = createBrowserRouter([
   {
@@ -76,30 +79,46 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "login",
-        element: <LoginAdmin />
+        element: <LoginAdmin />,
       },
       {
         path: "",
-        element: <ProtectedAdminRoute><AdminPage /></ProtectedAdminRoute>,
+        element: (
+          <ProtectedAdminRoute>
+            <AdminPage />
+          </ProtectedAdminRoute>
+        ),
         children: [
           {
             path: "",
-            element: <Dashboard />
+            element: <Dashboard />,
           },
           {
             path: "user",
-            element: <UserManagement />
+            element: <UserManagement />,
           },
           {
             path: "order",
-            element: <OrderManagement />
+            element: <OrderManagement />,
           },
           {
             path: "product",
-            element: <ProductManagement />
-          }
-        ]
-      }
-    ]
-  }
+            element: <ProductManagement />,
+          },
+          {
+            path: "product/add",
+            element: <AddProduct />,
+          },
+          {
+            path: "category",
+            element: <CategoryManagement />,
+          },
+          {
+            path: "category/add",
+            element: <AddCategory />,
+          },
+        ],
+      },
+    ],
+  },
 ]);

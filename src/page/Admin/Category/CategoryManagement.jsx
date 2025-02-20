@@ -1,32 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, message, Modal } from "antd";
+import { Table, Button, Space, Tooltip, message, Modal, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { getAllProducts, deleteProduct } from "../../../service/product/index";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
+import {
+  getAllCategories,
+  deleteCategory,
+} from "../../../service/category/index";
 
-const ProductManagement = () => {
+const CategoryManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
 
-  const fetchProducts = async (params = {}) => {
+  const fetchCategories = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await getAllProducts({
+      const response = await getAllCategories({
         page: params.page - 1 || 0,
         size: params.pageSize || 10,
       });
 
       if (!response.error) {
-        setProducts(response.result.productResponses);
-
+        setCategories(response.result.categoryResponses);
         setPagination({
           current: response.result.pageNumber + 1,
           pageSize: response.result.pageSize,
@@ -36,36 +43,37 @@ const ProductManagement = () => {
         message.error(response.message);
       }
     } catch (error) {
-      message.error("Failed to fetch products");
+      message.error("Failed to fetch categories");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchCategories();
   }, []);
 
   const handleTableChange = (newPagination) => {
-    fetchProducts({
+    fetchCategories({
       page: newPagination.current,
       pageSize: newPagination.pageSize,
     });
   };
 
-  const showDeleteConfirm = (product) => {
-    setProductToDelete(product);
+  const showDeleteConfirm = (category) => {
+    setSelectedCategory(category);
     setDeleteModalVisible(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!productToDelete) return;
+    if (!selectedCategory) return;
 
     try {
-      const response = await deleteProduct(productToDelete.id);
+      setLoading(true);
+      const response = await deleteCategory(selectedCategory.id);
       if (!response.error) {
-        message.success(response.message);
-        fetchProducts({
+        message.success("Category deleted successfully");
+        await fetchCategories({
           page: pagination.current,
           pageSize: pagination.pageSize,
         });
@@ -73,37 +81,31 @@ const ProductManagement = () => {
         message.error(response.message);
       }
     } catch (error) {
-      message.error("Failed to delete product");
+      message.error("Failed to delete category");
     } finally {
+      setLoading(false);
       setDeleteModalVisible(false);
-      setProductToDelete(null);
+      setSelectedCategory(null);
     }
   };
 
   const columns = [
     {
-      title: "Thumbnail",
+      title: "Image",
       dataIndex: "thumbnail",
-      key: "thumbnail",
-      render: (thumbnail) => (
+      key: "image",
+      render: (image) => (
         <img
-          src={thumbnail}
-          alt="product"
-          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+          src={image}
+          alt="category"
+          className="w-16 h-16 object-cover rounded"
         />
       ),
     },
     {
-      title: "Product Name",
+      title: "Category Name",
       dataIndex: "name",
       key: "name",
-      ellipsis: true,
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => (price ? `${price.toLocaleString("vi-VN")}đ` : "N/A"),
     },
     {
       title: "Description",
@@ -116,15 +118,7 @@ const ProductManagement = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <span
-          className={`px-2 py-1 rounded ${
-            status === "ACTIVE"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {status}
-        </span>
+        <Tag color={status === "ACTIVE" ? "green" : "red"}>{status}</Tag>
       ),
     },
     {
@@ -136,7 +130,7 @@ const ProductManagement = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/product/edit/${record.id}`)}
+              onClick={() => navigate(`/admin/category/edit/${record.id}`)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -154,42 +148,59 @@ const ProductManagement = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Product Management</h2>
+        <h2 className="text-2xl font-bold">Category Management</h2>
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => navigate("/admin/product/add")}
+          onClick={() => navigate("/admin/category/add")}
         >
-          Add New Product
+          Add New Category
         </Button>
       </div>
       <Table
         columns={columns}
-        dataSource={products}
+        dataSource={categories}
         rowKey="id"
         pagination={pagination}
         loading={loading}
         onChange={handleTableChange}
       />
       <Modal
-        title="Confirm Delete"
+        title={
+          <div className="flex items-center gap-2 text-red-600">
+            <ExclamationCircleOutlined className="text-xl" />
+            <span>Delete Category</span>
+          </div>
+        }
         open={deleteModalVisible}
         onOk={handleDeleteConfirm}
         onCancel={() => {
           setDeleteModalVisible(false);
-          setProductToDelete(null);
+          setSelectedCategory(null);
         }}
         okText="Delete"
         cancelText="Cancel"
-        okButtonProps={{ danger: true }}
+        okButtonProps={{
+          danger: true,
+          loading: loading,
+        }}
+        centered
+        maskClosable={false}
+        className="confirm-delete-modal"
       >
-        <p>
-          Are you sure you want to delete product "{productToDelete?.name}"?
-        </p>
-        <p>This action cannot be undone.</p>
+        <div className="py-4">
+          <p className="text-lg mb-2">
+            Are you sure you want to delete category{" "}
+            <strong>"{selectedCategory?.name}"</strong>?
+          </p>
+          <p className="text-gray-500">
+            This action cannot be undone and will permanently delete the
+            category.
+          </p>
+        </div>
       </Modal>
     </div>
   );
 };
 
-export default ProductManagement;
+export default CategoryManagement;
