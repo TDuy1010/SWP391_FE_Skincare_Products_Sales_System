@@ -34,7 +34,7 @@ const ShopPagce = () => {
           </div>
         </div>
       </div>
-      <div className="bg-gray-100 w-full py-4">
+      <div className="bg-gray-100 w-full py-4 overflow-x-auto ">
         <div className="flex justify-center space-x-4">
           <button className="px-4 py-2 border-b-2 border-black">Shop All</button>
           <button className="px-4 py-2">Cleanse</button>
@@ -47,7 +47,6 @@ const ShopPagce = () => {
           <button className="px-4 py-2">Shave</button>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto p-6">
         <h1 className="text-sm text-gray-500 mb-2">Renowned Formulations</h1>
         <h2 className="text-4xl font-light mb-8">Essentials For Every Skincare</h2>

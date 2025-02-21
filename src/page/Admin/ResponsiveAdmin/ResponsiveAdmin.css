@@ -1,11 +1,15 @@
-/*AddUser.jsx */
+/* AddUser */
 @media (max-width: 768px) {
     .add-user-container {
       width: 90% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      display: flex;
+      flex-direction: column;
     }
   }
   
-  /*UserManagement.jsx */
+  /* UserManagement */
   @media (max-width: 1024px) {
     .user-table th, .user-table td {
       padding: 8px !important;
@@ -25,14 +29,18 @@
     }
   }
   
-  /*AddProduct.jsx */
+  /* AddProduct */
   @media (max-width: 768px) {
     .add-product-container {
       width: 90% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      display: flex;
+      flex-direction: column;
     }
   }
   
-  /*ProductManagement.jsx */
+  /* ProductManagement */
   @media (max-width: 1024px) {
     .product-table th, .product-table td {
       padding: 8px !important;
@@ -52,7 +60,7 @@
     }
   }
   
-  /*OrderManagement.jsx */
+  /* OrderManagement */
   @media (max-width: 768px) {
     .order-table {
       overflow-x: auto !important;
@@ -61,21 +69,21 @@
     }
   }
   
-  /*LoginAdmin.jsx */
+  /* LoginAdmin */
   @media (max-width: 768px) {
     .login-container {
       width: 90% !important;
     }
   }
   
-  /*Dashboard.jsx */
+  /* Dashboard */
   @media (max-width: 1024px) {
     .dashboard-header h1 {
       font-size: 1.5rem !important;
     }
   }
   
-  /*AdminPage.jsx */
+  /* AdminPage */
   @media (max-width: 1024px) {
     .admin-content {
       margin-left: 80px !important;
@@ -95,4 +103,13 @@
     }
   }
   
+  /* Đảm bảo button AddProduct và AddUser hiển thị rõ trên smartphone */
+  @media (max-width: 768px) {
+    .add-user-button, .add-product-button {
+      position: relative !important;
+      bottom: auto !important;
+      width: 100% !important;
+      margin-top: 10px !important;
+    }
+  }
   
