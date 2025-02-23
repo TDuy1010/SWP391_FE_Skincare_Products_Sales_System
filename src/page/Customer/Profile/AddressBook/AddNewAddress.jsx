@@ -13,6 +13,8 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     }
   );
 
+  const [errors, setErrors] = useState({});
+
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -52,6 +54,33 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     }));
   };
 
+  const validateForm = () => {
+    let newErrors = {};
+    if (!form.name || form.name.length < 2 || form.name.length > 50) {
+      newErrors.name = "Độ dài phải từ 2 - 50 kí tự.";
+    }
+    if (!form.phone) {
+      newErrors.phone = "Thông tin bắt buộc.";
+    }
+    if (!form.city) {
+      newErrors.city = "Thông tin bắt buộc.";
+    }
+    if (!form.district) {
+      newErrors.district = "Thông tin bắt buộc.";
+    }
+    if (!form.ward) {
+      newErrors.ward = "Thông tin bắt buộc.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      console.log("Form hợp lệ, gửi dữ liệu...");
+    }
+  };
+
   useEffect(() => {
     if (form.city && form.district && form.ward && form.address) {
       const query = `${form.address}, ${form.ward}, ${form.district}, ${form.city}, Vietnam`;
@@ -72,6 +101,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
+          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
         <div>
           <label className="block text-gray-700 mb-1">Số điện thoại:</label>
@@ -82,6 +112,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
+          {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
         </div>
         <div>
           <label className="block text-gray-700 mb-1">Tỉnh/Thành phố:</label>
@@ -96,6 +127,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
               <option key={city.code} value={city.code}>{city.name}</option>
             ))}
           </select>
+          {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
         </div>
         <div>
           <label className="block text-gray-700 mb-1">Quận/Huyện:</label>
@@ -111,6 +143,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
               <option key={district.code} value={district.code}>{district.name}</option>
             ))}
           </select>
+          {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
         </div>
         <div>
           <label className="block text-gray-700 mb-1">Phường/Xã:</label>
@@ -126,6 +159,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
               <option key={ward.code} value={ward.code}>{ward.name}</option>
             ))}
           </select>
+          {errors.ward && <p className="text-red-500 text-sm">{errors.ward}</p>}
         </div>
         <div>
           <label className="block text-gray-700 mb-1">Địa chỉ nhận hàng:</label>
@@ -137,6 +171,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             className="w-full border p-2 rounded"
           />
         </div>
+       
       </div>
       {mapUrl && (
         <div className="mt-4">
@@ -151,9 +186,20 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
           ></iframe>
         </div>
       )}
-      <div className="flex justify-end space-x-2 mt-4">
-        <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded">Hủy</button>
-        <button className="px-4 py-2 bg-green-600 text-white rounded">Cập nhật</button>
+      
+      <div className="mt-4">
+            <div className="flex items-center gap-1"> 
+            <input id="defaultAddress" type="checkbox" name="default" checked={form.default} onChange={handleChange} className="w-4 h-4"/>
+            <label htmlFor="defaultAddress" className="text-sm cursor-pointer">Đặt làm địa chỉ mặc định</label>
+            </div>
+       <div className="flex justify-end space-x-2 mt-2">
+            <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded">
+            Hủy
+            </button>
+            <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 text-white rounded">
+            Cập nhật
+            </button>
+        </div>
       </div>
     </div>
   );
