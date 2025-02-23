@@ -16,7 +16,8 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-  
+  const [mapUrl, setMapUrl] = useState("");
+
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
       .then((res) => res.json())
@@ -51,9 +52,16 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     }));
   };
 
+  useEffect(() => {
+    if (form.city && form.district && form.ward && form.address) {
+      const query = `${form.address}, ${form.ward}, ${form.district}, ${form.city}, Vietnam`;
+      const encodedQuery = encodeURIComponent(query);
+      setMapUrl(`https://www.google.com/maps/embed/v1/place?key=AIzaSyC5A_iOQRQTz-XsPeqz0nQByVZCpGlG10o&q=${encodedQuery}`);
+    }
+  }, [form]);
+
   return (
     <div className="p-6 bg-white w-full max-w-full border rounded-md">
-      {/* <h2 className="text-xl font-semibold mb-4">Thêm địa chỉ mới</h2> */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-gray-700 mb-1">Tên:</label>
@@ -130,21 +138,23 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
           />
         </div>
       </div>
-      <div className="mt-4">
-            <div className="flex items-center gap-1"> 
-                <input type="checkbox" name="default" checked={form.default} onChange={handleChange}className="w-4 h-4"/>
-                <span className="text-sm">Đặt làm địa chỉ mặc định</span>
-            </div>
-       <div className="flex justify-end space-x-2 mt-2">
-            <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded">
-            Hủy
-            </button>
-            <button className="px-4 py-2 bg-green-600 text-white rounded">
-            Cập nhật
-            </button>
+      {mapUrl && (
+        <div className="mt-4">
+          <iframe
+            title="Google Map"
+            width="100%"
+            height="300"
+            frameBorder="0"
+            style={{ border: 0 }}
+            src={mapUrl}
+            allowFullScreen
+          ></iframe>
         </div>
+      )}
+      <div className="flex justify-end space-x-2 mt-4">
+        <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded">Hủy</button>
+        <button className="px-4 py-2 bg-green-600 text-white rounded">Cập nhật</button>
       </div>
-
     </div>
   );
 };

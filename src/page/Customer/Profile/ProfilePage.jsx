@@ -3,7 +3,7 @@ import { FiEdit2, FiX } from 'react-icons/fi';
 import avatar from '../../../assets/img/hero-photo.png';
 import AddressBook from "../Profile/AddressBook/AddressBook.jsx";
 import { div } from 'framer-motion/client';
-import AddNewAddress from './AddressBook/AddNewAddress.jsx';
+import AddNewAddress from "../Profile/AddressBook/AddNewAddress.jsx";
 
 
 
