@@ -30,8 +30,8 @@ const AddressBook = () => {
 
   const [locationData, setLocationData] = useState({
     cities: [],
-    districts: [],
-    wards: [],
+    districts: {},
+    wards: {},
   });
 
   useEffect(() => {
@@ -43,45 +43,56 @@ const AddressBook = () => {
     fetchCities();
   }, []);
 
-  const fetchDistricts = async (cityCode) => {
-    if (!cityCode) return;
-    const response = await fetch(`https://provinces.open-api.vn/api/p/${cityCode}?depth=2`);
-    const data = await response.json();
-    setLocationData((prev) => ({ ...prev, districts: data.districts || [] }));
-  };
+  useEffect(() => {
+    const fetchAllDistrictsAndWards = async () => {
+      let allDistricts = {};
+      let allWards = {};
 
-  const fetchWards = async (districtCode) => {
-    if (!districtCode) return;
-    const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
-    const data = await response.json();
-    setLocationData((prev) => ({ ...prev, wards: data.wards || [] }));
-  };
+      const citiesResponse = await fetch("https://provinces.open-api.vn/api/p/");
+      const citiesData = await citiesResponse.json();
+
+      for (const city of citiesData) {
+        const districtsResponse = await fetch(`https://provinces.open-api.vn/api/p/${city.code}?depth=2`);
+        const districtsData = await districtsResponse.json();
+        allDistricts[city.code] = districtsData.districts || [];
+
+        for (const district of districtsData.districts || []) {
+          const wardsResponse = await fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`);
+          const wardsData = await wardsResponse.json();
+          allWards[district.code] = wardsData.wards || [];
+        }
+      }
+
+      setLocationData((prev) => ({ ...prev, districts: allDistricts, wards: allWards }));
+    };
+
+    fetchAllDistrictsAndWards();
+  }, []);
 
   const getCityName = (code) => {
     const city = locationData.cities.find(c => c.code.toString() === code);
     return city ? city.name : code;
   };
 
-  const getDistrictName = (code) => {
-    const district = locationData.districts.find(d => d.code.toString() === code);
-    return district ? district.name : code;
+  const getDistrictName = (cityCode, districtCode) => {
+    const districts = locationData.districts[cityCode] || [];
+    const district = districts.find(d => d.code.toString() === districtCode);
+    return district ? district.name : districtCode;
   };
 
-  const getWardName = (code) => {
-    const ward = locationData.wards.find(w => w.code.toString() === code);
-    return ward ? ward.name : code;
+  const getWardName = (districtCode, wardCode) => {
+    const wards = locationData.wards[districtCode] || [];
+    const ward = wards.find(w => w.code.toString() === wardCode);
+    return ward ? ward.name : wardCode;
   };
 
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr.id !== id));
   };
 
-  const handleEdit = async (addr) => {
+  const handleEdit = (addr) => {
     setEditForm(addr);
     setShowForm(true);
-
-    await fetchDistricts(addr.city); 
-    await fetchWards(addr.district);  
   };
 
   const handleCloseForm = () => {
@@ -121,8 +132,6 @@ const AddressBook = () => {
           onClose={handleCloseForm}
           defaultValues={editForm}
           onAddAddress={editForm ? handleUpdateAddAddress : handleAddAddress}
-          onCityChange={fetchDistricts}
-          onDistrictChange={fetchWards}
         />
       ) : (
         <>
@@ -132,19 +141,19 @@ const AddressBook = () => {
                 key={addr.id}
                 className="border-b last:border-0 p-4 flex justify-between items-start"
               >
-                <div>
+                <div className="w-full max-w-[80%]">
                   <p className="font-semibold text-green-800 flex items-center gap-1">
                     {addr.name} - {addr.phone}
                     {addr.default && (
                       <span className="text-yellow-500 font-medium"> - Địa chỉ mặc định</span>
                     )}
                   </p>
-                  <p className="text-gray-700 text-sm">
-                    {addr.address}, {getWardName(addr.ward)}, {getDistrictName(addr.district)}, {getCityName(addr.city)}
+                  <p className="text-gray-700 text-sm ">
+                    {addr.address}, {getWardName(addr.district, addr.ward)}, {getDistrictName(addr.city, addr.district)}, {getCityName(addr.city)}
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 ">
                   <button
                     className="text-green-600 font-medium hover:underline"
                     onClick={() => handleEdit(addr)}
@@ -163,7 +172,8 @@ const AddressBook = () => {
               </div>
             ))}
           </div>
-           {/* Thêm địa chỉ mới */}
+
+          {/* Thêm địa chỉ mới */}
           <div className="mt-6 px-0 flex items-center justify-end w-full">
             <p className="text-gray-700 px-2">Bạn muốn giao hàng đến địa chỉ khác?</p>
             <button
