@@ -4,7 +4,7 @@ import avatar from '../../../assets/img/hero-photo.png';
 import AddressBook from "../Profile/AddressBook/AddressBook.jsx";
 import { div } from 'framer-motion/client';
 import AddNewAddress from "../Profile/AddressBook/AddNewAddress.jsx";
-import Orders from "./MyOrders/Orders.jsx";
+import Orders from "./MyOrders/MyOrdered.jsx";
 
 
 

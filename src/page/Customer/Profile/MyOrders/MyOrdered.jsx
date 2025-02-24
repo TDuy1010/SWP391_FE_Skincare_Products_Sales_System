@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import OrderDetail from "./OrderDetail";
-import AddressBook from "../../Profile/AddressBook/AddressBook.jsx";
+import OrderDetail from "./MyOrderedDetail.jsx";
+import AddressBook from "../AddressBook/AddressBook.jsx";
 
 const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
