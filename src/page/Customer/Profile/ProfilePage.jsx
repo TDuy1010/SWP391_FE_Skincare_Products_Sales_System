@@ -4,6 +4,7 @@ import avatar from '../../../assets/img/hero-photo.png';
 import AddressBook from "../Profile/AddressBook/AddressBook.jsx";
 import { div } from 'framer-motion/client';
 import AddNewAddress from "../Profile/AddressBook/AddNewAddress.jsx";
+import Orders from "./MyOrders/Orders.jsx";
 
 
 
@@ -215,6 +216,7 @@ const ProfilePage = () => {
               {activeTab === 'orders' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-6">Đơn hàng của tôi</h3>
+                  <Orders />
                   {/* Order history content */}
                 </div>
               )}

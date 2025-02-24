@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const AddNewAddress = ({ onClose, defaultValues }) => {
+const AddNewAddress = ({ onClose, defaultValues, onAddAddress }) => {
   const [form, setForm] = useState(
     defaultValues || {
       name: "",
@@ -14,7 +14,6 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
   );
 
   const [errors, setErrors] = useState({});
-
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -59,8 +58,11 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     if (!form.name || form.name.length < 2 || form.name.length > 50) {
       newErrors.name = "Độ dài phải từ 2 - 50 kí tự.";
     }
-    if (!form.phone) {
-      newErrors.phone = "Thông tin bắt buộc.";
+    const phoneRegex = /^[0-9]{8,10}$/; 
+       if (!form.phone) {
+       newErrors.phone = "Thông tin bắt buộc.";
+    } else if (!phoneRegex.test(form.phone)) {
+    newErrors.phone = "Thông tin vừa nhập không hợp lệ. Vui lòng kiểm tra lại. ";
     }
     if (!form.city) {
       newErrors.city = "Thông tin bắt buộc.";
@@ -77,7 +79,8 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
 
   const handleSubmit = () => {
     if (validateForm()) {
-      console.log("Form hợp lệ, gửi dữ liệu...");
+      onAddAddress(form);
+      onClose();
     }
   };
 
