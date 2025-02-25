@@ -142,10 +142,10 @@ const AddressBook = () => {
                 className="border-b last:border-0 p-4 flex justify-between items-start"
               >
                 <div className="w-full max-w-[80%]">
-                  <p className="font-semibold text-green-800 flex items-center gap-1">
+                  <p className="font-semibold text-gray-800 flex items-center gap-1">
                     {addr.name} - {addr.phone}
                     {addr.default && (
-                      <span className="text-yellow-500 font-medium"> - Địa chỉ mặc định</span>
+                      <span className="text-sky-900 font-medium"> - Địa chỉ mặc định</span>
                     )}
                   </p>
                   <p className="text-gray-700 text-sm ">
@@ -155,7 +155,7 @@ const AddressBook = () => {
 
                 <div className="flex items-center space-x-3 ">
                   <button
-                    className="text-green-600 font-medium hover:underline"
+                    className="text-neutral-600 font-medium hover:underline"
                     onClick={() => handleEdit(addr)}
                   >
                     Chỉnh sửa
@@ -178,7 +178,7 @@ const AddressBook = () => {
             <p className="text-gray-700 px-2">Bạn muốn giao hàng đến địa chỉ khác?</p>
             <button
               onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-green-700 text-white font-semibold rounded-md hover:bg-green-800"
+              className="px-4 py-2 bg-neutral-600 text-white font-semibold rounded-md hover:bg-neutral-900"
             >
               Thêm địa chỉ mới
             </button>

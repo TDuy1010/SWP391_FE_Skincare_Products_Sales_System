@@ -5,10 +5,10 @@ const OrderDetail = ({ order, customer, onBack }) => {
 
   return (
     <div className="">
-      <button onClick={onBack} className="text-blue-600 mb-4 flex items-center">
+      <button onClick={onBack} className="text-sky-700 hover:text-gray-800 mb-4 flex items-center">
         &larr; Trở lại
       </button>
-      <h3 className="text-lg font-semibold mt-4 bg-blue-100 p-2 rounded-md">Chi Tiết Đơn Hàng</h3>
+      <div className="text-lg font-semibold mt-4 bg-neutral-300 p-2 rounded-md">Chi Tiết Đơn Hàng</div>
 <div className="grid grid-cols-2 gap-4 p-3 bg-gray-100 rounded-md">
   {/* Thông tin khách hàng */}
   <div className="p-4 bg-gray-100 rounded-md">
@@ -19,7 +19,7 @@ const OrderDetail = ({ order, customer, onBack }) => {
 
   {/* Thông tin đơn hàng */}
   <div className="p-4 bg-gray-100 rounded-md">
-    <p className="text-gray-700"><strong>Mã đơn hàng:</strong> #{order.id} <span className="text-green-600 font-medium">| Mua Hàng</span></p>
+    <p className="text-gray-700"><strong>Mã đơn hàng:</strong> #{order.id} </p>
     <p className="text-gray-700"><strong>Ngày đặt:</strong> {order.date}</p>
     <p className="text-gray-700"><strong>Trạng thái đơn hàng:</strong> {order.status}</p>
     <p className="text-gray-700"><strong>Hình thức thanh toán:</strong> VN Pay</p>
@@ -32,7 +32,7 @@ const OrderDetail = ({ order, customer, onBack }) => {
       </div>
 
       {/* Chi tiết sản phẩm */}
-      <h3 className="text-lg font-semibold mt-4 bg-blue-100 p-2 rounded-md">Chi Tiết Sản Phẩm</h3>
+      <h3 className="text-lg font-semibold mt-4 bg-neutral-300 p-2 rounded-md">Chi Tiết Sản Phẩm</h3>
       <div className="p-4">
         {order.items.map((item, index) => (
           <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
@@ -63,7 +63,7 @@ const OrderDetail = ({ order, customer, onBack }) => {
 
       {/*hủy đơn hàng */}
       <div className="mt-4 flex justify-end">
-        <button className="px-6 py-1 bg-red-600 text-white rounded">Hủy đơn hàng</button>
+        <button className="px-6 py-1 bg-neutral-600 hover:bg-neutral-800 text-white rounded">Hủy đơn hàng</button>
       </div>
     </div>
   );

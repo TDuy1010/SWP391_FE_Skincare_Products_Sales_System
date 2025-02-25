@@ -190,16 +190,16 @@ const AddNewAddress = ({ onClose, defaultValues, onAddAddress }) => {
         </div>
       )}
       
-      <div className="mt-4">
-            <div className="flex items-center gap-1"> 
+      <div className="mt-5 ">
+      <div className="flex items-center gap-1"> 
             <input id="defaultAddress" type="checkbox" name="default" checked={form.default} onChange={handleChange} className="w-4 h-4"/>
             <label htmlFor="defaultAddress" className="text-sm cursor-pointer">Đặt làm địa chỉ mặc định</label>
             </div>
        <div className="flex justify-end space-x-2 mt-2">
-            <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded">
+            <button onClick={onClose} className="px-4 py-2 bg-neutral-400 hover:bg-neutral-900 text-white rounded">
             Hủy
             </button>
-            <button onClick={handleSubmit} className="px-4 py-2 bg-green-600 text-white rounded">
+            <button onClick={handleSubmit} className="px-4 py-2 bg-neutral-600 hover:bg-neutral-900 text-white rounded">
             Cập nhật
             </button>
         </div>

@@ -23,7 +23,6 @@ const Orders = () => {
   const [addresses, setAddresses] = useState([]);
 
   useEffect(() => {
-    // Giả lập lấy danh sách địa chỉ từ AddressBook (có thể thay bằng API nếu cần)
     const fetchAddresses = async () => {
       const storedAddresses = [
         {
@@ -70,11 +69,11 @@ const Orders = () => {
           {currentOrders.map((order, index) => (
             <div 
               key={index} 
-              className="border-b pb-4 mb-4 last:border-0 cursor-pointer hover:bg-gray-100 p-4" 
+              className="border-b pb-4 mb-4 last:border-0 cursor-pointer hover:bg-gray-100 p-4"   
               onClick={() => setSelectedOrder(order)}
             >
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-blue-600">#{order.id}</span>
+                <span className="font-semibold text-gray-800">#{order.id}</span>
                 <span className={`px-2 py-1 text-white rounded ${order.status === "COMPLETED" ? "bg-green-600" : "bg-yellow-500"}`}>
                   {order.status}
                 </span>
@@ -85,7 +84,7 @@ const Orders = () => {
                   <li key={i} className="text-gray-800">{item.name} - {item.quantity} x {item.price.toLocaleString()} đ</li>
                 ))}
               </ul>
-              <p className="text-green-600 mt-2">✔ {order.delivery}</p>
+              <p className="text-neutral-600 mt-2">✔ {order.delivery}</p>
               <p className="text-right font-semibold text-lg">Total: {order.total.toLocaleString()} đ</p>
             </div>
           ))}
