@@ -4,6 +4,7 @@ import avatar from '../../../assets/img/hero-photo.png';
 import AddressBook from "../Profile/AddressBook/AddressBook.jsx";
 import { div } from 'framer-motion/client';
 import AddNewAddress from "../Profile/AddressBook/AddNewAddress.jsx";
+import Orders from "./MyOrders/MyOrdered.jsx";
 
 
 
@@ -36,7 +37,7 @@ const ProfilePage = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Chỉnh sửa thông tin</h3>
+          <h3 className="text-xl font-semibold">Edit information</h3>
           <button onClick={() => setIsEditing(false)} className="text-gray-500 hover:text-gray-700">
             <FiX size={24} />
           </button>
@@ -44,7 +45,7 @@ const ProfilePage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 mb-1">Họ và tên</label>
+            <label className="block text-gray-700 mb-1">Full name</label>
             <input
               type="text"
               name="fullName"
@@ -66,7 +67,7 @@ const ProfilePage = () => {
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-1">Số điện thoại</label>
+            <label className="block text-gray-700 mb-1">Phone number</label>
             <input
               type="tel"
               name="phone"
@@ -77,7 +78,7 @@ const ProfilePage = () => {
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-1">Ngày sinh</label>
+            <label className="block text-gray-700 mb-1">Date of birth</label>
             <input
               type="date"
               name="birthDate"
@@ -88,16 +89,16 @@ const ProfilePage = () => {
           </div>
 
           <div>
-            <label className="block text-gray-700 mb-1">Giới tính</label>
+            <label className="block text-gray-700 mb-1">Gender</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleInputChange}
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-gray-900"
             >
-              <option value="Nam">Nam</option>
-              <option value="Nữ">Nữ</option>
-              <option value="Khác">Khác</option>
+              <option value="Nam">Male</option>
+              <option value="Nữ">Female</option>
+              <option value="Khác">Other</option>
             </select>
           </div>
 
@@ -107,13 +108,13 @@ const ProfilePage = () => {
               onClick={() => setIsEditing(false)}
               className="flex-1 px-4 py-2 border border-gray-900 text-gray-900 rounded-lg hover:bg-gray-100"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
               className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700"
             >
-              Lưu thay đổi
+              Save changes
             </button>
           </div>
         </form>
@@ -141,7 +142,7 @@ const ProfilePage = () => {
                     activeTab === 'profile' ? 'bg-gray-900 text-white' : 'hover:bg-gray-100'
                   }`}
                 >
-                  Thông tin cá nhân
+                  Personal information
                 </button>
                 <button 
                   onClick={() => setActiveTab('orders')}
@@ -149,7 +150,7 @@ const ProfilePage = () => {
                     activeTab === 'orders' ? 'bg-gray-900 text-white' : 'hover:bg-gray-100'
                   }`}
                 >
-                  Đơn hàng của tôi
+                  My orders
                 </button>
                 <button 
                   onClick={() => setActiveTab('addresses')}
@@ -157,7 +158,7 @@ const ProfilePage = () => {
                     activeTab === 'addresses' ? 'bg-gray-900 text-white' : 'hover:bg-gray-100'
                   }`}
                 >
-                  Sổ địa chỉ
+                  Address book
                 </button>
                 <button 
                   onClick={() => setActiveTab('wishlist')}
@@ -165,7 +166,7 @@ const ProfilePage = () => {
                     activeTab === 'wishlist' ? 'bg-gray-900 text-white' : 'hover:bg-gray-100'
                   }`}
                 >
-                  Sản phẩm yêu thích
+                  Favorite products
                 </button>
               </div>
             </div>
@@ -177,19 +178,19 @@ const ProfilePage = () => {
               {activeTab === 'profile' && (
                 <div>
                   <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-semibold">Thông tin cá nhân</h3>
+                    <h3 className="text-xl font-semibold">Personal information</h3>
                     <button 
                       onClick={() => setIsEditing(true)}
                       className="flex items-center text-gray-900 hover:text-gray-700"
                     >
                       <FiEdit2 className="mr-2" />
-                      Chỉnh sửa
+                      Edit
                     </button>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <p className="text-gray-500 mb-1">Họ và tên</p>
+                      <p className="text-gray-500 mb-1">Full name</p>
                       <p className="font-medium">{formData.fullName}</p>
                     </div>
                     <div>
@@ -197,15 +198,15 @@ const ProfilePage = () => {
                       <p className="font-medium">{formData.email}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Số điện thoại</p>
+                      <p className="text-gray-500 mb-1">Phone number</p>
                       <p className="font-medium">{formData.phone}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Ngày sinh</p>
+                      <p className="text-gray-500 mb-1">Date of birth</p>
                       <p className="font-medium">{formData.birthDate}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 mb-1">Giới tính</p>
+                      <p className="text-gray-500 mb-1">Gender</p>
                       <p className="font-medium">{formData.gender}</p>
                     </div>
                   </div>
@@ -214,21 +215,22 @@ const ProfilePage = () => {
 
               {activeTab === 'orders' && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-6">Đơn hàng của tôi</h3>
+                  <h3 className="text-xl font-semibold mb-6">My orders</h3>
+                  <Orders />
                   {/* Order history content */}
                 </div>
               )}
 
               {activeTab === 'addresses' && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-6">Sổ địa chỉ</h3>
+                  <h3 className="text-xl font-semibold mb-6">Address book</h3>
                   <AddressBook />
                 </div>
               )}
 
               {activeTab === 'wishlist' && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-6">Sản phẩm yêu thích</h3>
+                  <h3 className="text-xl font-semibold mb-6">Favorite products</h3>
                   {/* Wishlist content */}
                 </div>
               )}

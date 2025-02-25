@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Trash2 } from "lucide-react"; 
 import AddNewAddress from "./AddNewAddress";
 
 const AddressBook = () => {
@@ -10,38 +10,89 @@ const AddressBook = () => {
       id: 1,
       name: "Tuấn Anh",
       phone: "123456789",
-      city: "Hồ Chí Minh",
-      district: "Quận 9",
-      ward: "Phường Long Bình",
+      city: "79",
+      district: "769",
+      ward: "26830",
       address: "Vinhomes Grand Park Origami S7.03",
+      default: true,
     },
     {
       id: 2,
       name: "Tuấn Em",
       phone: "0123456789",
-      city: "Hồ Chí Minh",
-      district: "Quận 9",
-      ward: "Phường Long Bình",
+      city: "79",
+      district: "769",
+      ward: "26831",
       address: "Vinhomes Grand Park Origami S7.03",
-    },
-    {
-      id: 3,
-      name: "Tuấn Chị",
-      phone: "0123456789",
-      city: "Hồ Chí Minh",
-      district: "Quận 9",
-      ward: "Phường Long Bình",
-      address: "Vinhomes Grand Park Origami S7.03",
+      default: false,
     },
   ]);
+
+  const [locationData, setLocationData] = useState({
+    cities: [],
+    districts: {},
+    wards: {},
+  });
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      const response = await fetch("https://provinces.open-api.vn/api/p/");
+      const data = await response.json();
+      setLocationData((prev) => ({ ...prev, cities: data }));
+    };
+    fetchCities();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllDistrictsAndWards = async () => {
+      let allDistricts = {};
+      let allWards = {};
+
+      const citiesResponse = await fetch("https://provinces.open-api.vn/api/p/");
+      const citiesData = await citiesResponse.json();
+
+      for (const city of citiesData) {
+        const districtsResponse = await fetch(`https://provinces.open-api.vn/api/p/${city.code}?depth=2`);
+        const districtsData = await districtsResponse.json();
+        allDistricts[city.code] = districtsData.districts || [];
+
+        for (const district of districtsData.districts || []) {
+          const wardsResponse = await fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`);
+          const wardsData = await wardsResponse.json();
+          allWards[district.code] = wardsData.wards || [];
+        }
+      }
+
+      setLocationData((prev) => ({ ...prev, districts: allDistricts, wards: allWards }));
+    };
+
+    fetchAllDistrictsAndWards();
+  }, []);
+
+  const getCityName = (code) => {
+    const city = locationData.cities.find(c => c.code.toString() === code);
+    return city ? city.name : code;
+  };
+
+  const getDistrictName = (cityCode, districtCode) => {
+    const districts = locationData.districts[cityCode] || [];
+    const district = districts.find(d => d.code.toString() === districtCode);
+    return district ? district.name : districtCode;
+  };
+
+  const getWardName = (districtCode, wardCode) => {
+    const wards = locationData.wards[districtCode] || [];
+    const ward = wards.find(w => w.code.toString() === wardCode);
+    return ward ? ward.name : wardCode;
+  };
 
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr.id !== id));
   };
 
   const handleEdit = (addr) => {
-    setEditForm(addr);  // Gán dữ liệu địa chỉ cần chỉnh sửa
-    setShowForm(true);  // Hiển thị form chỉnh sửa
+    setEditForm(addr);
+    setShowForm(true);
   };
 
   const handleCloseForm = () => {
@@ -49,10 +100,39 @@ const AddressBook = () => {
     setEditForm(null);
   };
 
+  const handleAddAddress = (newAddress) => {
+    setAddresses((prevAddresses) => {
+      const updatedAddresses = newAddress.default
+        ? prevAddresses.map((addr) => ({ ...addr, default: false }))
+        : prevAddresses;
+      return [...updatedAddresses, { ...newAddress, id: prevAddresses.length + 1 }];
+    });
+
+    handleCloseForm();
+  };
+
+  const handleUpdateAddAddress = (updatedAddress) => {
+    setAddresses((prevAddresses) => {
+      return prevAddresses.map((addr) =>
+        addr.id === updatedAddress.id
+          ? { ...updatedAddress }
+          : updatedAddress.default
+          ? { ...addr, default: false }
+          : addr
+      );
+    });
+
+    handleCloseForm();
+  };
+
   return (
     <div className="p-6 bg-white w-full max-w-full">
       {showForm ? (
-        <AddNewAddress onClose={handleCloseForm} defaultValues={editForm} />
+        <AddNewAddress
+          onClose={handleCloseForm}
+          defaultValues={editForm}
+          onAddAddress={editForm ? handleUpdateAddAddress : handleAddAddress}
+        />
       ) : (
         <>
           <div className="border rounded-md p-4 bg-gray-50">
@@ -61,20 +141,24 @@ const AddressBook = () => {
                 key={addr.id}
                 className="border-b last:border-0 p-4 flex justify-between items-start"
               >
-                <div>
-                  <p className="font-semibold text-green-800">
+                <div className="w-full max-w-[80%]">
+                  <p className="font-semibold text-gray-800 flex items-center gap-1">
                     {addr.name} - {addr.phone}
+                    {addr.default && (
+                      <span className="text-sky-900 font-medium"> - Default address</span>
+                    )}
                   </p>
-                  <p className="text-gray-700 text-sm">
-                    {addr.address}, {addr.ward}, {addr.district}, {addr.city}
+                  <p className="text-gray-700 text-sm ">
+                    {addr.address}, {getWardName(addr.district, addr.ward)}, {getDistrictName(addr.city, addr.district)}, {getCityName(addr.city)}
                   </p>
                 </div>
-                <div className="flex items-center space-x-3">
+
+                <div className="flex items-center space-x-3 ">
                   <button
-                    className="text-green-600 font-medium hover:underline"
+                    className="text-neutral-600 font-medium hover:underline"
                     onClick={() => handleEdit(addr)}
                   >
-                    Chỉnh sửa
+                    Edit
                   </button>
                   {addresses.length > 1 && (
                     <button
@@ -89,14 +173,14 @@ const AddressBook = () => {
             ))}
           </div>
 
-          {/* thêm địa chỉ mới */}
+          {/* Thêm địa chỉ mới */}
           <div className="mt-6 px-0 flex items-center justify-end w-full">
-            <p className="text-gray-700 px-2">Bạn muốn giao hàng đến địa chỉ khác?</p>
+            <p className="text-gray-700 px-2">Do you want to ship to a different address?</p>
             <button
               onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-green-700 text-white font-semibold rounded-md hover:bg-green-800"
+              className="px-4 py-2 bg-neutral-600 text-white font-semibold rounded-md hover:bg-neutral-900"
             >
-              Thêm địa chỉ mới
+              Add new address
             </button>
           </div>
         </>

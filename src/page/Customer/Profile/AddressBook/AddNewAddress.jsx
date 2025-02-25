@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const AddNewAddress = ({ onClose, defaultValues }) => {
+const AddNewAddress = ({ onClose, defaultValues, onAddAddress }) => {
   const [form, setForm] = useState(
     defaultValues || {
       name: "",
@@ -13,6 +13,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     }
   );
 
+  const [errors, setErrors] = useState({});
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -52,6 +53,37 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     }));
   };
 
+  const validateForm = () => {
+    let newErrors = {};
+    if (!form.name || form.name.length < 2 || form.name.length > 50) {
+      newErrors.name = "The length must be between 2 and 50 characters.";
+    }
+    const phoneRegex = /^[0-9]{8,10}$/; 
+       if (!form.phone) {
+       newErrors.phone = "Required information.";
+    } else if (!phoneRegex.test(form.phone)) {
+    newErrors.phone = "The information you just entered is invalid. Please check again. ";
+    }
+    if (!form.city) {
+      newErrors.city = "Required information.";
+    }
+    if (!form.district) {
+      newErrors.district = "Required information.";
+    }
+    if (!form.ward) {
+      newErrors.ward = "Required information.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onAddAddress(form);
+      onClose();
+    }
+  };
+
   useEffect(() => {
     if (form.city && form.district && form.ward && form.address) {
       const query = `${form.address}, ${form.ward}, ${form.district}, ${form.city}, Vietnam`;
@@ -64,7 +96,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
     <div className="p-6 bg-white w-full max-w-full border rounded-md">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-gray-700 mb-1">Tên:</label>
+          <label className="block text-gray-700 mb-1">Name:</label>
           <input
             type="text"
             name="name"
@@ -72,9 +104,10 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
+          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
         <div>
-          <label className="block text-gray-700 mb-1">Số điện thoại:</label>
+          <label className="block text-gray-700 mb-1">Phone number:</label>
           <input
             type="text"
             name="phone"
@@ -82,23 +115,25 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
+          {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
         </div>
         <div>
-          <label className="block text-gray-700 mb-1">Tỉnh/Thành phố:</label>
+          <label className="block text-gray-700 mb-1">Province/City:</label>
           <select
             name="city"
             value={form.city}
             onChange={handleCityChange}
             className="w-full border p-2 rounded"
           >
-            <option value="">Vui lòng chọn tỉnh/thành phố</option>
+            <option value="">Please select a Province/City.</option>
             {cities.map((city) => (
               <option key={city.code} value={city.code}>{city.name}</option>
             ))}
           </select>
+          {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
         </div>
         <div>
-          <label className="block text-gray-700 mb-1">Quận/Huyện:</label>
+          <label className="block text-gray-700 mb-1">District/County:</label>
           <select
             name="district"
             value={form.district}
@@ -106,14 +141,15 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             className="w-full border p-2 rounded"
             disabled={!form.city}
           >
-            <option value="">Vui lòng chọn quận/huyện</option>
+            <option value="">Please select a district/county.</option>
             {districts.map((district) => (
               <option key={district.code} value={district.code}>{district.name}</option>
             ))}
           </select>
+          {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
         </div>
         <div>
-          <label className="block text-gray-700 mb-1">Phường/Xã:</label>
+          <label className="block text-gray-700 mb-1">Ward/Commune:</label>
           <select
             name="ward"
             value={form.ward}
@@ -121,14 +157,15 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             className="w-full border p-2 rounded"
             disabled={!form.district}
           >
-            <option value="">Vui lòng chọn phường/xã</option>
+            <option value="">Please select a ward/commune.</option>
             {wards.map((ward) => (
               <option key={ward.code} value={ward.code}>{ward.name}</option>
             ))}
           </select>
+          {errors.ward && <p className="text-red-500 text-sm">{errors.ward}</p>}
         </div>
         <div>
-          <label className="block text-gray-700 mb-1">Địa chỉ nhận hàng:</label>
+          <label className="block text-gray-700 mb-1">Delivery address:</label>
           <input
             type="text"
             name="address"
@@ -137,6 +174,7 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
             className="w-full border p-2 rounded"
           />
         </div>
+       
       </div>
       {mapUrl && (
         <div className="mt-4">
@@ -151,9 +189,20 @@ const AddNewAddress = ({ onClose, defaultValues }) => {
           ></iframe>
         </div>
       )}
-      <div className="flex justify-end space-x-2 mt-4">
-        <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded">Hủy</button>
-        <button className="px-4 py-2 bg-green-600 text-white rounded">Cập nhật</button>
+      
+      <div className="mt-5 ">
+      <div className="flex items-center gap-1"> 
+            <input id="defaultAddress" type="checkbox" name="default" checked={form.default} onChange={handleChange} className="w-4 h-4"/>
+            <label htmlFor="defaultAddress" className="text-sm cursor-pointer">Set as default address.</label>
+            </div>
+       <div className="flex justify-end space-x-2 mt-2">
+            <button onClick={onClose} className="px-4 py-2 bg-neutral-400 hover:bg-neutral-900 text-white rounded">
+            Cancel
+            </button>
+            <button onClick={handleSubmit} className="px-4 py-2 bg-neutral-600 hover:bg-neutral-900 text-white rounded">
+            Update
+            </button>
+        </div>
       </div>
     </div>
   );
