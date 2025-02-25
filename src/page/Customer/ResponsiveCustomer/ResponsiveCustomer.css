@@ -1,0 +1,169 @@
+
+  /* Typography Scaling */
+  h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* Images */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Layout */
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Tablet Styles - 481px to 768px */
+  @media (min-width: 481px) {
+    .container {
+      max-width: 90%;
+    }
+    
+    .row {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    
+    .col {
+      flex: 1 1 45%;
+      margin: 10px;
+    }
+    
+    h1 {
+      font-size: 2rem;
+    }
+    
+    p {
+      font-size: 1.1rem;
+    }
+  }
+  
+  /* Laptop/Desktop Styles - 769px and above */
+  /* @media (min-width: 769px) {
+    .container {
+      max-width: 1200px;
+    }
+    
+    .col {
+      flex: 1 1 30%;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+    }
+    
+    p {
+      font-size: 1.2rem;
+    }
+  } */
+  
+  /* Smartphone Portrait Orientation */
+  @media (max-width: 480px) and (orientation: portrait) {
+    .row {
+      flex-direction: column;
+    }
+    
+    .col {
+      width: 100%;
+      margin: 5px 0;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Utility Classes */
+  .text-center {
+    text-align: center;
+  }
+  
+  .mt-20 {
+    margin-top: 20px;
+  }
+  
+  .mb-20 {
+    margin-bottom: 20px;
+  }
+  
+  .p-15 {
+    padding: 15px;
+  }
+  
+  /* Responsive Navigation */
+  .navbar {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  @media (min-width: 481px) {
+    .navbar {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+  
+  /* Form Elements */
+  input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    box-sizing: border-box;
+  }
+  
+  @media (min-width: 481px) {
+    input, textarea, select {
+      width: 80%;
+    }
+  }
+  
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  @media (min-width: 481px) {
+    .btn {
+      width: auto;
+    }
+  }
+  
+  /* Hide/Show Elements */
+  .hide-on-mobile {
+    display: none;
+  }
+  
+  @media (min-width: 481px) {
+    .hide-on-mobile {
+      display: block;
+    }
+  }
+  
+  .show-on-mobile {
+    display: block;
+  }
+  
+  @media (min-width: 481px) {
+    .show-on-mobile {
+      display: none;
+    }
+  }
+  
