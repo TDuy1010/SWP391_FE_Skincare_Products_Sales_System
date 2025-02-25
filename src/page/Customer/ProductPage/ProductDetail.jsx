@@ -306,7 +306,7 @@ const ProductDetail = () => {
               }}
             >
               <h2 className="text-2xl font-semibold mb-6 text-center">
-                Share your review
+                Share your review about product
               </h2>
               <motion.div
                 initial={{ opacity: 0 }}
