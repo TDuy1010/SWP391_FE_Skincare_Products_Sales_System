@@ -145,7 +145,7 @@ const AddressBook = () => {
                   <p className="font-semibold text-gray-800 flex items-center gap-1">
                     {addr.name} - {addr.phone}
                     {addr.default && (
-                      <span className="text-sky-900 font-medium"> - Địa chỉ mặc định</span>
+                      <span className="text-sky-900 font-medium"> - Default address</span>
                     )}
                   </p>
                   <p className="text-gray-700 text-sm ">
@@ -158,7 +158,7 @@ const AddressBook = () => {
                     className="text-neutral-600 font-medium hover:underline"
                     onClick={() => handleEdit(addr)}
                   >
-                    Chỉnh sửa
+                    Edit
                   </button>
                   {addresses.length > 1 && (
                     <button
@@ -175,12 +175,12 @@ const AddressBook = () => {
 
           {/* Thêm địa chỉ mới */}
           <div className="mt-6 px-0 flex items-center justify-end w-full">
-            <p className="text-gray-700 px-2">Bạn muốn giao hàng đến địa chỉ khác?</p>
+            <p className="text-gray-700 px-2">Do you want to ship to a different address?</p>
             <button
               onClick={() => setShowForm(true)}
               className="px-4 py-2 bg-neutral-600 text-white font-semibold rounded-md hover:bg-neutral-900"
             >
-              Thêm địa chỉ mới
+              Add new address
             </button>
           </div>
         </>

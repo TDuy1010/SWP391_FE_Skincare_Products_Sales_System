@@ -17,7 +17,7 @@ const Orders = () => {
       { name: "Kem chong nắng", price: 559000, quantity: 1 },
     ],
     total: 1134000,
-    delivery: "Đang giao hàng...",
+    delivery: "Shipping in progress...",
   }));
 
   const [addresses, setAddresses] = useState([]);
@@ -34,16 +34,6 @@ const Orders = () => {
           ward: "Phường Long Bình",
           address: "Vinhomes Grand Park Origami S7.03",
           default: true, // Địa chỉ mặc định
-        },
-        {
-          id: 2,
-          name: "Nguyễn Văn B",
-          phone: "0987654321",
-          city: "Hà Nội",
-          district: "Cầu Giấy",
-          ward: "Phường Dịch Vọng",
-          address: "Tòa nhà Keangnam",
-          default: false,
         },
       ];
       setAddresses(storedAddresses);
@@ -89,9 +79,9 @@ const Orders = () => {
             </div>
           ))}
           <div className="flex justify-between items-center mt-4">
-            <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">← Trước</button>
-            <span>Trang {currentPage} / {totalPages}</span>
-            <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">Tiếp →</button>
+            <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">← Previous</button>
+            <span>Page {currentPage} / {totalPages}</span>
+            <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">Next →</button>
           </div>
         </div>
       )}
