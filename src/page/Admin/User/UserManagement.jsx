@@ -99,7 +99,8 @@ const UserManagement = () => {
                         </div>
                         <button className="bg-purple-600 text-white p-2 rounded-lg" onClick={() => setShowAddUser(true)}>+ Add User</button>
                     </div>
-                    <table className="w-full text-left">
+                    <div className="overflow-x-auto">
+                    <table className="w-full text-left table-auto min-w-full">
                         <thead>
                             <tr className="text-white">
                                 <th className="p-2">User name</th>
@@ -243,6 +244,7 @@ const UserManagement = () => {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
             {showAddUser && (

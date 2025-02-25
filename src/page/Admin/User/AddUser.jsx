@@ -173,7 +173,7 @@ const AddUser = ({ onClose }) => {
     {showNotification && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1E283A] text-gray-300 px-6 py-3 rounded-md shadow-lg">
           <h3 className="font-bold text-lg text-center">Notification</h3>
-          <p className="text-sm text-center text-gray-1 300">User added successfully!</p>
+          <p className="text-sm text-center text-gray-300">User added successfully!</p>
         </div>
       )}
     </div>

@@ -55,100 +55,66 @@ const ProductManagement = () => {
     }
   };
 
-  return (
-    <div className="p-6 min-h-screen bg-[#182237]">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-white">Product Management</h2>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("/admin/product/add")}
-          className="bg-[#0066ff] hover:bg-[#0052cc]"
-        >
-          Add New Product
-        </Button>
-      </div>
-
-      <div className="overflow-x-auto rounded-lg">
-        <table className="w-full text-white">
-          <thead className="bg-[#182237] border-b border-gray-700">
-            <tr>
-              <th className="p-4 text-left">Thumbnail</th>
-              <th className="p-4 text-left">Product Name</th>
-              <th className="p-4 text-left">Price</th>
-              <th className="p-4 text-left">Description</th>
-              <th className="p-4 text-left">Status</th>
-              <th className="p-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id} className="border-b border-gray-700 hover:bg-[#1e2c48]">
-                <td className="p-4">
-                  <img
-                    src={product.thumbnail}
-                    alt={product.name}
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                </td>
-                <td className="p-4">{product.name}</td>
-                <td className="p-4">
-                  {product.price?.toLocaleString("vi-VN")}đ
-                </td>
-                <td className="p-4 max-w-xs truncate">{product.description}</td>
-                <td className="p-4">
-                  <span
-                    className={`px-2 py-1 rounded text-sm ${
-                      product.status === "ACTIVE"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {product.status}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigate(`/admin/product/edit/${product.id}`)}
-                      className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      <EditOutlined />
-                    </button>
-                    <button
-                      onClick={() => showDeleteConfirm(product)}
-                      className="p-2 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      <DeleteOutlined />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <Modal
-        title="Confirm Delete"
-        open={deleteModalVisible}
-        onOk={handleDeleteConfirm}
-        onCancel={() => {
-          setDeleteModalVisible(false);
-          setProductToDelete(null);
-        }}
-        okText="Delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true }}
-        className="[&_.ant-modal-content]:bg-[#182237] [&_.ant-modal-header]:bg-[#182237] [&_.ant-modal-title]:text-white"
-      >
-        <p className="text-white">
-          Are you sure you want to delete product "{productToDelete?.name}"?
-        </p>
-        <p className="text-white">This action cannot be undone.</p>
-      </Modal>
-    </div>
-  );
-};
+    return (
+        <>
+            <div>
+                <h2 className="text-2xl text-white font-bold mb-4">Products</h2>
+                <div className="bg-slate-700 p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center">
+                            <input type="text" placeholder="Search user" className="bg-slate-800 text-white p-2 rounded-lg mr-2" />
+                            <select className="bg-slate-800 text-white p-2 rounded-lg">
+                                {types.map((type, index) => (
+                                    <option key={index}>{type}</option>
+                                ))}
+                            </select>
+                            {/*update15/02*/}
+                        </div>
+                        <button className="bg-purple-600 text-white p-2 rounded-lg" onClick={() => setShowAddProduct(true)}> + Add Product </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                    <table className="w-full text-left table-auto min-w-full">
+                        <thead>
+                            <tr className="text-yellow-400">
+                                <th className="p-2">ProductID</th>
+                                <th className="p-2">Name</th>
+                                <th className="p-2">Type</th>
+                                <th className="p-2">Quantity</th>
+                                <th className="p-2">Price</th>
+                                <th className="p-2">Rating</th>
+                                <th className="p-2">Image</th>
+                                <th className="p-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((product, index) => (
+                                <tr key={index} className="border-t border-white text-gray-200">
+                                    <td className="py-4 px-2">{product.productId}</td>
+                                    <td className="py-4 px-2">{product.name}</td>
+                                    <td className="py-4 px-2">{product.type}</td>
+                                    <td className="py-4 px-2">{product.quantity}</td>
+                                    <td className="py-4 px-2">{product.price}</td>
+                                    <td className="py-4 px-2">{product.rating}</td>
+                                    <td className="py-4 px-2">
+                                        <img src={product.image} alt="sữa rửa mặt" className="w-14 h-14"/>
+                                    </td>
+                                    <td className="py-4 px-2 flex items-center justify-start h-20">
+                                        <FaRegEdit className="text-green-500 mr-3" size={20} />
+                                        <FaRegTrashCan className='text-red-500' size={20} />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+            
+      {showAddProduct && (
+        <AddProduct onClose={() => setShowAddProduct(false)} onAddProduct={handleAddProduct} />
+      )}
+        </>
+    )
+}
 
 export default ProductManagement;

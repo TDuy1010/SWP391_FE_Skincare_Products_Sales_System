@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { FiEdit2, FiX } from 'react-icons/fi';
 import avatar from '../../../assets/img/hero-photo.png';
+import AddressBook from "../Profile/AddressBook/AddressBook.jsx";
+import { div } from 'framer-motion/client';
+import AddNewAddress from "../Profile/AddressBook/AddNewAddress.jsx";
+
+
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -217,7 +222,7 @@ const ProfilePage = () => {
               {activeTab === 'addresses' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-6">Sổ địa chỉ</h3>
-                  {/* Addresses content */}
+                  <AddressBook />
                 </div>
               )}
 
