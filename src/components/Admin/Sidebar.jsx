@@ -44,9 +44,9 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       label: <Link to="/admin/category">Category Management</Link>,
     },
     {
-      key: "/admin/reports",
+      key: "/admin/brand",
       icon: <BarChartOutlined />,
-      label: <Link to="/admin/reports">Reports</Link>,
+      label: <Link to="/admin/brand">Brand Management</Link>,
     },
     {
       key: "/admin/vouchers",

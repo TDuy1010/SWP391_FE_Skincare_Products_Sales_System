@@ -1,22 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { Button, Tooltip, message, Modal } from "antd";
+import { Table, Button, Space, Tooltip, message, Modal, Switch } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { getAllProducts, deleteProduct } from "../../../service/product/index";
+import {
+  getAllProducts,
+  deleteProduct,
+  updateProductStatus,
+} from "../../../service/product/index";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await getAllProducts();
+      const response = await getAllProducts({
+        page: params.page - 1 || 0,
+        size: params.pageSize || 10,
+      });
       if (!response.error) {
         setProducts(response.result.productResponses);
+        setPagination({
+          current: response.result.pageNumber + 1,
+          pageSize: response.result.pageSize,
+          total: response.result.totalElements,
+        });
       } else {
         message.error(response.message);
       }
@@ -31,90 +51,166 @@ const ProductManagement = () => {
     fetchProducts();
   }, []);
 
+  const handleTableChange = (newPagination) => {
+    fetchProducts({
+      page: newPagination.current,
+      pageSize: newPagination.pageSize,
+    });
+  };
+
+  const toggleStatus = async (product) => {
+    try {
+      setLoading(true);
+      const newStatus = product.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+      const response = await updateProductStatus(product.id, newStatus);
+      if (!response.error) {
+        fetchProducts({
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+        });
+        toast.success("Product status updated successfully!");
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      toast.error("Failed to update status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const showDeleteConfirm = (product) => {
-    setProductToDelete(product);
+    setSelectedProduct(product);
     setDeleteModalVisible(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!productToDelete) return;
+    if (!selectedProduct) return;
 
     try {
-      const response = await deleteProduct(productToDelete.id);
+      setLoading(true);
+      const response = await deleteProduct(selectedProduct.id);
+
       if (!response.error) {
-        message.success(response.message);
-        fetchProducts();
+        await fetchProducts({
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+        });
+        toast.success("Product deleted successfully!");
       } else {
-        message.error(response.message);
+        toast.error(response.message);
       }
     } catch (error) {
-      message.error("Failed to delete product");
+      toast.error("Failed to delete product");
     } finally {
+      setLoading(false);
       setDeleteModalVisible(false);
-      setProductToDelete(null);
+      setSelectedProduct(null);
     }
   };
 
-    return (
-        <>
-            <div>
-                <h2 className="text-2xl text-white font-bold mb-4">Products</h2>
-                <div className="bg-slate-700 p-4 rounded-lg">
-                    <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center">
-                            <input type="text" placeholder="Search user" className="bg-slate-800 text-white p-2 rounded-lg mr-2" />
-                            <select className="bg-slate-800 text-white p-2 rounded-lg">
-                                {types.map((type, index) => (
-                                    <option key={index}>{type}</option>
-                                ))}
-                            </select>
-                            {/*update15/02*/}
-                        </div>
-                        <button className="bg-purple-600 text-white p-2 rounded-lg" onClick={() => setShowAddProduct(true)}> + Add Product </button>
-                    </div>
-                    <div className="overflow-x-auto">
-                    <table className="w-full text-left table-auto min-w-full">
-                        <thead>
-                            <tr className="text-yellow-400">
-                                <th className="p-2">ProductID</th>
-                                <th className="p-2">Name</th>
-                                <th className="p-2">Type</th>
-                                <th className="p-2">Quantity</th>
-                                <th className="p-2">Price</th>
-                                <th className="p-2">Rating</th>
-                                <th className="p-2">Image</th>
-                                <th className="p-2">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map((product, index) => (
-                                <tr key={index} className="border-t border-white text-gray-200">
-                                    <td className="py-4 px-2">{product.productId}</td>
-                                    <td className="py-4 px-2">{product.name}</td>
-                                    <td className="py-4 px-2">{product.type}</td>
-                                    <td className="py-4 px-2">{product.quantity}</td>
-                                    <td className="py-4 px-2">{product.price}</td>
-                                    <td className="py-4 px-2">{product.rating}</td>
-                                    <td className="py-4 px-2">
-                                        <img src={product.image} alt="sữa rửa mặt" className="w-14 h-14"/>
-                                    </td>
-                                    <td className="py-4 px-2 flex items-center justify-start h-20">
-                                        <FaRegEdit className="text-green-500 mr-3" size={20} />
-                                        <FaRegTrashCan className='text-red-500' size={20} />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            </div>
-            
-      {showAddProduct && (
-        <AddProduct onClose={() => setShowAddProduct(false)} onAddProduct={handleAddProduct} />
-      )}
-        </>
-    )
-}
+  const columns = [
+    {
+      title: "Thumbnail",
+      dataIndex: "thumbnail",
+      key: "thumbnail",
+      render: (thumbnail) => (
+        <img
+          src={thumbnail}
+          alt="product"
+          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+        />
+      ),
+    },
+    {
+      title: "Product Name",
+      dataIndex: "name",
+      key: "name",
+      ellipsis: true,
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => (price ? `${price.toLocaleString("vi-VN")}đ` : "N/A"),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (_, record) => (
+        <Switch
+          checked={record.status === "ACTIVE"}
+          onChange={() => toggleStatus(record)}
+          checkedChildren="ACTIVE"
+          unCheckedChildren="INACTIVE"
+        />
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="Edit">
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/admin/product/edit/${record.id}`)}
+            />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => showDeleteConfirm(record)}
+            />
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Product Management</h2>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate("/admin/product/add")}
+        >
+          Add New Product
+        </Button>
+      </div>
+      <Table
+        columns={columns}
+        dataSource={products}
+        rowKey="id"
+        pagination={pagination}
+        loading={loading}
+        onChange={handleTableChange}
+      />
+      <Modal
+        title="Confirm Delete"
+        open={deleteModalVisible}
+        onOk={handleDeleteConfirm}
+        onCancel={() => {
+          setDeleteModalVisible(false);
+          setSelectedProduct(null);
+        }}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+      >
+        <p>
+          Are you sure you want to delete product "{selectedProduct?.name}"?
+        </p>
+        <p>This action cannot be undone.</p>
+      </Modal>
+      <ToastContainer />
+    </div>
+  );
+};
 
 export default ProductManagement;

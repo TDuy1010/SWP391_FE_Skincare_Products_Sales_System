@@ -1,151 +1,240 @@
-import React, { useState } from "react";
-import { Form, Input, InputNumber, Button, Card, message } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Card,
+  message,
+  Upload,
+  Select,
+} from "antd";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { addProduct } from "../../../service/product/index";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getAllCategories } from "../../../service/category/index";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await getAllCategories();
+      if (!response.error) {
+        const activeCategories =
+          response.result?.categoryResponses.filter(
+            (category) => category.status === "ACTIVE"
+          ) || [];
+        setCategories(activeCategories);
+      } else {
+        toast.error("Failed to fetch categories");
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
 
   const onFinish = async (values) => {
-    try {
-      setLoading(true);
-      const response = await addProduct(values);
+    if (
+      values.name &&
+      values.price &&
+      values.description &&
+      values.thumbnail?.length > 0 &&
+      values.categoryId
+    ) {
+      try {
+        setLoading(true);
+        const formData = new FormData();
 
-      if (!response.error) {
-        message.success(response.message);
-        navigate("/admin/product");
-      } else {
-        message.error(response.message);
+        // Get file from upload component
+        const file = values.thumbnail[0].originFileObj;
+
+        if (!file) {
+          message.error("Please select a file");
+          return;
+        }
+
+        formData.append(
+          "request",
+          JSON.stringify({
+            name: values.name,
+            price: values.price,
+            description: values.description,
+            category_id: values.categoryId,
+          })
+        );
+        formData.append("thumbnail", file);
+
+        const response = await addProduct(formData);
+        if (!response.error) {
+          navigate("/admin/product", {
+            state: { message: response.message, type: "success" },
+          });
+        } else {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        toast.error("Failed to add product");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      message.error("Failed to add product");
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-[#182237] text-gray-300 p-4 rounded-lg w-[400px] max-h-[500px] shadow-lg overflow-auto">
-        <h2 className="text-xl font-semibold mb-3">Product Add</h2>
+    <div className="h-[calc(100vh-64px)] bg-gray-50 p-6 overflow-y-auto">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 
-        <form onSubmit={handleSubmit} className="space-y-2">
-          {/* Name */}
-          <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm font-bold">Name:</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-[500px] p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
-              required
+      <Button
+        icon={<ArrowLeftOutlined />}
+        onClick={() => navigate("/admin/product")}
+        className="mb-4 hover:bg-gray-100"
+      >
+        Back to Products
+      </Button>
+
+      <Card
+        title={
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Add New Product
+          </h2>
+        }
+        className="max-w-5xl mx-auto shadow-md rounded-lg"
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          autoComplete="off"
+          className="space-y-6"
+        >
+          <Form.Item
+            name="name"
+            label="Product Name"
+            rules={[
+              { required: true, message: "Please enter product name" },
+              { min: 3, message: "Name must be at least 3 characters" },
+            ]}
+          >
+            <Input
+              placeholder="Enter product name"
+              className="rounded-md h-12"
             />
-          </div>
+          </Form.Item>
 
-          {/* Type */}
-          <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm font-bold">Type:</label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="w-[500px] p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
-              required
-            >
-              <option value="">Choose</option>
-              <option value="Skincare">Skincare</option>
-              <option value="Haircare">Haircare</option>
-            </select>
-          </div>
-
-          {/* Price */}
-          <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm font-bold">Price:</label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-[500px] p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
-              required
+          <Form.Item
+            name="price"
+            label="Price"
+            rules={[
+              { required: true, message: "Please enter price" },
+              {
+                type: "number",
+                min: 0.01,
+                message: "Price must be greater than 0",
+              },
+            ]}
+          >
+            <InputNumber
+              className="w-full rounded-md h-12"
+              min={0.01}
+              step={0.01}
+              placeholder="Enter price"
+              formatter={(value) =>
+                `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
             />
-          </div>
+          </Form.Item>
 
-          {/* Quantity */}
-          <div className="flex items-center gap-2">
-            <label className="w-1/3 text-sm font-bold">Quantity:</label>
-            <div className="flex items-center w-3/4">
-              <button
-                type="button"
-                onClick={() => handleQuantityChange(-1)}
-                className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-500"
-              >
-                -
-              </button>
-              <span className="w-10 text-center">{formData.quantity}</span>
-              <button
-                type="button"
-                onClick={() => handleQuantityChange(1)}
-                className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-500"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm mb-1 font-bold">Description:</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-              className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
-            ></textarea>
-          </div>
-
-          {/* Image URL */}
-          <div>
-            <label className="block text-sm mb-1 font-bold">Url Image:</label>
-            <input
-              type="text"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[
+              { required: true, message: "Please enter description" },
+              {
+                min: 10,
+                message: "Description must be at least 10 characters",
+              },
+            ]}
+          >
+            <Input.TextArea
+              rows={4}
+              placeholder="Enter product description"
+              maxLength={500}
+              showCount
+              className="rounded-md"
             />
-          </div>
+          </Form.Item>
 
-          {/* Buttons */}
-          <div className="flex justify-end mt-3 gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-1 bg-gray-600 rounded hover:bg-gray-500"
+          <Form.Item
+            name="categoryId"
+            label="Category"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select
+              placeholder="Select a category"
+              options={categories.map((category) => ({
+                value: category.id,
+                label: category.name,
+              }))}
+              className="w-full rounded-md h-12"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="thumbnail"
+            label="Thumbnail"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+            rules={[{ required: true, message: "Please upload an image" }]}
+          >
+            <Upload
+              beforeUpload={() => false}
+              maxCount={1}
+              accept="image/*"
+              listType="picture"
+              className="upload-list-inline"
             >
-              Close
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-1 bg-purple-600 rounded hover:bg-purple-500"
+              <Button icon={<UploadOutlined />} className="rounded-md h-12">
+                Select Image
+              </Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item className="mt-6">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className="w-full md:w-auto px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
             >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
-      {/* Thông báo thành công */}
-    {showNotification && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1E283A] text-gray-300 px-6 py-3 rounded-md shadow-lg">
-          <h3 className="font-bold text-lg text-center">Notification</h3>
-          <p className="text-sm text-center text-gray-300">New product added successfully!</p>
-        </div>
-      )}
+              Add Product
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };
