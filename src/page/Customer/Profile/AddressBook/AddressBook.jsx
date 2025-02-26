@@ -1,32 +1,19 @@
 import { useState, useEffect } from "react";
-import { Trash2 } from "lucide-react"; 
+import { Trash2 } from "lucide-react";
 import AddNewAddress from "./AddNewAddress";
+import {
+  addNewAddress,
+  getAddresses,
+  updateAddress,
+  setDefaultAddress,
+} from "../../../../service/address";
+import { toast } from "react-toastify";
 
 const AddressBook = () => {
   const [showForm, setShowForm] = useState(false);
   const [editForm, setEditForm] = useState(null);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      name: "Tuấn Anh",
-      phone: "123456789",
-      city: "79",
-      district: "769",
-      ward: "26830",
-      address: "Vinhomes Grand Park Origami S7.03",
-      default: true,
-    },
-    {
-      id: 2,
-      name: "Tuấn Em",
-      phone: "0123456789",
-      city: "79",
-      district: "769",
-      ward: "26831",
-      address: "Vinhomes Grand Park Origami S7.03",
-      default: false,
-    },
-  ]);
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [locationData, setLocationData] = useState({
     cities: [],
@@ -34,56 +21,26 @@ const AddressBook = () => {
     wards: {},
   });
 
+  // Add this useEffect to fetch addresses when component mounts
   useEffect(() => {
-    const fetchCities = async () => {
-      const response = await fetch("https://provinces.open-api.vn/api/p/");
-      const data = await response.json();
-      setLocationData((prev) => ({ ...prev, cities: data }));
-    };
-    fetchCities();
-  }, []);
+    fetchAddresses();
+  }, []); // Empty dependency array means this runs once when component mounts
 
-  useEffect(() => {
-    const fetchAllDistrictsAndWards = async () => {
-      let allDistricts = {};
-      let allWards = {};
-
-      const citiesResponse = await fetch("https://provinces.open-api.vn/api/p/");
-      const citiesData = await citiesResponse.json();
-
-      for (const city of citiesData) {
-        const districtsResponse = await fetch(`https://provinces.open-api.vn/api/p/${city.code}?depth=2`);
-        const districtsData = await districtsResponse.json();
-        allDistricts[city.code] = districtsData.districts || [];
-
-        for (const district of districtsData.districts || []) {
-          const wardsResponse = await fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`);
-          const wardsData = await wardsResponse.json();
-          allWards[district.code] = wardsData.wards || [];
-        }
+  // Fetch addresses
+  const fetchAddresses = async () => {
+    try {
+      setLoading(true);
+      const response = await getAddresses();
+      if (response.code !== 200) {
+        console.error("Error fetching addresses:", response.message);
+        return;
       }
-
-      setLocationData((prev) => ({ ...prev, districts: allDistricts, wards: allWards }));
-    };
-
-    fetchAllDistrictsAndWards();
-  }, []);
-
-  const getCityName = (code) => {
-    const city = locationData.cities.find(c => c.code.toString() === code);
-    return city ? city.name : code;
-  };
-
-  const getDistrictName = (cityCode, districtCode) => {
-    const districts = locationData.districts[cityCode] || [];
-    const district = districts.find(d => d.code.toString() === districtCode);
-    return district ? district.name : districtCode;
-  };
-
-  const getWardName = (districtCode, wardCode) => {
-    const wards = locationData.wards[districtCode] || [];
-    const ward = wards.find(w => w.code.toString() === wardCode);
-    return ward ? ward.name : wardCode;
+      setAddresses(response.result || []);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = (id) => {
@@ -100,29 +57,47 @@ const AddressBook = () => {
     setEditForm(null);
   };
 
-  const handleAddAddress = (newAddress) => {
-    setAddresses((prevAddresses) => {
-      const updatedAddresses = newAddress.default
-        ? prevAddresses.map((addr) => ({ ...addr, default: false }))
-        : prevAddresses;
-      return [...updatedAddresses, { ...newAddress, id: prevAddresses.length + 1 }];
-    });
-
-    handleCloseForm();
+  const handleAddAddress = async (formData) => {
+    try {
+      const response = await addNewAddress(formData);
+      if (response.error) {
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Address added successfully!");
+      fetchAddresses(); // Refresh the addresses list
+    } catch (error) {
+      toast.error("Failed to add address");
+    }
   };
 
-  const handleUpdateAddAddress = (updatedAddress) => {
-    setAddresses((prevAddresses) => {
-      return prevAddresses.map((addr) =>
-        addr.id === updatedAddress.id
-          ? { ...updatedAddress }
-          : updatedAddress.default
-          ? { ...addr, default: false }
-          : addr
-      );
-    });
+  const handleUpdateAddAddress = async (updatedAddress) => {
+    try {
+      const response = await updateAddress(updatedAddress.id, updatedAddress);
+      if (response.error) {
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Address updated successfully!");
+      fetchAddresses(); // Refresh the addresses list
+      handleCloseForm();
+    } catch (error) {
+      toast.error("Failed to update address");
+    }
+  };
 
-    handleCloseForm();
+  const handleSetDefault = async (addressId) => {
+    try {
+      const response = await setDefaultAddress(addressId);
+      if (response.error) {
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Default address updated successfully!");
+      fetchAddresses(); // Refresh the addresses list
+    } catch (error) {
+      toast.error("Failed to set default address");
+    }
   };
 
   return (
@@ -136,46 +111,65 @@ const AddressBook = () => {
       ) : (
         <>
           <div className="border rounded-md p-4 bg-gray-50">
-            {addresses.map((addr) => (
-              <div
-                key={addr.id}
-                className="border-b last:border-0 p-4 flex justify-between items-start"
-              >
-                <div className="w-full max-w-[80%]">
-                  <p className="font-semibold text-gray-800 flex items-center gap-1">
-                    {addr.name} - {addr.phone}
-                    {addr.default && (
-                      <span className="text-sky-900 font-medium"> - Default address</span>
-                    )}
-                  </p>
-                  <p className="text-gray-700 text-sm ">
-                    {addr.address}, {getWardName(addr.district, addr.ward)}, {getDistrictName(addr.city, addr.district)}, {getCityName(addr.city)}
-                  </p>
-                </div>
+            {loading ? (
+              <div className="text-center py-4">Loading addresses...</div>
+            ) : addresses.length === 0 ? (
+              <div className="text-center py-4">No addresses found</div>
+            ) : (
+              addresses.map((addr) => (
+                <div
+                  key={addr.id}
+                  className="border-b last:border-0 p-4 flex justify-between items-start"
+                >
+                  <div className="w-full max-w-[60%]">
+                    <p className="font-semibold text-gray-800 flex items-center gap-1">
+                      {addr.name} - {addr.phone}
+                      {addr.isDefault && (
+                        <span className="text-sky-900 font-medium">
+                          {" "}
+                          - Default address
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-gray-700 text-sm">
+                      {addr.street}, {addr.ward}, {addr.district}, {addr.city}
+                    </p>
+                  </div>
 
-                <div className="flex items-center space-x-3 ">
-                  <button
-                    className="text-neutral-600 font-medium hover:underline"
-                    onClick={() => handleEdit(addr)}
-                  >
-                    Edit
-                  </button>
-                  {addresses.length > 1 && (
+                  <div className="flex items-center space-x-3">
+                    {!addr.isDefault && (
+                      <button
+                        className="text-sky-600 font-medium hover:underline"
+                        onClick={() => handleSetDefault(addr.id)}
+                      >
+                        Set as Default
+                      </button>
+                    )}
                     <button
-                      className="text-red-600 hover:text-red-800"
-                      onClick={() => handleDelete(addr.id)}
+                      className="text-neutral-600 font-medium hover:underline"
+                      onClick={() => handleEdit(addr)}
                     >
-                      <Trash2 size={18} />
+                      Edit
                     </button>
-                  )}
+                    {addresses.length > 1 && (
+                      <button
+                        className="text-red-600 hover:text-red-800"
+                        onClick={() => handleDelete(addr.id)}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
-          {/* Thêm địa chỉ mới */}
+          {/* Add new address button */}
           <div className="mt-6 px-0 flex items-center justify-end w-full">
-            <p className="text-gray-700 px-2">Do you want to ship to a different address?</p>
+            <p className="text-gray-700 px-2">
+              Do you want to ship to a different address?
+            </p>
             <button
               onClick={() => setShowForm(true)}
               className="px-4 py-2 bg-neutral-600 text-white font-semibold rounded-md hover:bg-neutral-900"

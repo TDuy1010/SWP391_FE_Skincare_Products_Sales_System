@@ -53,35 +53,66 @@ const Orders = () => {
   return (
     <div className="p-6 bg-white w-full max-w-full border rounded-md">
       {selectedOrder ? (
-        <OrderDetail order={selectedOrder} customer={defaultAddress} onBack={() => setSelectedOrder(null)} />
+        <OrderDetail
+          order={selectedOrder}
+          customer={defaultAddress}
+          onBack={() => setSelectedOrder(null)}
+        />
       ) : (
         <div>
           {currentOrders.map((order, index) => (
-            <div 
-              key={index} 
-              className="border-b pb-4 mb-4 last:border-0 cursor-pointer hover:bg-gray-100 p-4"   
+            <div
+              key={index}
+              className="border-b pb-4 mb-4 last:border-0 cursor-pointer hover:bg-gray-100 p-4"
               onClick={() => setSelectedOrder(order)}
             >
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-gray-800">#{order.id}</span>
-                <span className={`px-2 py-1 text-white rounded ${order.status === "COMPLETED" ? "bg-green-600" : "bg-yellow-500"}`}>
+                <span
+                  className={`px-2 py-1 text-white rounded ${
+                    order.status === "COMPLETED"
+                      ? "bg-green-600"
+                      : "bg-yellow-500"
+                  }`}
+                >
                   {order.status}
                 </span>
               </div>
               <p className="text-gray-600">📅 {order.date}</p>
               <ul className="mt-2">
                 {order.items.map((item, i) => (
-                  <li key={i} className="text-gray-800">{item.name} - {item.quantity} x {item.price.toLocaleString()} đ</li>
+                  <li key={i} className="text-gray-800">
+                    {item.name} - {item.quantity} x{" "}
+                    {item.price.toLocaleString()} đ
+                  </li>
                 ))}
               </ul>
               <p className="text-neutral-600 mt-2">✔ {order.delivery}</p>
-              <p className="text-right font-semibold text-lg">Total: {order.total.toLocaleString()} đ</p>
+              <p className="text-right font-semibold text-lg">
+                Total: {order.total.toLocaleString()} đ
+              </p>
             </div>
           ))}
           <div className="flex justify-between items-center mt-4">
-            <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">← Previous</button>
-            <span>Page {currentPage} / {totalPages}</span>
-            <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">Next →</button>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            >
+              ← Previous
+            </button>
+            <span>
+              Page {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            >
+              Next →
+            </button>
           </div>
         </div>
       )}
