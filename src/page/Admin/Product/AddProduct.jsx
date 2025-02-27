@@ -15,26 +15,39 @@ import { addProduct } from "../../../service/product/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllCategories } from "../../../service/category/index";
+import { getAllBrandsUser } from "../../../service/brand/index";
 
 const AddProduct = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      const response = await getAllCategories();
-      if (!response.error) {
+    const fetchData = async () => {
+      const categoryResponse = await getAllCategories();
+      if (!categoryResponse.error) {
         const activeCategories =
-          response.result?.categoryResponses.filter(
+          categoryResponse.result?.categoryResponses.filter(
             (category) => category.status === "ACTIVE"
           ) || [];
         setCategories(activeCategories);
       } else {
         toast.error("Failed to fetch categories");
       }
+
+      const brandResponse = await getAllBrandsUser();
+      if (!brandResponse.error) {
+        const activeBrands =
+          brandResponse.result?.brandResponses.filter(
+            (brand) => brand.status === "ACTIVE"
+          ) || [];
+        setBrands(activeBrands);
+      } else {
+        toast.error("Failed to fetch brands");
+      }
     };
-    fetchCategories();
+    fetchData();
   }, []);
 
   const normFile = (e) => {
@@ -50,13 +63,13 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
       values.price &&
       values.description &&
       values.thumbnail?.length > 0 &&
-      values.categoryId
+      values.categoryId &&
+      values.brandId
     ) {
       try {
         setLoading(true);
         const formData = new FormData();
 
-        // Get file from upload component
         const file = values.thumbnail[0].originFileObj;
 
         if (!file) {
@@ -71,6 +84,7 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
             price: values.price,
             description: values.description,
             category_id: values.categoryId,
+            brand_id: values.brandId,
           })
         );
         formData.append("thumbnail", file);
@@ -191,6 +205,21 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
             className="w-full rounded-md h-12"
           />
         </Form.Item>
+
+          <Form.Item
+            name="brandId"
+            label="Brand"
+            rules={[{ required: true, message: "Please select a brand" }]}
+          >
+            <Select
+              placeholder="Select a brand"
+              options={brands.map((brand) => ({
+                value: brand.id,
+                label: brand.name,
+              }))}
+              className="w-full rounded-md h-12"
+            />
+          </Form.Item>
 
         <Form.Item
           name="thumbnail"
