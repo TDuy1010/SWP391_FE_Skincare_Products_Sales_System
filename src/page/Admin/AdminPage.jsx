@@ -41,7 +41,7 @@ const AdminPage = () => {
   };
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="h-screen overflow-hidden">
       <Sidebar
         handleLogout={handleLogout}
         collapsed={collapsed}
@@ -51,8 +51,8 @@ const AdminPage = () => {
         style={{
           marginLeft: collapsed ? 80 : 250,
           transition: "all 0.2s",
-          background: "#0f172a",
-          minHeight: "100vh",
+          background: "#f5f5f5",
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
         }}
@@ -61,19 +61,26 @@ const AdminPage = () => {
           collapsed={collapsed}
           toggleCollapsed={toggleCollapsed}
           adminUser={adminUser}
+          style={{ 
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            width: "100%"
+          }}
         />
         <Content
           style={{
             margin: "24px 16px",
             padding: 24,
             flex: 1,
-            background: "#1e293b",
+            background: "#f5f5f5",
             borderRadius: 8,
-            color: "#fff",
-            overflow: "auto",
+            color: "#000000",
+            overflowY: "auto",
+            height: "calc(100vh - 88px)",
           }}
         >
-          <Outlet /> {/* ✅ Đảm bảo Dashboard có thể hiển thị */}
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

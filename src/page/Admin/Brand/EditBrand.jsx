@@ -127,93 +127,155 @@ const EditBrand = () => {
   }
 
   return (
-    <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <div className="p-6">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <ToastContainer />
+      <div className="flex items-center pl-8 justify-between">
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate("/admin/brand")}
-          className="mb-4"
+          className="mb-4 hover:bg-gray-100 transition-colors"
         >
           Back to Brands
         </Button>
+      </div>
 
-        <Card title="Edit Brand" className="max-w-3xl">
+      <div className="max-w-4xl mx-auto px-4">
+        <Card className="shadow-md rounded-lg">
+          <div className="mb-6">
+            <h1 className="text-xl font-semibold text-gray-800">Edit Brand</h1>
+          </div>
+
           <Form
             form={form}
             layout="vertical"
             onFinish={onFinish}
             autoComplete="off"
+            className="space-y-4"
           >
-            <Form.Item
-              name="name"
-              label="Brand Name"
-              rules={[
-                { required: true, message: "Please enter brand name" },
-                { min: 3, message: "Name must be at least 3 characters" },
-              ]}
-            >
-              <Input placeholder="Enter brand name" />
-            </Form.Item>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Form.Item
+                  name="name"
+                  label={
+                    <span className="text-gray-700 font-medium">
+                      Brand Name
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter brand name" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter brand name"
+                    className="rounded-md"
+                  />
+                </Form.Item>
 
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[
-                { required: true, message: "Please enter description" },
-                {
-                  min: 10,
-                  message: "Description must be at least 10 characters",
-                },
-              ]}
-            >
-              <Input.TextArea
-                rows={4}
-                placeholder="Enter brand description"
-                maxLength={500}
-                showCount
-              />
-            </Form.Item>
+                <Form.Item
+                  name="status"
+                  label={
+                    <span className="text-gray-700 font-medium">Status</span>
+                  }
+                  rules={[{ required: true, message: "Please select status" }]}
+                >
+                  <Select className="rounded-md">
+                    <Select.Option value="ACTIVE">Active</Select.Option>
+                    <Select.Option value="INACTIVE">Inactive</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
 
-            <Form.Item
-              name="status"
-              label="Status"
-              rules={[{ required: true, message: "Please select status" }]}
-            >
-              <Select>
-                <Select.Option value="ACTIVE">Active</Select.Option>
-                <Select.Option value="INACTIVE">Inactive</Select.Option>
-              </Select>
-            </Form.Item>
+              <div>
+                <Form.Item
+                  name="description"
+                  label={
+                    <span className="text-gray-700 font-medium">
+                      Description
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter description" },
+                    {
+                      min: 10,
+                      message: "Description must be at least 10 characters",
+                    },
+                  ]}
+                >
+                  <Input.TextArea
+                    rows={4}
+                    placeholder="Enter brand description"
+                    maxLength={500}
+                    showCount
+                    className="rounded-md"
+                  />
+                </Form.Item>
+              </div>
+            </div>
 
-            <Form.Item
-              label="Thumbnail"
-              rules={[{ required: true, message: "Please upload a thumbnail" }]}
-            >
-              <Upload listType="picture" {...uploadProps}>
-                <Button icon={<UploadOutlined />}>Upload Thumbnail</Button>
-              </Upload>
-            </Form.Item>
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <div className="mb-6">
+                <h3 className="text-gray-700 font-medium mb-4">Brand Image</h3>
+                {imageUrl && (
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-500 mb-2">Current Image:</p>
+                    <img
+                      src={imageUrl}
+                      alt="Current thumbnail"
+                      className="max-w-xs rounded-lg shadow-sm"
+                      style={{ maxHeight: "200px" }}
+                    />
+                  </div>
+                )}
+              </div>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
+              <Form.Item
+                name="thumbnail"
+                valuePropName="fileList"
+                getValueFromEvent={(e) => {
+                  if (Array.isArray(e)) {
+                    return e;
+                  }
+                  return e?.fileList;
+                }}
+              >
+                <Upload
+                  beforeUpload={() => false}
+                  maxCount={1}
+                  accept="image/*"
+                  listType="picture"
+                  className="upload-list-inline"
+                >
+                  <Button
+                    icon={<UploadOutlined />}
+                    className="rounded-md hover:bg-gray-50 border-dashed"
+                  >
+                    Upload New Image
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </div>
+
+            <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
+              <Button
+                onClick={() => navigate("/admin/brand")}
+                className="rounded-md px-6"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="rounded-md px-8 bg-blue-600 hover:bg-blue-700"
+              >
                 Update Brand
               </Button>
-            </Form.Item>
+            </div>
           </Form>
         </Card>
       </div>
-    </>
+    </div>
   );
 };
 

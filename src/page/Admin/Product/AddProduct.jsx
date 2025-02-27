@@ -8,16 +8,15 @@ import {
   message,
   Upload,
   Select,
+  Modal,
 } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import { addProduct } from "../../../service/product/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllCategories } from "../../../service/category/index";
 
-const AddProduct = () => {
-  const navigate = useNavigate();
+const AddProduct = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -78,9 +77,9 @@ const AddProduct = () => {
 
         const response = await addProduct(formData);
         if (!response.error) {
-          navigate("/admin/product", {
-            state: { message: response.message, type: "success" },
-          });
+          onSuccess(response.message);
+          form.resetFields();
+          onCancel();
         } else {
           toast.error(response.message);
         }
@@ -93,7 +92,13 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-64px)] bg-gray-50 p-6 overflow-y-auto">
+    <Modal
+      open={visible}
+      onCancel={onCancel}
+      footer={null}
+      width={800}
+      title="Add New Product"
+    >
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -107,135 +112,118 @@ const AddProduct = () => {
         theme="light"
       />
 
-      <Button
-        icon={<ArrowLeftOutlined />}
-        onClick={() => navigate("/admin/product")}
-        className="mb-4 hover:bg-gray-100"
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        autoComplete="off"
+        className="space-y-6"
       >
-        Back to Products
-      </Button>
-
-      <Card
-        title={
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Add New Product
-          </h2>
-        }
-        className="max-w-5xl mx-auto shadow-md rounded-lg"
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          autoComplete="off"
-          className="space-y-6"
+        <Form.Item
+          name="name"
+          label="Product Name"
+          rules={[
+            { required: true, message: "Please enter product name" },
+            { min: 3, message: "Name must be at least 3 characters" },
+          ]}
         >
-          <Form.Item
-            name="name"
-            label="Product Name"
-            rules={[
-              { required: true, message: "Please enter product name" },
-              { min: 3, message: "Name must be at least 3 characters" },
-            ]}
-          >
-            <Input
-              placeholder="Enter product name"
-              className="rounded-md h-12"
-            />
-          </Form.Item>
+          <Input
+            placeholder="Enter product name"
+            className="rounded-md h-12"
+          />
+        </Form.Item>
 
-          <Form.Item
-            name="price"
-            label="Price"
-            rules={[
-              { required: true, message: "Please enter price" },
-              {
-                type: "number",
-                min: 0.01,
-                message: "Price must be greater than 0",
-              },
-            ]}
-          >
-            <InputNumber
-              className="w-full rounded-md h-12"
-              min={0.01}
-              step={0.01}
-              placeholder="Enter price"
-              formatter={(value) =>
-                `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-            />
-          </Form.Item>
+        <Form.Item
+          name="price"
+          label="Price"
+          rules={[
+            { required: true, message: "Please enter price" },
+            {
+              type: "number",
+              min: 0.01,
+              message: "Price must be greater than 0",
+            },
+          ]}
+        >
+          <InputNumber
+            className="w-full rounded-md h-12"
+            min={0.01}
+            step={0.01}
+            placeholder="Enter price"
+            formatter={(value) =>
+              `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+          />
+        </Form.Item>
 
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[
-              { required: true, message: "Please enter description" },
-              {
-                min: 10,
-                message: "Description must be at least 10 characters",
-              },
-            ]}
-          >
-            <Input.TextArea
-              rows={4}
-              placeholder="Enter product description"
-              maxLength={500}
-              showCount
-              className="rounded-md"
-            />
-          </Form.Item>
+        <Form.Item
+          name="description"
+          label="Description"
+          rules={[
+            { required: true, message: "Please enter description" },
+            {
+              min: 10,
+              message: "Description must be at least 10 characters",
+            },
+          ]}
+        >
+          <Input.TextArea
+            rows={4}
+            placeholder="Enter product description"
+            maxLength={500}
+            showCount
+            className="rounded-md"
+          />
+        </Form.Item>
 
-          <Form.Item
-            name="categoryId"
-            label="Category"
-            rules={[{ required: true, message: "Please select a category" }]}
-          >
-            <Select
-              placeholder="Select a category"
-              options={categories.map((category) => ({
-                value: category.id,
-                label: category.name,
-              }))}
-              className="w-full rounded-md h-12"
-            />
-          </Form.Item>
+        <Form.Item
+          name="categoryId"
+          label="Category"
+          rules={[{ required: true, message: "Please select a category" }]}
+        >
+          <Select
+            placeholder="Select a category"
+            options={categories.map((category) => ({
+              value: category.id,
+              label: category.name,
+            }))}
+            className="w-full rounded-md h-12"
+          />
+        </Form.Item>
 
-          <Form.Item
-            name="thumbnail"
-            label="Thumbnail"
-            valuePropName="fileList"
-            getValueFromEvent={normFile}
-            rules={[{ required: true, message: "Please upload an image" }]}
+        <Form.Item
+          name="thumbnail"
+          label="Thumbnail"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          rules={[{ required: true, message: "Please upload an image" }]}
+        >
+          <Upload
+            beforeUpload={() => false}
+            maxCount={1}
+            accept="image/*"
+            listType="picture"
+            className="upload-list-inline"
           >
-            <Upload
-              beforeUpload={() => false}
-              maxCount={1}
-              accept="image/*"
-              listType="picture"
-              className="upload-list-inline"
-            >
-              <Button icon={<UploadOutlined />} className="rounded-md h-12">
-                Select Image
-              </Button>
-            </Upload>
-          </Form.Item>
-
-          <Form.Item className="mt-6">
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              className="w-full md:w-auto px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
-            >
-              Add Product
+            <Button icon={<UploadOutlined />} className="rounded-md h-12">
+              Select Image
             </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-    </div>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item className="mt-6">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            className="w-full md:w-auto px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
+          >
+            Add Product
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 };
 

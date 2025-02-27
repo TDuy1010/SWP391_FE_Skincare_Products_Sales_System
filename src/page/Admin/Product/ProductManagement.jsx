@@ -9,6 +9,7 @@ import {
 } from "../../../service/product/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AddProduct from './AddProduct';
 
 const ProductManagement = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const ProductManagement = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const fetchProducts = async (params = {}) => {
     try {
@@ -109,6 +111,20 @@ const ProductManagement = () => {
     }
   };
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleSuccess = (message) => {
+    toast.success(message);
+    setIsModalVisible(false);
+    fetchProducts();
+  };
+
   const columns = [
     {
       title: "Thumbnail",
@@ -177,20 +193,22 @@ const ProductManagement = () => {
         <h2 className="text-2xl font-bold">Product Management</h2>
         <Button
           type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("/admin/product/add")}
+          onClick={showModal}
+          className="mb-4"
         >
           Add New Product
         </Button>
       </div>
-      <Table
-        columns={columns}
-        dataSource={products}
-        rowKey="id"
-        pagination={pagination}
-        loading={loading}
-        onChange={handleTableChange}
-      />
+      <div className="shadow-md rounded-lg bg-white">
+        <Table
+          columns={columns}
+          dataSource={products}
+          rowKey="id"
+          pagination={pagination}
+          loading={loading}
+          onChange={handleTableChange}
+        />
+      </div>
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -208,6 +226,11 @@ const ProductManagement = () => {
         </p>
         <p>This action cannot be undone.</p>
       </Modal>
+      <AddProduct
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        onSuccess={handleSuccess}
+      />
       <ToastContainer />
     </div>
   );

@@ -70,10 +70,11 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       collapsed={collapsed}
       width={250}
       style={{
-        background: "#001529",
+        background: "#ffffff",
         height: "100vh",
         position: "fixed",
         left: 0,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
       }}
     >
       <div className="p-4 flex items-center justify-center">
@@ -83,15 +84,15 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
           }`}
         >
           {collapsed ? (
-            <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">S</span>
+            <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+              <span className="text-2xl font-bold text-gray-800">S</span>
             </div>
           ) : (
             <div className="flex items-center">
-              <div className="text-2xl font-bold text-white flex items-center">
+              <div className="text-2xl font-bold text-gray-800 flex items-center">
                 <div className="flex items-end">
                   <span>SKYN</span>
-                  <span className="text-sm text-gray-400 ml-2 mb-1">ADMIN</span>
+                  <span className="text-sm text-gray-500 ml-2 mb-1">ADMIN</span>
                 </div>
               </div>
             </div>
@@ -100,7 +101,7 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       </div>
 
       <Menu
-        theme="dark"
+        theme="light"
         mode="inline"
         selectedKeys={[location.pathname]}
         items={menuItems}

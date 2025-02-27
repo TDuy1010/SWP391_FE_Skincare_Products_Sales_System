@@ -9,6 +9,7 @@ import {
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AddCategory from './AddCategory';
 
 const CategoryManagement = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const CategoryManagement = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const fetchCategories = async (params = {}) => {
     try {
@@ -107,6 +109,19 @@ const CategoryManagement = () => {
     }
   };
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleSuccess = (message) => {
+    fetchCategories();
+    toast.success(message);
+  };
+
   const columns = [
     {
       title: "Image",
@@ -174,8 +189,8 @@ const CategoryManagement = () => {
         <h2 className="text-2xl font-bold">Category Management</h2>
         <Button
           type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("/admin/category/add")}
+          onClick={showModal}
+          className="mb-4"
         >
           Add New Category
         </Button>
@@ -206,6 +221,11 @@ const CategoryManagement = () => {
         </p>
         <p>This action cannot be undone.</p>
       </Modal>
+      <AddCategory
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        onSuccess={handleSuccess}
+      />
       <ToastContainer />
     </div>
   );
