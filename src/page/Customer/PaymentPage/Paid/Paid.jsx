@@ -31,11 +31,7 @@ const Paid = ({ selectedAddressId, cartId }) => {
         if (selectedPaymentMethod === "VNPAY" && response.result.redirectUrl) {
           window.location.href = response.result.redirectUrl;
         } else {
-          navigate("/order-success", {
-            state: {
-              orderId: response.result.orderId,
-            },
-          });
+          navigate("/");
         }
       } else {
         alert(response.message);
