@@ -86,7 +86,7 @@ const UserManagement = () => {
     return (
         <>
             <div>
-                <h2 className="text-2xl text-white font-bold mb-4">Users</h2>
+                <h2 className="text-2xl text-black font-bold mb-4">Users</h2>
                 <div className="bg-slate-700 p-4 rounded-lg">
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center">
