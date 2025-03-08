@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Editor } from "@tinymce/tinymce-react";
 
-const EditBrand = ({ visible, onCancel, onSuccess }) => {
+const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
@@ -18,44 +18,22 @@ const EditBrand = ({ visible, onCancel, onSuccess }) => {
   const [description, setDescription] = useState("");
 
   useEffect(() => {
-    fetchBrandDetails();
-  }, [id]);
-
-  const fetchBrandDetails = async () => {
-    try {
-      const response = await getBrandById(id);
-      if (!response.error) {
-        form.setFieldsValue({
-          name: response.result.name,
-          description: response.result.description,
-          
-        });
-        setImageUrl(response.result.thumbnail);
-        setFileList([
-          {
-            uid: "-1",
-            name: "thumbnail.png",
-            
-            url: response.result.thumbnail,
-          },
-        ]);
-      } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        navigate("/admin/brand");
-      }
-    } catch (error) {
-      toast.error("Failed to fetch brand details", {
-        position: "top-right",
-        autoClose: 3000,
+    if (brandData) {
+      form.setFieldsValue({
+        name: brandData.name,
+        description: brandData.description,
       });
-      navigate("/admin/brand");
-    } finally {
+      setImageUrl(brandData.thumbnail);
+      setFileList([
+        {
+          uid: "-1",
+          name: "thumbnail.png",
+          url: brandData.thumbnail,
+        },
+      ]);
       setInitialLoading(false);
     }
-  };
+  }, [brandData]);
 
   const onFinish = async (values) => {
     try {
@@ -75,7 +53,7 @@ const EditBrand = ({ visible, onCancel, onSuccess }) => {
         requestData.thumbnail = imageUrl;
       }
 
-      const response = await updateBrand(id, formData);
+      const response = await updateBrand(brandData.id, formData);
 
       if (!response.error) {
         navigate("/admin/brand");

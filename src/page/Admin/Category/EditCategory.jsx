@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Editor } from "@tinymce/tinymce-react";
 
-const EditCategory = ({ visible, onCancel, onSuccess }) => {
+const EditCategory = ({ visible, onCancel, onSuccess, categoryData }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
@@ -23,6 +23,17 @@ const EditCategory = ({ visible, onCancel, onSuccess }) => {
   useEffect(() => {
     fetchCategoryDetails();
   }, [id]);
+
+  useEffect(() => {
+    if (categoryData) {
+      form.setFieldsValue({
+        name: categoryData.name,
+        description: categoryData.description,
+      });
+      setCurrentThumbnail(categoryData.thumbnail);
+      setDescription(categoryData.description);
+    }
+  }, [categoryData]);
 
   const fetchCategoryDetails = async () => {
     try {
@@ -76,7 +87,7 @@ const EditCategory = ({ visible, onCancel, onSuccess }) => {
         thumbnail: thumbnailUrl,
       };
 
-      const response = await updateCategory(id, updateData);
+      const response = await updateCategory(categoryData.id, updateData);
 
       if (!response.error) {
         navigate("/admin/category");

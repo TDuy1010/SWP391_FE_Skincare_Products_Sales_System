@@ -137,7 +137,8 @@ const showDetail = (brand) => {
   };
 
   const handleEditBrand = (brand) => {
-    navigate(`/admin/brand/edit/${brand.id}`);
+    setEditingBrand(brand);
+    setIsEditModalVisible(true);
   };
   
   const handleEditCancel = () => {

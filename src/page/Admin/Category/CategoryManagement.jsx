@@ -72,7 +72,8 @@ const CategoryManagement = () => {
 
 
   const handleEditCategory = (category) => {
-    navigate(`/admin/category/edit/${category.id}`);
+    setEditingCategory(category);
+    setIsEditModalVisible(true);
   };
   
   
@@ -192,6 +193,7 @@ const CategoryManagement = () => {
           Add New Category
         </Button>
       </div>
+      <div className="shadow-md rounded-lg bg-white">
       <Table
         columns={columns}
         dataSource={categories}
@@ -201,6 +203,8 @@ const CategoryManagement = () => {
         onChange={handleTableChange}
         className="dark-table"
       />
+      </div>
+      
       <Modal
         title="Category Details"
         open={detailModalVisible}
