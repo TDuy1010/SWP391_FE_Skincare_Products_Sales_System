@@ -164,39 +164,47 @@ const EditBrand = ({ visible, onCancel, onSuccess }) => {
               
               
               <Form.Item
-  label={<span className="text-gray-700 font-medium">Description</span>}
-  name="description"
-  rules={[
-    { required: true, message: "Please enter description" },
-    { min: 10, message: "Description must be at least 10 characters" },
-  ]}
->
-  
-    <Editor
-      apiKey='ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn'
-      value={description}
-      onEditorChange={(content) => {
-        setDescription(content);
-        form.setFieldsValue({ description: content }); 
-      }}
-      init={{
-        height: 250,
-        menubar: false,
-        plugins: [
-          "advlist autolink lists link image charmap print preview anchor",
-          "searchreplace visualblocks code fullscreen",
-          "insertdatetime media table paste code help wordcount",
-        ],
-        toolbar:
-          "undo redo | formatselect | bold italic backcolor | \
-          alignleft aligncenter alignright alignjustify | \
-          bullist numlist outdent indent | removeformat | help",
-        content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
-      }}
-      className="w-full"
-    />
-  
-</Form.Item>
+                label={<span className="text-gray-700 font-medium">Description</span>}
+                name="description"
+                rules={[
+                  { required: true, message: "Please enter description" },
+                  {
+                    validator: (_, value) => {
+                      const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
+                      return textContent.length >= 10
+                        ? Promise.resolve()
+                        : Promise.reject(new Error("Description must be at least 10 characters"));
+                    },
+                  },
+                ]}
+              >
+                <div className="rounded-md p-2">
+                  <Editor
+                    apiKey="ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn"
+                    value={description}
+                    onEditorChange={(content) => {
+                      setDescription(content);
+                      form.setFieldsValue({ description: content }); 
+                      form.validateFields(["description"]); 
+                    }}
+                    init={{
+                      height: 250,
+                      menubar: false,
+                      plugins: [
+                        "advlist autolink lists link image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "insertdatetime media table paste code help wordcount",
+                      ],
+                      toolbar:
+                        "undo redo | formatselect | bold italic backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help",
+                      content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+                    }}
+                    className="w-full"
+                  />
+                </div>
+              </Form.Item>
             
             <div className="pt-2 mt-6">
               <div className="mb-6">
