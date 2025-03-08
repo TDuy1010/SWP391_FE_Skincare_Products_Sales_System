@@ -25,6 +25,14 @@ const BrandManagement = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+const [selectedDetail, setSelectedDetail] = useState("");
+
+const showDetail = (brand) => {
+  setSelectedDetail(brand.description);
+  setDetailModalVisible(true);
+};
+
 
   const fetchBrands = async (params = {}) => {
     try {
@@ -128,9 +136,8 @@ const BrandManagement = () => {
     }
   };
 
-  const showEditModal = (brand) => {
-    setEditingBrand(brand);
-    setIsEditModalVisible(true);
+  const handleEditBrand = (brand) => {
+    navigate(`/admin/brand/edit/${brand.id}`);
   };
   
   const handleEditCancel = () => {
@@ -172,10 +179,14 @@ const BrandManagement = () => {
     },
     {
       title: "Description",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
+      key: "details",
+      render: (_, record) => (
+        <Button type="link" onClick={() => showDetail(record)}>
+          Detail
+        </Button>
+      ),
     },
+    
     {
       title: "Actions",
       key: "actions",
@@ -185,7 +196,7 @@ const BrandManagement = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => showEditModal(record)}
+              onClick={() => handleEditBrand(record)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -222,6 +233,18 @@ const BrandManagement = () => {
           onChange={handleTableChange}
         />
       </div>
+      <Modal
+              title="Brand Details"
+              open={detailModalVisible}
+              onCancel={() => setDetailModalVisible(false)}
+              footer={[
+              <Button key="close" onClick={() => setDetailModalVisible(false)}>
+               Close
+              </Button>,
+              ]}
+            >
+            <p>{selectedDetail}</p>
+            </Modal>
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}

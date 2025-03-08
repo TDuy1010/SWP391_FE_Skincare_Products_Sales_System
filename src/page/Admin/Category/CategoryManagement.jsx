@@ -25,6 +25,14 @@ const CategoryManagement = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState("");
+
+  const showDetail = (category) => {
+        setSelectedDetail(category.description);
+        setDetailModalVisible(true);
+      };
+
 
   const fetchCategories = async (params = {}) => {
     try {
@@ -62,30 +70,11 @@ const CategoryManagement = () => {
     });
   };
 
-  // const toggleCategoryStatus = async (category) => {
-  //   try {
-  //     setLoading(true);
-  //     const newStatus = category.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-  //     const response = await updateCategoryStatus(category.id, newStatus);
-  //     if (!response.error) {
-  //       toast.success("Category status updated successfully!");
-  //       fetchCategories({
-  //         page: pagination.current,
-  //         pageSize: pagination.pageSize,
-  //       });
-  //     } else {
-  //       toast.error(response.message);
-  //     }
-  //   } catch (error) {
-  //     toast.error("Failed to update category status");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  const showEditModal = (category) => {
-    setEditingCategory(category);
-    setIsEditModalVisible(true);
+
+  const handleEditCategory = (category) => {
+    navigate(`/admin/category/edit/${category.id}`);
   };
+  
   
   const handleEditCancel = () => {
     setIsEditModalVisible(false);
@@ -159,23 +148,14 @@ const CategoryManagement = () => {
     },
     {
       title: "Description",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
+      key: "details",
+      render: (_, record) => (
+        <Button type="link" onClick={() => showDetail(record)}>
+          Detail
+        </Button>
+      ),
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   key: "status",
-    //   render: (status, record) => (
-    //     <Switch
-    //       checked={status === "ACTIVE"}
-    //       onChange={() => toggleCategoryStatus(record)}
-    //       checkedChildren="Active"
-    //       unCheckedChildren="Inactive"
-    //     />
-    //   ),
-    // },
+    
     {
       title: "Actions",
       key: "actions",
@@ -185,7 +165,7 @@ const CategoryManagement = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => showEditModal(record)}
+              onClick={() => handleEditCategory(record)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -221,6 +201,19 @@ const CategoryManagement = () => {
         onChange={handleTableChange}
         className="dark-table"
       />
+      <Modal
+        title="Category Details"
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[
+        <Button key="close" onClick={() => setDetailModalVisible(false)}>
+         Close
+        </Button>,
+        ]}
+      >
+      <p>{selectedDetail}</p>
+      </Modal>
+
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}

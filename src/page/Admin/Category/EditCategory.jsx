@@ -116,7 +116,7 @@ const EditCategory = ({ visible, onCancel, onSuccess }) => {
     <div>
       <ToastContainer />
       <Modal
-      title="Edit Brand"
+      title="Edit Category"
       open={visible}
       onCancel={onCancel}
       footer={null}
@@ -186,12 +186,7 @@ const EditCategory = ({ visible, onCancel, onSuccess }) => {
     />
   </div>
 </Form.Item>
-
-
-              
-            
-
-            <div className="pt-2 mt-6">
+            <div className=" pt-2 mt-6">
               <div className="mb-6">
                 <h3 className="text-gray-700 font-medium mb-4">Category Image</h3>
                 {currentThumbnail && (
