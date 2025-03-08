@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Select, Spin, Upload } from "antd";
+import { Form, Input, Button, Card, Select, Spin, Upload, Modal } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,14 +9,16 @@ import {
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Editor } from "@tinymce/tinymce-react";
 
-const EditCategory = () => {
+const EditCategory = ({ visible, onCancel, onSuccess }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [currentThumbnail, setCurrentThumbnail] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     fetchCategoryDetails();
@@ -29,7 +31,6 @@ const EditCategory = () => {
         form.setFieldsValue({
           name: response.result.name,
           description: response.result.description,
-          status: response.result.status,
         });
         setCurrentThumbnail(response.result.thumbnail);
       } else {
@@ -112,37 +113,23 @@ const EditCategory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div>
       <ToastContainer />
-      
-      <div className="flex items-center pl-8 justify-between">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/admin/category")}
-            className="flex items-center hover:bg-gray-100 transition-colors"
-          >
-            Back to Categories
-          </Button>
-        </div>
-
-      <div className="max-w-4xl mx-auto px-4">
-        <Card 
-          className="shadow-md rounded-lg"
-          title={
-            <span className="text-xl font-semibold text-gray-800">
-              Edit Category
-            </span>
-          }
-        >
-          <Form
+      <Modal
+      title="Edit Brand"
+      open={visible}
+      onCancel={onCancel}
+      footer={null}
+      width={800}
+      >
+      <Form
             form={form}
             layout="vertical"
             onFinish={onFinish}
             autoComplete="off"
             className="space-y-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+
                 <Form.Item
                   name="name"
                   label={<span className="text-gray-700 font-medium">Category Name</span>}
@@ -158,36 +145,41 @@ const EditCategory = () => {
                 </Form.Item>
 
                 <Form.Item
-                  name="status"
-                  label={<span className="text-gray-700 font-medium">Status</span>}
-                  rules={[{ required: true, message: "Please select status" }]}
-                >
-                  <Select className="rounded-md">
-                    <Select.Option value="ACTIVE">Active</Select.Option>
-                    <Select.Option value="INACTIVE">Inactive</Select.Option>
-                  </Select>
-                </Form.Item>
-              </div>
-
-              <div>
-                <Form.Item
-                  name="description"
                   label={<span className="text-gray-700 font-medium">Description</span>}
+                  name="description"
                   rules={[
                     { required: true, message: "Please enter description" },
                     { min: 10, message: "Description must be at least 10 characters" },
                   ]}
                 >
-                  <Input.TextArea
-                    rows={4}
-                    placeholder="Enter category description"
-                    maxLength={500}
-                    showCount
-                    className="rounded-md"
-                  />
+                  
+                    <Editor
+                      apiKey='ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn'
+                      value={description}
+                      onEditorChange={(content) => {
+                        setDescription(content);
+                        form.setFieldsValue({ description: content }); 
+                      }}
+                      init={{
+                        height: 250,
+                        menubar: false,
+                        plugins: [
+                          "advlist autolink lists link image charmap print preview anchor",
+                          "searchreplace visualblocks code fullscreen",
+                          "insertdatetime media table paste code help wordcount",
+                        ],
+                        toolbar:
+                          "undo redo | formatselect | bold italic backcolor | \
+                          alignleft aligncenter alignright alignjustify | \
+                          bullist numlist outdent indent | removeformat | help",
+                        content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+                      }}
+                      className="w-full"
+                    />
+                  
                 </Form.Item>
-              </div>
-            </div>
+              
+            
 
             <div className="border-t border-gray-200 pt-6 mt-6">
               <div className="mb-6">
@@ -209,6 +201,7 @@ const EditCategory = () => {
                 name="thumbnail"
                 valuePropName="fileList"
                 getValueFromEvent={normFile}
+                rules={[{ required: true, message: "Please upload an image" }]}
               >
                 <Upload
                   beforeUpload={() => false}
@@ -229,7 +222,7 @@ const EditCategory = () => {
 
             <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
               <Button 
-                onClick={() => navigate("/admin/category")}
+                onClick={onCancel}
                 className="rounded-md px-6"
               >
                 Cancel
@@ -244,8 +237,8 @@ const EditCategory = () => {
               </Button>
             </div>
           </Form>
-        </Card>
-      </div>
+      </Modal>
+     
     </div>
   );
 };

@@ -5,11 +5,11 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   getAllCategories,
   deleteCategory,
-  updateCategoryStatus,
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddCategory from './AddCategory';
+import EditCategory from './EditCategory';
 
 const CategoryManagement = () => {
   const navigate = useNavigate();
@@ -23,6 +23,8 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
   const fetchCategories = async (params = {}) => {
     try {
@@ -60,25 +62,40 @@ const CategoryManagement = () => {
     });
   };
 
-  const toggleCategoryStatus = async (category) => {
-    try {
-      setLoading(true);
-      const newStatus = category.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-      const response = await updateCategoryStatus(category.id, newStatus);
-      if (!response.error) {
-        toast.success("Category status updated successfully!");
-        fetchCategories({
-          page: pagination.current,
-          pageSize: pagination.pageSize,
-        });
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Failed to update category status");
-    } finally {
-      setLoading(false);
-    }
+  // const toggleCategoryStatus = async (category) => {
+  //   try {
+  //     setLoading(true);
+  //     const newStatus = category.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+  //     const response = await updateCategoryStatus(category.id, newStatus);
+  //     if (!response.error) {
+  //       toast.success("Category status updated successfully!");
+  //       fetchCategories({
+  //         page: pagination.current,
+  //         pageSize: pagination.pageSize,
+  //       });
+  //     } else {
+  //       toast.error(response.message);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to update category status");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const showEditModal = (category) => {
+    setEditingCategory(category);
+    setIsEditModalVisible(true);
+  };
+  
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    setEditingCategory(null);
+  };
+  
+  const handleEditSuccess = (message) => {
+    fetchCategories(); // Refresh danh sách danh mục
+    toast.success(message);
+    setIsEditModalVisible(false);
   };
 
   const showDeleteConfirm = (category) => {
@@ -146,19 +163,19 @@ const CategoryManagement = () => {
       key: "description",
       ellipsis: true,
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => (
-        <Switch
-          checked={status === "ACTIVE"}
-          onChange={() => toggleCategoryStatus(record)}
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-        />
-      ),
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   key: "status",
+    //   render: (status, record) => (
+    //     <Switch
+    //       checked={status === "ACTIVE"}
+    //       onChange={() => toggleCategoryStatus(record)}
+    //       checkedChildren="Active"
+    //       unCheckedChildren="Inactive"
+    //     />
+    //   ),
+    // },
     {
       title: "Actions",
       key: "actions",
@@ -168,7 +185,7 @@ const CategoryManagement = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/category/edit/${record.id}`)}
+              onClick={() => showEditModal(record)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -225,6 +242,12 @@ const CategoryManagement = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         onSuccess={handleSuccess}
+      />
+      <EditCategory
+        visible={isEditModalVisible}
+        onCancel={handleEditCancel}
+        categoryData={editingCategory}
+        onSuccess={handleEditSuccess}
       />
       <ToastContainer />
     </div>

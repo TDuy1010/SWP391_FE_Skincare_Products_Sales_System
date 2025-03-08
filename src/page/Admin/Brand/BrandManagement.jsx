@@ -5,11 +5,11 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   getAllBrands,
   deleteBrand,
-  updateBrandStatus,
 } from "../../../service/brand/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddBrand from './AddBrand';
+import EditBrand from './EditBrand';
 
 const BrandManagement = () => {
   const navigate = useNavigate();
@@ -23,6 +23,8 @@ const BrandManagement = () => {
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingBrand, setEditingBrand] = useState(null);
 
   const fetchBrands = async (params = {}) => {
     try {
@@ -126,25 +128,20 @@ const BrandManagement = () => {
     }
   };
 
-  const toggleBrandStatus = async (brand) => {
-    try {
-      setLoading(true);
-      const newStatus = brand.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-      const response = await updateBrandStatus(brand.id, newStatus);
-      if (!response.error) {
-        toast.success("Brand status updated successfully!");
-        fetchBrands({
-          page: pagination.current,
-          pageSize: pagination.pageSize,
-        });
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Failed to update brand status");
-    } finally {
-      setLoading(false);
-    }
+  const showEditModal = (brand) => {
+    setEditingBrand(brand);
+    setIsEditModalVisible(true);
+  };
+  
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    setEditingBrand(null);
+  };
+  
+  const handleEditSuccess = (message) => {
+    fetchBrands();
+    toast.success(message);
+    setIsEditModalVisible(false);
   };
 
   const showAddModal = () => {
@@ -180,19 +177,6 @@ const BrandManagement = () => {
       ellipsis: true,
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => (
-        <Switch
-          checked={status === "ACTIVE"}
-          onChange={() => toggleBrandStatus(record)}
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-        />
-      ),
-    },
-    {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
@@ -201,7 +185,7 @@ const BrandManagement = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/brand/edit/${record.id}`)}
+              onClick={() => showEditModal(record)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -259,6 +243,12 @@ const BrandManagement = () => {
         onSuccess={handleAddSuccess}
       />
       <ToastContainer />
+      <EditBrand
+      visible={isEditModalVisible}
+      onCancel={handleEditCancel}
+      brandData={editingBrand}
+      onSuccess={handleEditSuccess}
+      />
     </div>
   );
 };

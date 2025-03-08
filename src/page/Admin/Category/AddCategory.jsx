@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { Form, Input, Button, Modal, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { addCategory } from "../../../service/category/index";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import { Editor } from "@tinymce/tinymce-react";
+import { div } from "framer-motion/client";
 
 const AddCategory = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState("");
 
   const onFinish = async (values) => {
     if (values.name && values.description && values.thumbnail?.length > 0) {
@@ -52,7 +55,9 @@ const AddCategory = ({ visible, onCancel, onSuccess }) => {
   };
 
   return (
-    <Modal
+    <div>
+      <ToastContainer/>
+      <Modal
       title="Add New Category"
       open={visible}
       onCancel={onCancel}
@@ -81,23 +86,38 @@ const AddCategory = ({ visible, onCancel, onSuccess }) => {
         </Form.Item>
 
         <Form.Item
+          label={<span className="text-gray-700 font-medium">Description</span>}
           name="description"
-          label="Description"
           rules={[
             { required: true, message: "Please enter description" },
-            {
-              min: 10,
-              message: "Description must be at least 10 characters",
-            },
+            { min: 10, message: "Description must be at least 10 characters" },
           ]}
         >
-          <Input.TextArea
-            rows={6}
-            placeholder="Enter category description"
-            maxLength={500}
-            showCount
-            className="text-base"
-          />
+          <div className="">
+            <Editor
+              apiKey='ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn'
+              value={description}
+              onEditorChange={(content) => {
+                setDescription(content);
+                form.setFieldsValue({ description: content }); 
+              }}
+              init={{
+                height: 250,
+                menubar: false,
+                plugins: [
+                  "advlist autolink lists link image charmap print preview anchor",
+                  "searchreplace visualblocks code fullscreen",
+                  "insertdatetime media table paste code help wordcount",
+                ],
+                toolbar:
+                  "undo redo | formatselect | bold italic backcolor | \
+                  alignleft aligncenter alignright alignjustify | \
+                  bullist numlist outdent indent | removeformat | help",
+                content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+              }}
+              className="w-full"
+            />
+          </div>
         </Form.Item>
 
         <Form.Item
@@ -118,7 +138,7 @@ const AddCategory = ({ visible, onCancel, onSuccess }) => {
         </Form.Item>
 
         <Form.Item className="flex justify-end mb-0">
-          <Button onClick={onCancel} className="mr-2">
+          <Button onClick={onCancel} className="mr-2 h-10 px-8 text-base font-medium">
             Cancel
           </Button>
           <Button
@@ -132,6 +152,7 @@ const AddCategory = ({ visible, onCancel, onSuccess }) => {
         </Form.Item>
       </Form>
     </Modal>
+    </div>
   );
 };
 
