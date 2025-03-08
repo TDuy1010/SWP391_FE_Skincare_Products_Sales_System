@@ -193,7 +193,7 @@ const ProductManagement = () => {
         <h2 className="text-2xl font-bold">Product Management</h2>
         <Button
           type="primary"
-          onClick={showModal}
+          onClick={() => navigate("/admin/product/add")}
           className="mb-4"
         >
           Add New Product
@@ -226,11 +226,11 @@ const ProductManagement = () => {
         </p>
         <p>This action cannot be undone.</p>
       </Modal>
-      <AddProduct
+      {/* <AddProduct
         visible={isModalVisible}
         onCancel={handleCancel}
         onSuccess={handleSuccess}
-      />
+      /> */}
       <ToastContainer />
     </div>
   );
