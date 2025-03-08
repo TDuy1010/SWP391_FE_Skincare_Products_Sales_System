@@ -244,10 +244,10 @@ const EditBrand = ({ visible, onCancel, onSuccess }) => {
             </div>
 
             <Form.Item className="mb-0">
-            <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
+            <div className="flex justify-end">
               <Button
                 onClick={onCancel}
-                className="rounded-md px-6"
+                className="mr-2 h-10 px-8 text-base font-medium"
               >
                 Cancel
               </Button>
@@ -255,7 +255,7 @@ const EditBrand = ({ visible, onCancel, onSuccess }) => {
                 type="primary"
                 htmlType="submit"
                 loading={loading}
-                className="rounded-md px-8 bg-blue-600 hover:bg-blue-700"
+                className="h-10 px-8 text-base font-medium rounded-md px-8 bg-blue-600 hover:bg-blue-700"
               >
                 Update Brand
               </Button>
