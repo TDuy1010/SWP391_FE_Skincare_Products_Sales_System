@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -14,6 +14,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getProductById, updateProduct } from "../../../service/product/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CustomEditor from "./CustomEditor";
+import { AiFillCaretRight } from "react-icons/ai";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -23,6 +25,8 @@ const EditProduct = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState("");
   const [fileList, setFileList] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
   useEffect(() => {
     fetchProductDetails();
@@ -165,12 +169,15 @@ const EditProduct = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+              <div className="flex items-center mb-2">
+                  <AiFillCaretRight />
+                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Basic Information</h1>
+                </div>
+                <hr className="border-t-2 border-gray-200 mb-4" />
                 <Form.Item
                   name="name"
                   label={
-                    <span className="text-gray-700 font-medium">
-                      Product Name
-                    </span>
+                    <span className="text-gray-700 font-medium">Product Name</span>
                   }
                   rules={[
                     { required: true, message: "Please enter product name" },
@@ -221,38 +228,133 @@ const EditProduct = () => {
                     <Select.Option value="INACTIVE">Inactive</Select.Option>
                   </Select>
                 </Form.Item>
+
+                <Form.Item
+                  name="categoryId"
+                  label={
+                    <span className="text-gray-700 font-medium">Category</span>
+                  }
+                  rules={[{ required: true, message: "Please select a category" }]}
+                >
+                  <Select
+                    placeholder="Select a category"
+                    options={categories.map((category) => ({
+                      value: category.id,
+                      label: category.name,
+                    }))}
+                    className="w-full rounded-md"
+                  />
+                </Form.Item>
               </div>
 
               <div>
+                <div className="flex items-center mb-2">
+                  <AiFillCaretRight />
+                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Product Parameter</h1>
+                </div>
+                <hr className="border-t-2 border-gray-200 mb-4" />
                 <Form.Item
-                  name="description"
+                  name="brandId"
                   label={
-                    <span className="text-gray-700 font-medium">
-                      Description
-                    </span>
+                    <span className="text-gray-700 font-medium">Brand</span>
+                  }
+                  rules={[{ required: true, message: "Please select a brand" }]}
+                >
+                  <Select
+                    placeholder="Select a brand"
+                    options={brands.map((brand) => ({
+                      value: brand.id,
+                      label: brand.name,
+                    }))}
+                    className="w-full rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="brandOrigin"
+                  label={
+                    <span className="text-gray-700 font-medium">Brand Origin</span>
                   }
                   rules={[
-                    { required: true, message: "Please enter description" },
-                    {
-                      min: 10,
-                      message: "Description must be at least 10 characters",
-                    },
+                    { required: true, message: "Please enter brand origin" },
+                    { min: 3, message: "Name must be at least 3 characters" },
                   ]}
                 >
-                  <Input.TextArea
-                    rows={4}
-                    placeholder="Enter product description"
-                    maxLength={500}
-                    showCount
+                  <Input
+                    placeholder="Enter brand origin"
+                    className="rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="manufacture"
+                  label={
+                    <span className="text-gray-700 font-medium">Place Of Manufacture</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter place of mmanufacture" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter place of manufacture"
+                    className="rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="skinType"
+                  label={
+                    <span className="text-gray-700 font-medium">Skin Type</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter skin type" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter skin type"
                     className="rounded-md"
                   />
                 </Form.Item>
               </div>
             </div>
 
+            <div>
+              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
+              <div className="flex items-center mb-2">
+                <AiFillCaretRight />
+                <h1 className="text-xl font-semibold text-gray-800 ml-2">Description</h1>
+              </div>
+              <CustomEditor
+                initialValue={"Enter product description"}
+              />
+
+              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
+              <div className="flex items-center mb-2">
+                <AiFillCaretRight />
+                <h1 className="text-xl font-semibold text-gray-800 ml-2">Ingredient</h1>
+              </div>
+              <CustomEditor
+                initialValue={"Enter product ingredient"}
+              />
+
+              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
+              <div className="flex items-center mb-2">
+                <AiFillCaretRight />
+                <h1 className="text-xl font-semibold text-gray-800 ml-2">Instructions For Use</h1>
+              </div>
+              <CustomEditor
+                initialValue={"Enter product instruction"}
+              />
+            </div>
+
             <div className="border-t border-gray-200 pt-6 mt-6">
               <div className="mb-6">
-                <h3 className="text-gray-700 font-medium mb-4">Product Image</h3>
+                <div className="flex items-center mb-2">
+                  <AiFillCaretRight />
+                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Product Image</h1>
+                </div>
                 {imageUrl && (
                   <div className="mb-4">
                     <p className="text-sm text-gray-500 mb-2">Current Image:</p>
