@@ -9,6 +9,7 @@ import LandingPage from "../page/Customer/LandingPage/LandingPage";
 import LoginModal from "../page/Customer/LoginPage/LoginPage";
 import AboutUsPage from "../page/Customer/AboutUsPage/AboutUsPage";
 import BlogPage from "../page/Customer/BlogPage/BlogPage";
+import BlogDetail from "../page/Customer/BlogPage/BlogDetail";  // Đảm bảo import đúng
 import CartPage from "../page/Customer/CartPage/CartPage";
 import ShopPagce from "../page/Customer/ShopPage/ShopPagce";
 import ProductDetail from "../page/Customer/ProductPage/ProductDetail";
@@ -28,6 +29,9 @@ import EditBrand from "../page/Admin/Brand/EditBrand";
 import AddBrand from "../page/Admin/Brand/AddBrand";
 
 export const router = createBrowserRouter([
+  
+  
+  //Customer
   {
     path: "/",
     element: <RootLayout />,
@@ -49,6 +53,10 @@ export const router = createBrowserRouter([
         element: <BlogPage />,
       },
       {
+        path: "/blog/:id",  // Thêm đường dẫn cho trang chi tiết blog
+        element: <BlogDetail />,
+      },
+      {
         path: "/cart",
         element: <CartPage />,
       },
@@ -64,7 +72,6 @@ export const router = createBrowserRouter([
         path: "/shop/brand/:slug",
         element: <ShopPagce />,
       },
-
       {
         path: "/product/:slug",
         element: <ProductDetail />,
@@ -73,7 +80,6 @@ export const router = createBrowserRouter([
         path: "/helps",
         element: <HelpPage />,
       },
-
       {
         path: "/payment",
         element: <Payment />,
@@ -84,6 +90,8 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  
+  //Admin
   {
     path: "/admin/login",
     element: <LoginAdmin />,

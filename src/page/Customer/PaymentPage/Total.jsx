@@ -23,41 +23,41 @@ const Total = ({ buttonText, onNext }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg border">
-      <h2 className="text-lg font-bold mb-4 text-[#17183B]">Tạm Tính</h2>
+      <h2 className="text-lg font-bold mb-4 text-[#17183B]">Subtotal</h2>
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <p>Thành Tiền</p>
+          <p>Total Amount</p>
           <p>
             {cartData
               ? `${cartData.totalPrice.toLocaleString("vi-VN")}đ`
-              : "Đang tải..."}
+              : "Loading..."}
           </p>
         </div>
         <div className="flex justify-between text-sm">
-          <p>Giảm Giá</p>
+          <p>Discount</p>
           <p>0đ</p>
         </div>
         <div className="flex justify-between text-sm">
-          <p>Vận chuyển</p>
-          <p>Miễn phí</p>
+          <p>Shipping</p>
+          <p>Free</p>
         </div>
         <div className="flex justify-between text-sm">
-          <p>Mã giảm giá sử dụng</p>
+          <p>Promo Code Used</p>
           <p>0đ</p>
         </div>
       </div>
       <hr className="my-4" />
       <div className="flex justify-between font-semibold text-[#17183B]">
-        <p>Tổng Tiền</p>
+        <p>Total</p>
         <p>
           {cartData
             ? `${cartData.totalPrice.toLocaleString("vi-VN")}đ`
-            : "Đang tải..."}
+            : "Loading..."}
         </p>
       </div>
       <p className="text-sm text-gray-500 mt-2 flex justify-between">
-        Dự kiến giao hàng vào ngày{" "}
-        <span className="font-semibold">01 tháng 02 năm 2025</span>
+        Estimated delivery date{" "}
+        <span className="font-semibold">February 01, 2025</span>
       </p>
       <div className="mt-4">
         <button

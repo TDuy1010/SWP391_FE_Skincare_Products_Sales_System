@@ -9,6 +9,7 @@ import {
 } from "../../../service/brand/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AddBrand from './AddBrand';
 
 const BrandManagement = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const BrandManagement = () => {
   });
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const fetchBrands = async (params = {}) => {
     try {
@@ -145,6 +147,14 @@ const BrandManagement = () => {
     }
   };
 
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
+
+  const handleAddSuccess = (message) => {
+    toast.success(message);
+  };
+
   const columns = [
     {
       title: "Image",
@@ -212,20 +222,22 @@ const BrandManagement = () => {
         <h2 className="text-2xl font-bold">Brand Management</h2>
         <Button
           type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("/admin/brand/add")}
+          onClick={showAddModal}
+          className="mb-4"
         >
           Add New Brand
         </Button>
       </div>
-      <Table
-        columns={columns}
-        dataSource={brands}
-        rowKey="id"
-        pagination={pagination}
-        loading={loading}
-        onChange={handleTableChange}
-      />
+      <div className="shadow-md rounded-lg bg-white">
+        <Table
+          columns={columns}
+          dataSource={brands}
+          rowKey="id"
+          pagination={pagination}
+          loading={loading}
+          onChange={handleTableChange}
+        />
+      </div>
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -241,6 +253,11 @@ const BrandManagement = () => {
         <p>Are you sure you want to delete brand "{selectedBrand?.name}"?</p>
         <p>This action cannot be undone.</p>
       </Modal>
+      <AddBrand
+        visible={isAddModalVisible}
+        onCancel={() => setIsAddModalVisible(false)}
+        onSuccess={handleAddSuccess}
+      />
       <ToastContainer />
     </div>
   );
