@@ -3,15 +3,21 @@ import { blogPosts, featuredArticles } from './BlogPost';
 import img3 from '../../../assets/img/hero-landingPage.png';
 import { useEffect, useState } from "react";
 import AddBlog from './AddBlog';
+import { FiMoreHorizontal } from 'react-icons/fi'; // Import the icon
 
 const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showAddBlog, setShowAddBlog] = useState(false);
-  const [blogs, setBlogs] = useState(blogPosts);
+  const [blogs, setBlogs] = useState([...blogPosts]);
+  const [showOptions, setShowOptions] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    console.log("Blogs state:", blogs);
+  }, [blogs]);
 
   const containerAnimation = {
     hidden: { opacity: 0, y: 20 },
@@ -23,8 +29,27 @@ const BlogPage = () => {
   };
 
   const handleAddBlog = (newBlog) => {
-    setBlogs([newBlog, ...blogs]);
+    console.log("New Blog Data:", newBlog); // Debug to check the data before adding to state
+
+    setBlogs([
+      {
+        ...newBlog,
+        description: newBlog.descriptions[0], // Take the first description
+        images: newBlog.images // Ensure all images are saved
+      },
+      ...blogs
+    ]);
     setShowAddBlog(false);
+  };
+
+  const handleEdit = (post) => {
+    // Implement edit functionality
+    console.log("Edit post:", post);
+  };
+
+  const handleDelete = (post) => {
+    // Implement delete functionality
+    console.log("Delete post:", post);
   };
 
   const truncateText = (text, length) => {
@@ -35,6 +60,10 @@ const BlogPage = () => {
     const textarea = document.createElement("textarea");
     textarea.innerHTML = text;
     return textarea.value;
+  };
+
+  const toggleOptions = (index) => {
+    setShowOptions(showOptions === index ? null : index);
   };
 
   return (
@@ -89,20 +118,44 @@ const BlogPage = () => {
             {blogs.map((post, index) => (
               <motion.div 
                 key={index}
-                className="group cursor-pointer"
+                className="group cursor-pointer relative"
                 whileHover={{ scale: 1.02 }}
                 onClick={() => handleReadMore(post)}
               >
+                <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <button 
+                    className="bg-gray-600 text-white py-1 px-2 rounded hover:bg-gray-400"
+                    onClick={(e) => { e.stopPropagation(); toggleOptions(index); }}
+                  >
+                    <FiMoreHorizontal /> {/* Use the icon */}
+                  </button>
+                  {showOptions === index && (
+                    <div className="flex space-x-2 mt-2">
+                      <button 
+                        className="h-10 px-8 text-base font-medium rounded-md bg-blue-400 hover:bg-blue-600 text-white"
+                        onClick={(e) => { e.stopPropagation(); handleEdit(post); }}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        className="h-10 px-8 text-base font-medium rounded-md bg-red-400 hover:bg-red-600 text-white"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(post); }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <div className="aspect-square overflow-hidden mb-4">
                   <img 
-                    src={post.images && post.images.length > 0 ? post.images[0] : 'path/to/placeholder-image.png'} 
+                    src={post.image || (post.images && post.images.length > 0 ? post.images[0] : 'path/to/placeholder-image.png')} 
                     alt={post.title || 'No Title'} 
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => { e.target.onerror = null; e.target.src = 'path/to/placeholder-image.png'; }}
                   />
                 </div>
                 <h3 className="text-lg mb-2">{truncateText(post.title || 'No Title', 80)}</h3>
-                <p className="text-sm text-gray-600 mb-3" dangerouslySetInnerHTML={{ __html: truncateText(decodeHtmlEntities(post.descriptions && post.descriptions.length > 0 ? post.descriptions[0] : 'No Description'), 80) }} />
+                <p className="text-sm text-gray-600 mb-3" dangerouslySetInnerHTML={{ __html: truncateText(decodeHtmlEntities(post.description || (post.descriptions && post.descriptions.length > 0 ? post.descriptions[0] : "No Description")), 80) }} />
                 <button 
                   className="text-sm text-gray-600 hover:text-black"
                 >
@@ -128,20 +181,39 @@ const BlogPage = () => {
             </button>
             <h2 className="text-4xl font-bold mb-4 text-center">{selectedPost.title || 'No Title'}</h2>
             <p className="text-gray-600 mb-4 text-center">Author: {selectedPost.author || 'Unknown'}</p>
-            <div className="flex justify-center mb-4">
-              {selectedPost.images && selectedPost.images.length > 0 && selectedPost.images.map((image, index) => (
-                <img 
-                  key={index}
-                  src={image} 
-                  alt={selectedPost.title || 'No Title'} 
-                  className="w-1/3 h-auto rounded mb-4"
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'path/to/placeholder-image.png'; }}
-                />
-              ))}
+            <div className="flex flex-wrap gap-4 mb-4">
+              {selectedPost.images && selectedPost.images.length > 0
+                ? selectedPost.images.map((image, index) => (
+                    <div key={index} className="w-full mb-4 flex flex-col md:flex-row">
+                      {index % 2 === 0 ? (
+                        <>
+                          <img 
+                            src={image} 
+                            alt={`Blog Image ${index + 1}`} 
+                            className="w-full md:w-1/2 h-auto rounded"
+                            onError={(e) => { e.target.onerror = null; e.target.src = 'path/to/placeholder-image.png'; }}
+                          />
+                          {selectedPost.descriptions && selectedPost.descriptions.length > index && (
+                            <div className="text-gray-700 mt-4 md:mt-0 md:ml-4 px-8 w-full md:w-1/2" dangerouslySetInnerHTML={{ __html: decodeHtmlEntities(selectedPost.descriptions[index]) }} />
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {selectedPost.descriptions && selectedPost.descriptions.length > index && (
+                            <div className="text-gray-700 mt-4 md:mt-0 md:mr-4 px-8 w-full md:w-1/2" dangerouslySetInnerHTML={{ __html: decodeHtmlEntities(selectedPost.descriptions[index]) }} />
+                          )}
+                          <img 
+                            src={image} 
+                            alt={`Blog Image ${index + 1}`} 
+                            className="w-full md:w-1/2 h-auto rounded"
+                            onError={(e) => { e.target.onerror = null; e.target.src = 'path/to/placeholder-image.png'; }}
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))
+                : <span>No Image</span>}
             </div>
-            {selectedPost.descriptions && selectedPost.descriptions.length > 0 && selectedPost.descriptions.map((description, index) => (
-              <div key={index} className="text-gray-700 mb-4 px-8" dangerouslySetInnerHTML={{ __html: decodeHtmlEntities(description) }} />
-            ))}
             <div className="flex justify-center">
               <button 
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
@@ -153,8 +225,6 @@ const BlogPage = () => {
           </div>
         </div>
       )}
-
-      
     </motion.div>
   );
 };
