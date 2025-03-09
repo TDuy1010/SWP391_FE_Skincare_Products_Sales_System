@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Space, Tooltip, Modal, Tag, Switch } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { FaEye } from "react-icons/fa";
 import {
   getAllBrands,
   deleteBrand,
@@ -183,7 +184,7 @@ const showDetail = (brand) => {
       key: "details",
       render: (_, record) => (
         <Button type="link" onClick={() => showDetail(record)}>
-          Detail
+          <FaEye />
         </Button>
       ),
     },
