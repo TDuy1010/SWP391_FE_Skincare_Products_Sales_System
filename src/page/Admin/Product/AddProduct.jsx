@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -8,7 +8,6 @@ import {
   message,
   Upload,
   Select,
-  Modal,
 } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { addProduct } from "../../../service/product/index";
@@ -16,12 +15,16 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllCategories } from "../../../service/category/index";
 import { getAllBrandsUser } from "../../../service/brand/index";
+import { useNavigate } from "react-router-dom";
+import CustomEditor from "./CustomEditor";
+import { AiFillCaretRight } from "react-icons/ai";
 
 const AddProduct = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,13 +109,7 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
   };
 
   return (
-    <Modal
-      open={visible}
-      onCancel={onCancel}
-      footer={null}
-      width={800}
-      title="Add New Product"
-    >
+    <div className="min-h-screen bg-gray-50 py-8">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -125,134 +122,235 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
         pauseOnHover
         theme="light"
       />
-
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        autoComplete="off"
-        className="space-y-6"
-      >
-        <Form.Item
-          name="name"
-          label="Product Name"
-          rules={[
-            { required: true, message: "Please enter product name" },
-            { min: 3, message: "Name must be at least 3 characters" },
-          ]}
+      <div className="flex items-center pl-8 justify-between">
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/admin/product")}
+          className="mb-4 hover:bg-gray-100 transition-colors"
         >
-          <Input
-            placeholder="Enter product name"
-            className="rounded-md h-12"
-          />
-        </Form.Item>
+          Back to Products
+        </Button>
+      </div>
 
-        <Form.Item
-          name="price"
-          label="Price"
-          rules={[
-            { required: true, message: "Please enter price" },
-            {
-              type: "number",
-              min: 0.01,
-              message: "Price must be greater than 0",
-            },
-          ]}
-        >
-          <InputNumber
-            className="w-full rounded-md h-12"
-            min={0.01}
-            step={0.01}
-            placeholder="Enter price"
-            formatter={(value) =>
-              `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            }
-            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-          />
-        </Form.Item>
+      <div className="max-w-4xl mx-auto px-4">
+        <Card className="shadow-md rounded-lg">
+          <div className="mb-6">
+            <h1 className="text-xl font-semibold text-gray-800">Add Product</h1>
+          </div>
 
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[
-            { required: true, message: "Please enter description" },
-            {
-              min: 10,
-              message: "Description must be at least 10 characters",
-            },
-          ]}
-        >
-          <Input.TextArea
-            rows={4}
-            placeholder="Enter product description"
-            maxLength={500}
-            showCount
-            className="rounded-md"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="categoryId"
-          label="Category"
-          rules={[{ required: true, message: "Please select a category" }]}
-        >
-          <Select
-            placeholder="Select a category"
-            options={categories.map((category) => ({
-              value: category.id,
-              label: category.name,
-            }))}
-            className="w-full rounded-md h-12"
-          />
-        </Form.Item>
-
-          <Form.Item
-            name="brandId"
-            label="Brand"
-            rules={[{ required: true, message: "Please select a brand" }]}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            autoComplete="off"
+            className="space-y-6"
           >
-            <Select
-              placeholder="Select a brand"
-              options={brands.map((brand) => ({
-                value: brand.id,
-                label: brand.name,
-              }))}
-              className="w-full rounded-md h-12"
-            />
-          </Form.Item>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="flex items-center mb-2">
+                  <AiFillCaretRight />
+                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Basic Information</h1>
+                </div>
+                <hr className="border-t-2 border-gray-200 mb-4" />
+                <Form.Item
+                  name="name"
+                  label={
+                    <span className="text-gray-700 font-medium">Product Name</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter product name" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter product name"
+                    className="rounded-md"
+                  />
+                </Form.Item>
 
-        <Form.Item
-          name="thumbnail"
-          label="Thumbnail"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-          rules={[{ required: true, message: "Please upload an image" }]}
-        >
-          <Upload
-            beforeUpload={() => false}
-            maxCount={1}
-            accept="image/*"
-            listType="picture"
-            className="upload-list-inline"
-          >
-            <Button icon={<UploadOutlined />} className="rounded-md h-12">
-              Select Image
-            </Button>
-          </Upload>
-        </Form.Item>
+                <Form.Item
+                  name="price"
+                  label={
+                    <span className="text-gray-700 font-medium">Price</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter price" },
+                    {
+                      type: "number",
+                      min: 0.01,
+                      message: "Price must be greater than 0",
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    className="w-full rounded-md"
+                    min={0.01}
+                    step={0.01}
+                    placeholder="Enter price"
+                    formatter={(value) =>
+                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
 
-        <Form.Item className="mt-6">
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            className="w-full md:w-auto px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
-          >
-            Add Product
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+                <Form.Item
+                  name="categoryId"
+                  label={
+                    <span className="text-gray-700 font-medium">Category</span>
+                  }
+                  rules={[{ required: true, message: "Please select a category" }]}
+                >
+                  <Select
+                    placeholder="Select a category"
+                    options={categories.map((category) => ({
+                      value: category.id,
+                      label: category.name,
+                    }))}
+                    className="w-full rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="thumbnail"
+                  label={
+                    <span className="text-gray-700 font-medium">Thumbnail</span>
+                  }
+                  valuePropName="fileList"
+                  getValueFromEvent={normFile}
+                  rules={[{ required: true, message: "Please upload an image" }]}
+                >
+                  <Upload
+                    beforeUpload={() => false}
+                    maxCount={1}
+                    accept="image/*"
+                    listType="picture"
+                    className="upload-list-inline"
+                  >
+                    <Button icon={<UploadOutlined />} className="rounded-md h-12">
+                      Select Image
+                    </Button>
+                  </Upload>
+                </Form.Item>
+              </div>
+
+              <div>
+                <div className="flex items-center mb-2">
+                  <AiFillCaretRight />
+                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Product Parameter</h1>
+                </div>
+                <hr className="border-t-2 border-gray-200 mb-4" />
+                <Form.Item
+                  name="brandId"
+                  label={
+                    <span className="text-gray-700 font-medium">Brand</span>
+                  }
+                  rules={[{ required: true, message: "Please select a brand" }]}
+                >
+                  <Select
+                    placeholder="Select a brand"
+                    options={brands.map((brand) => ({
+                      value: brand.id,
+                      label: brand.name,
+                    }))}
+                    className="w-full rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="brandOrigin"
+                  label={
+                    <span className="text-gray-700 font-medium">Brand Origin</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter brand origin" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter brand origin"
+                    className="rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="manufacture"
+                  label={
+                    <span className="text-gray-700 font-medium">Place Of Manufacture</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter place of manufacture" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter place of manufacture"
+                    className="rounded-md"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="skinType"
+                  label={
+                    <span className="text-gray-700 font-medium">Skin Type</span>
+                  }
+                  rules={[
+                    { required: true, message: "Please enter skin type" },
+                    { min: 3, message: "Name must be at least 3 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter skin type"
+                    className="rounded-md"
+                  />
+                </Form.Item>
+              </div>
+            </div>
+
+            <div>
+              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
+              <div className="flex items-center mb-2">
+                <AiFillCaretRight />
+                <h1 className="text-xl font-semibold text-gray-800 ml-2">Description</h1>
+              </div>
+              <CustomEditor
+                initialValue={"Enter product description"}
+              />
+
+
+              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
+              <div className="flex items-center mb-2">
+                <AiFillCaretRight />
+                <h1 className="text-xl font-semibold text-gray-800 ml-2">Ingredient</h1>
+              </div>
+              <CustomEditor
+                initialValue={"Enter product ingredient"}
+              />
+
+              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
+              <div className="flex items-center mb-2">
+                <AiFillCaretRight />
+                <h1 className="text-xl font-semibold text-gray-800 ml-2">Instructions For Use</h1>
+              </div>
+              <CustomEditor
+                initialValue={"Enter product instruction"}
+              />
+            </div>
+
+            <Form.Item className="mt-6">
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="w-full md:w-auto px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
+              >
+                Add Product
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
+    </div>
   );
 };
 
