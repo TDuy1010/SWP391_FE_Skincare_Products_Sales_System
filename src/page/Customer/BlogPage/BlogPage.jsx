@@ -2,14 +2,15 @@ import { motion } from 'framer-motion';
 import { blogPosts, featuredArticles } from './BlogPost';
 import img3 from '../../../assets/img/hero-landingPage.png';
 import { useEffect, useState } from "react";
-import AddBlog from './AddBlog';
-import { FiMoreHorizontal } from 'react-icons/fi'; // Import the icon
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
 
 const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const [blogs, setBlogs] = useState([...blogPosts]);
   const [showOptions, setShowOptions] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -43,8 +44,7 @@ const BlogPage = () => {
   };
 
   const handleEdit = (post) => {
-    // Implement edit functionality
-    console.log("Edit post:", post);
+    navigate(`/edit-blog/${post.id}`, { state: { blog: post } }); // Navigate to EditBlog with the blog data
   };
 
   const handleDelete = (post) => {
@@ -90,21 +90,6 @@ const BlogPage = () => {
         </div>
       </div>
 
-      {/* Add My Blogs Button */}
-      <div className="py-4 px-4 text-right">
-        <button 
-          className="py-4 px-14 text-xl font-bold rounded border border-gray-500 hover:border-blue-600 hover:text-blue-600"
-          onClick={() => setShowAddBlog(true)}
-        >
-          Add My Blogs
-        </button>
-      </div>
-
-      {/* Add Blog Form */}
-      {showAddBlog && (
-        <AddBlog visible={showAddBlog} onAddBlog={handleAddBlog} onClose={() => setShowAddBlog(false)} />
-      )}
-
       {/* Journal Section */}
       <div className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
@@ -122,30 +107,6 @@ const BlogPage = () => {
                 whileHover={{ scale: 1.02 }}
                 onClick={() => handleReadMore(post)}
               >
-                <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button 
-                    className="bg-gray-600 text-white py-1 px-2 rounded hover:bg-gray-400"
-                    onClick={(e) => { e.stopPropagation(); toggleOptions(index); }}
-                  >
-                    <FiMoreHorizontal /> {/* Use the icon */}
-                  </button>
-                  {showOptions === index && (
-                    <div className="flex space-x-2 mt-2">
-                      <button 
-                        className="h-10 px-8 text-base font-medium rounded-md bg-blue-400 hover:bg-blue-600 text-white"
-                        onClick={(e) => { e.stopPropagation(); handleEdit(post); }}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className="h-10 px-8 text-base font-medium rounded-md bg-red-400 hover:bg-red-600 text-white"
-                        onClick={(e) => { e.stopPropagation(); handleDelete(post); }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
                 <div className="aspect-square overflow-hidden mb-4">
                   <img 
                     src={post.image || (post.images && post.images.length > 0 ? post.images[0] : 'path/to/placeholder-image.png')} 
