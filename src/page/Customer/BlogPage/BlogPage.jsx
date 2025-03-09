@@ -2,11 +2,21 @@ import { motion } from 'framer-motion';
 import { blogPosts, featuredArticles } from './BlogPost';
 import img3 from '../../../assets/img/hero-landingPage.png';
 import { useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const BlogPage = () => {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Hàm xử lý khi click vào Read More
+  const handleReadMore = (id) => {
+    navigate(`/blog/${id}`);
+    // Sau này khi có API, bạn có thể thêm logic xử lý dữ liệu ở đây trước khi chuyển trang
+    // Ví dụ: gọi API để lấy chi tiết bài viết, sau đó lưu vào state hoặc context
+  };
 
   const containerAnimation = {
     hidden: { opacity: 0, y: 20 },
@@ -52,6 +62,7 @@ const BlogPage = () => {
                 key={index}
                 className="group cursor-pointer"
                 whileHover={{ scale: 1.02 }}
+                onClick={() => handleReadMore(post.id || index + 1)}
               >
                 <div className="aspect-square overflow-hidden mb-4">
                   <img 
@@ -62,7 +73,15 @@ const BlogPage = () => {
                 </div>
                 <h3 className="text-lg mb-2">{post.title}</h3>
                 <p className="text-sm text-gray-600 mb-3">{post.description}</p>
-                <button className="text-sm text-gray-600 hover:text-black">Read More →</button>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation(); // Ngăn sự kiện click lan tỏa lên div cha
+                    handleReadMore(post.id || index + 1);
+                  }}
+                  className="text-sm text-gray-600 hover:text-black"
+                >
+                  Read More →
+                </button>
               </motion.div>
             ))}
           </div>
@@ -84,10 +103,16 @@ const BlogPage = () => {
                 </div>
                 <div className="flex flex-col justify-center">
                   <h2 className="text-2xl mb-4">{article.title}</h2>
-                  {article.description.map((paragraph, i) => (
-                    <p key={i} className="text-gray-600 mb-6">{paragraph}</p>
-                  ))}
-                  <button className="text-sm text-gray-600 hover:text-black self-start">
+                  {Array.isArray(article.description) ? 
+                    article.description.map((paragraph, i) => (
+                      <p key={i} className="text-gray-600 mb-6">{paragraph}</p>
+                    )) : 
+                    <p className="text-gray-600 mb-6">{article.description}</p>
+                  }
+                  <button 
+                    onClick={() => handleReadMore(article.id || blogPosts.length + index + 1)}
+                    className="text-sm text-gray-600 hover:text-black self-start"
+                  >
                     Read More →
                   </button>
                 </div>
@@ -96,10 +121,16 @@ const BlogPage = () => {
               <>
                 <div className="flex flex-col justify-center">
                   <h2 className="text-2xl mb-4">{article.title}</h2>
-                  {article.description.map((paragraph, i) => (
-                    <p key={i} className="text-gray-600 mb-6">{paragraph}</p>
-                  ))}
-                  <button className="text-sm text-gray-600 hover:text-black self-start">
+                  {Array.isArray(article.description) ? 
+                    article.description.map((paragraph, i) => (
+                      <p key={i} className="text-gray-600 mb-6">{paragraph}</p>
+                    )) : 
+                    <p className="text-gray-600 mb-6">{article.description}</p>
+                  }
+                  <button 
+                    onClick={() => handleReadMore(article.id || blogPosts.length + index + 1)}
+                    className="text-sm text-gray-600 hover:text-black self-start"
+                  >
                     Read More →
                   </button>
                 </div>
