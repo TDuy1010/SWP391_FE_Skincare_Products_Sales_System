@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { getVoucherById, updateVoucher } from "../../../service/";
+import { getVoucherById, updateVoucher } from "../../../service/voucher/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs";
