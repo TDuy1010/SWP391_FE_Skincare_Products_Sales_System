@@ -1,50 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal, Tag, Switch } from "antd";
+import { Table, Button, Space, Tooltip, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { FaEye } from "react-icons/fa";
 import {
-  getAllBrands,
-  deleteBrand,
-} from "../../../service/brand/index";
+  getAllBlogs,
+  deleteBlog,
+} from "../../../service/blog/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AddBrand from './AddBrand';
-import EditBrand from './EditBrand';
+import AddBlog from './AddBlog';
+import EditBlog from './EditBlog';
 
-const BrandManagement = () => {
+const BlogManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [brands, setBrands] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
-  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedBlog, setSelectedBlog] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [editingBrand, setEditingBrand] = useState(null);
+  const [editingBlog, setEditingBlog] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-const [selectedDetail, setSelectedDetail] = useState("");
+  const [selectedDetail, setSelectedDetail] = useState("");
 
-const showDetail = (brand) => {
-  setSelectedDetail(brand.description);
-  setDetailModalVisible(true);
-};
+  const showDetail = (blog) => {
+    setSelectedDetail(blog.contents.join("\n\n"));
+    setDetailModalVisible(true);
+  };
 
-
-  const fetchBrands = async (params = {}) => {
+  const fetchBlogs = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await getAllBrands({
+      const response = await getAllBlogs({
         page: params.page - 1 || 0,
         size: params.pageSize || 10,
       });
 
       if (!response.error) {
-        setBrands(response.result.brandResponses);
+        setBlogs(response.result.blogResponses);
         setPagination({
           current: response.result.pageNumber + 1,
           pageSize: response.result.pageSize,
@@ -61,7 +60,7 @@ const showDetail = (brand) => {
         });
       }
     } catch (error) {
-      toast.error("Failed to fetch brands", {
+      toast.error("Failed to fetch blogs", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -75,34 +74,34 @@ const showDetail = (brand) => {
   };
 
   useEffect(() => {
-    fetchBrands();
+    fetchBlogs();
   }, []);
 
   const handleTableChange = (newPagination) => {
-    fetchBrands({
+    fetchBlogs({
       page: newPagination.current,
       pageSize: newPagination.pageSize,
     });
   };
 
-  const showDeleteConfirm = (brand) => {
-    setSelectedBrand(brand);
+  const showDeleteConfirm = (blog) => {
+    setSelectedBlog(blog);
     setDeleteModalVisible(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedBrand) return;
+    if (!selectedBlog) return;
 
     try {
       setLoading(true);
-      const response = await deleteBrand(selectedBrand.id);
+      const response = await deleteBlog(selectedBlog.id);
 
       if (!response.error) {
-        await fetchBrands({
+        await fetchBlogs({
           page: pagination.current,
           pageSize: pagination.pageSize,
         });
-        toast.success("Brand deleted successfully!", {
+        toast.success("Blog deleted successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -122,7 +121,7 @@ const showDetail = (brand) => {
       }
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("Failed to delete brand", {
+      toast.error("Failed to delete blog", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -133,22 +132,22 @@ const showDetail = (brand) => {
     } finally {
       setLoading(false);
       setDeleteModalVisible(false);
-      setSelectedBrand(null);
+      setSelectedBlog(null);
     }
   };
 
-  const handleEditBrand = (brand) => {
-    setEditingBrand(brand);
+  const handleEditBlog = (blog) => {
+    setEditingBlog(blog);
     setIsEditModalVisible(true);
   };
   
   const handleEditCancel = () => {
     setIsEditModalVisible(false);
-    setEditingBrand(null);
+    setEditingBlog(null);
   };
   
   const handleEditSuccess = (message) => {
-    fetchBrands();
+    fetchBlogs();
     toast.success(message);
     setIsEditModalVisible(false);
   };
@@ -164,23 +163,34 @@ const showDetail = (brand) => {
   const columns = [
     {
       title: "Image",
-      dataIndex: "thumbnail",
+      dataIndex: "thumbnails",
       key: "image",
-      render: (image) => (
-        <img
-          src={image}
-          alt="brand"
-          className="w-16 h-16 object-cover rounded"
-        />
+      render: (thumbnails) => (
+        <div className="flex flex-wrap">
+          {thumbnails.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt="blog"
+              className="w-16 h-16 object-cover rounded m-1"
+              style={{ flexBasis: "calc(33.33% - 8px)" }}
+            />
+          ))}
+        </div>
       ),
     },
     {
-      title: "Brand Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Blog Title",
+      dataIndex: "title",
+      key: "title",
     },
     {
-      title: "Description",
+      title: "Author",
+      dataIndex: "author",
+      key: "author",
+    },
+    {
+      title: "Content",
       key: "details",
       render: (_, record) => (
         <Button type="link" onClick={() => showDetail(record)}>
@@ -188,7 +198,6 @@ const showDetail = (brand) => {
         </Button>
       ),
     },
-    
     {
       title: "Actions",
       key: "actions",
@@ -198,7 +207,7 @@ const showDetail = (brand) => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => handleEditBrand(record)}
+              onClick={() => handleEditBlog(record)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -216,19 +225,19 @@ const showDetail = (brand) => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Brand Management</h2>
+        <h2 className="text-2xl font-bold">Blog Management</h2>
         <Button
           type="primary"
           onClick={showAddModal}
           className="mb-4"
         >
-          Add New Brand
+          Add New Blog
         </Button>
       </div>
       <div className="shadow-md rounded-lg bg-white">
         <Table
           columns={columns}
-          dataSource={brands}
+          dataSource={blogs}
           rowKey="id"
           pagination={pagination}
           loading={loading}
@@ -236,46 +245,48 @@ const showDetail = (brand) => {
         />
       </div>
       <Modal
-              title="Brand Details"
-              open={detailModalVisible}
-              onCancel={() => setDetailModalVisible(false)}
-              footer={[
-              <Button key="close" onClick={() => setDetailModalVisible(false)}>
-               Close
-              </Button>,
-              ]}
-            >
-            <p>{selectedDetail}</p>
-            </Modal>
+        title="Blog Details"
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setDetailModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+      >
+        {selectedDetail.split("\n\n").map((content, index) => (
+          <p key={index}>{content}</p>
+        ))}
+      </Modal>
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
         onOk={handleDeleteConfirm}
         onCancel={() => {
           setDeleteModalVisible(false);
-          setSelectedBrand(null);
+          setSelectedBlog(null);
         }}
         okText="Delete"
         cancelText="Cancel"
         okButtonProps={{ danger: true }}
       >
-        <p>Are you sure you want to delete brand "{selectedBrand?.name}"?</p>
+        <p>Are you sure you want to delete blog "{selectedBlog?.title}"?</p>
         <p>This action cannot be undone.</p>
       </Modal>
-      <AddBrand
+      <AddBlog
         visible={isAddModalVisible}
         onCancel={() => setIsAddModalVisible(false)}
         onSuccess={handleAddSuccess}
       />
       <ToastContainer />
-      <EditBrand
-      visible={isEditModalVisible}
-      onCancel={handleEditCancel}
-      brandData={editingBrand}
-      onSuccess={handleEditSuccess}
+      <EditBlog
+        visible={isEditModalVisible}
+        onCancel={handleEditCancel}
+        blogData={editingBlog}
+        onSuccess={handleEditSuccess}
       />
     </div>
   );
 };
 
-export default BrandManagement;
+export default BlogManagement;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Select, Spin, Upload } from "antd";
+import { Form, Input, Button, Card, Select, Spin, Upload, Modal } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,18 +9,31 @@ import {
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Editor } from "@tinymce/tinymce-react";
 
-const EditCategory = () => {
+const EditCategory = ({ visible, onCancel, onSuccess, categoryData }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [currentThumbnail, setCurrentThumbnail] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     fetchCategoryDetails();
   }, [id]);
+
+  useEffect(() => {
+    if (categoryData) {
+      form.setFieldsValue({
+        name: categoryData.name,
+        description: categoryData.description,
+      });
+      setCurrentThumbnail(categoryData.thumbnail);
+      setDescription(categoryData.description);
+    }
+  }, [categoryData]);
 
   const fetchCategoryDetails = async () => {
     try {
@@ -29,7 +42,6 @@ const EditCategory = () => {
         form.setFieldsValue({
           name: response.result.name,
           description: response.result.description,
-          status: response.result.status,
         });
         setCurrentThumbnail(response.result.thumbnail);
       } else {
@@ -75,7 +87,7 @@ const EditCategory = () => {
         thumbnail: thumbnailUrl,
       };
 
-      const response = await updateCategory(id, updateData);
+      const response = await updateCategory(categoryData.id, updateData);
 
       if (!response.error) {
         navigate("/admin/category");
@@ -112,37 +124,23 @@ const EditCategory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div>
       <ToastContainer />
-      
-      <div className="flex items-center pl-8 justify-between">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/admin/category")}
-            className="flex items-center hover:bg-gray-100 transition-colors"
-          >
-            Back to Categories
-          </Button>
-        </div>
-
-      <div className="max-w-4xl mx-auto px-4">
-        <Card 
-          className="shadow-md rounded-lg"
-          title={
-            <span className="text-xl font-semibold text-gray-800">
-              Edit Category
-            </span>
-          }
-        >
-          <Form
+      <Modal
+      title="Edit Category"
+      open={visible}
+      onCancel={onCancel}
+      footer={null}
+      width={800}
+      >
+      <Form
             form={form}
             layout="vertical"
             onFinish={onFinish}
             autoComplete="off"
             className="space-y-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+
                 <Form.Item
                   name="name"
                   label={<span className="text-gray-700 font-medium">Category Name</span>}
@@ -158,38 +156,48 @@ const EditCategory = () => {
                 </Form.Item>
 
                 <Form.Item
-                  name="status"
-                  label={<span className="text-gray-700 font-medium">Status</span>}
-                  rules={[{ required: true, message: "Please select status" }]}
-                >
-                  <Select className="rounded-md">
-                    <Select.Option value="ACTIVE">Active</Select.Option>
-                    <Select.Option value="INACTIVE">Inactive</Select.Option>
-                  </Select>
-                </Form.Item>
-              </div>
-
-              <div>
-                <Form.Item
-                  name="description"
-                  label={<span className="text-gray-700 font-medium">Description</span>}
-                  rules={[
-                    { required: true, message: "Please enter description" },
-                    { min: 10, message: "Description must be at least 10 characters" },
-                  ]}
-                >
-                  <Input.TextArea
-                    rows={4}
-                    placeholder="Enter category description"
-                    maxLength={500}
-                    showCount
-                    className="rounded-md"
-                  />
-                </Form.Item>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-6 mt-6">
+  label={<span className="text-gray-700 font-medium">Description</span>}
+  name="description"
+  rules={[
+    { required: true, message: "Please enter description" },
+    {
+      validator: (_, value) => {
+        const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
+        return textContent.length >= 10
+          ? Promise.resolve()
+          : Promise.reject(new Error("Description must be at least 10 characters"));
+      },
+    },
+  ]}
+>
+  <div className="rounded-md p-2">
+    <Editor
+      apiKey="ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn"
+      value={description}
+      onEditorChange={(content) => {
+        setDescription(content);
+        form.setFieldsValue({ description: content }); 
+        form.validateFields(["description"]); 
+      }}
+      init={{
+        height: 250,
+        menubar: false,
+        plugins: [
+          "advlist autolink lists link image charmap print preview anchor",
+          "searchreplace visualblocks code fullscreen",
+          "insertdatetime media table paste code help wordcount",
+        ],
+        toolbar:
+          "undo redo | formatselect | bold italic backcolor | \
+          alignleft aligncenter alignright alignjustify | \
+          bullist numlist outdent indent | removeformat | help",
+        content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+      }}
+      className="w-full"
+    />
+  </div>
+</Form.Item>
+            <div className=" pt-2 mt-6">
               <div className="mb-6">
                 <h3 className="text-gray-700 font-medium mb-4">Category Image</h3>
                 {currentThumbnail && (
@@ -209,6 +217,7 @@ const EditCategory = () => {
                 name="thumbnail"
                 valuePropName="fileList"
                 getValueFromEvent={normFile}
+                rules={[{ required: true, message: "Please upload an image" }]}
               >
                 <Upload
                   beforeUpload={() => false}
@@ -227,10 +236,10 @@ const EditCategory = () => {
               </Form.Item>
             </div>
 
-            <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
+            <div className="flex justify-end">
               <Button 
-                onClick={() => navigate("/admin/category")}
-                className="rounded-md px-6"
+                onClick={onCancel}
+                className="mr-2 h-10 px-8 text-base font-medium"
               >
                 Cancel
               </Button>
@@ -238,14 +247,14 @@ const EditCategory = () => {
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
-                className="rounded-md px-8 bg-blue-600 hover:bg-blue-700"
+                className="h-10 px-8 text-base font-medium rounded-md px-8 bg-blue-600 hover:bg-blue-700"
               >
                 Update Category
               </Button>
             </div>
           </Form>
-        </Card>
-      </div>
+      </Modal>
+     
     </div>
   );
 };

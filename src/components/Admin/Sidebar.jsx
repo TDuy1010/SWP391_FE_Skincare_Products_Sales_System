@@ -10,6 +10,7 @@ import {
   BarChartOutlined,
   GiftOutlined,
   LogoutOutlined,
+  BookOutlined, // Import the new icon
 } from "@ant-design/icons";
 
 const { Sider } = Layout;
@@ -52,6 +53,11 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       key: "/admin/vouchers",
       icon: <GiftOutlined />,
       label: <Link to="/admin/vouchers">Vouchers</Link>,
+    },
+    {
+      key: "/admin/blog",
+      icon: <BookOutlined />, 
+      label: <Link to="/admin/blog">Blog</Link>,
     },
     {
       key: "logout",

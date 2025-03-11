@@ -4,10 +4,12 @@ import { UploadOutlined } from "@ant-design/icons";
 import { addBrand } from "../../../service/brand/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Editor } from "@tinymce/tinymce-react";
 
 const AddBrand = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState("");
 
   const onFinish = async (values) => {
     if (values.name && values.description && values.thumbnail?.length > 0) {
@@ -53,7 +55,9 @@ const AddBrand = ({ visible, onCancel, onSuccess }) => {
   };
 
   return (
-    <Modal
+    <div>
+      <ToastContainer/>
+      <Modal
       title="Add New Brand"
       open={visible}
       onCancel={onCancel}
@@ -75,24 +79,52 @@ const AddBrand = ({ visible, onCancel, onSuccess }) => {
             { min: 3, message: "Name must be at least 3 characters" },
           ]}
         >
-          <Input placeholder="Enter brand name" className="h-10 text-base" />
+          <Input placeholder="Enter brand name" 
+          className="h-10 text-base" 
+          />
         </Form.Item>
 
         <Form.Item
+          label={<span className="text-gray-700 font-medium">Description</span>}
           name="description"
-          label="Description"
           rules={[
             { required: true, message: "Please enter description" },
-            { min: 10, message: "Description must be at least 10 characters" },
+            {
+              validator: (_, value) => {
+                const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
+                return textContent.length >= 10
+                  ? Promise.resolve()
+                  : Promise.reject(new Error("Description must be at least 10 characters"));
+              },
+            },
           ]}
         >
-          <Input.TextArea
-            rows={6}
-            placeholder="Enter brand description"
-            maxLength={500}
-            showCount
-            className="text-base"
-          />
+          <div className="rounded-md p-2">
+            <Editor
+              apiKey="ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn"
+              value={description}
+              onEditorChange={(content) => {
+                setDescription(content);
+                form.setFieldsValue({ description: content });
+                form.validateFields(["description"]); 
+              }}
+              init={{
+                height: 250,
+                menubar: false,
+                plugins: [
+                  "advlist autolink lists link image charmap print preview anchor",
+                  "searchreplace visualblocks code fullscreen",
+                  "insertdatetime media table paste code help wordcount",
+                ],
+                toolbar:
+                  "undo redo | formatselect | bold italic backcolor | \
+                  alignleft aligncenter alignright alignjustify | \
+                  bullist numlist outdent indent | removeformat | help",
+                content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+              }}
+              className="w-full"
+            />
+          </div>
         </Form.Item>
 
         <Form.Item
@@ -113,8 +145,8 @@ const AddBrand = ({ visible, onCancel, onSuccess }) => {
         </Form.Item>
 
         <Form.Item className="mb-0">
-          <div className="flex justify-end gap-2">
-            <Button onClick={onCancel}>Cancel</Button>
+          <div className="flex justify-end">
+            <Button onClick={onCancel}  className="mr-2 h-10 px-8 text-base font-medium">Cancel</Button>
             <Button
               type="primary"
               htmlType="submit"
@@ -127,6 +159,9 @@ const AddBrand = ({ visible, onCancel, onSuccess }) => {
         </Form.Item>
       </Form>
     </Modal>
+    </div>
+
+    
   );
 };
 

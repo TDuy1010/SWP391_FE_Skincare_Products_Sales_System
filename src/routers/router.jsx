@@ -28,6 +28,10 @@ import BrandManagement from "../page/Admin/Brand/BrandManagement";
 import EditBrand from "../page/Admin/Brand/EditBrand";
 import AddBrand from "../page/Admin/Brand/AddBrand";
 
+import EditBlog from "../page/Admin/Blog/EditBlog";
+import AddBlog from "../page/Admin/Blog/AddBlog";
+import BlogManagement from "../page/Admin/Blog/BlogManagement";
+
 export const router = createBrowserRouter([
   
   
@@ -158,6 +162,18 @@ export const router = createBrowserRouter([
           {
             path: "brand/add",
             element: <AddBrand />,
+          },
+          {
+            path: "blog",
+            element: <BlogManagement />,
+          },
+          {
+            path: "blog/edit/:id",
+            element: <EditBlog />,
+          },
+          {
+            path: "blog/add",
+            element: <AddBlog />,
           },
         ],
       },

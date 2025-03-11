@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Select, Spin, Upload } from "antd";
+import { Form, Input, Button, Card, Select, Spin, Upload, Modal } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { getBrandById, updateBrand } from "../../../service/brand/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Editor } from "@tinymce/tinymce-react";
 
-const EditBrand = () => {
+const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
@@ -14,46 +15,25 @@ const EditBrand = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState("");
   const [fileList, setFileList] = useState([]);
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
-    fetchBrandDetails();
-  }, [id]);
-
-  const fetchBrandDetails = async () => {
-    try {
-      const response = await getBrandById(id);
-      if (!response.error) {
-        form.setFieldsValue({
-          name: response.result.name,
-          description: response.result.description,
-          status: response.result.status,
-        });
-        setImageUrl(response.result.thumbnail);
-        setFileList([
-          {
-            uid: "-1",
-            name: "thumbnail.png",
-            status: "done",
-            url: response.result.thumbnail,
-          },
-        ]);
-      } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        navigate("/admin/brand");
-      }
-    } catch (error) {
-      toast.error("Failed to fetch brand details", {
-        position: "top-right",
-        autoClose: 3000,
+    if (brandData) {
+      form.setFieldsValue({
+        name: brandData.name,
+        description: brandData.description,
       });
-      navigate("/admin/brand");
-    } finally {
+      setImageUrl(brandData.thumbnail);
+      setFileList([
+        {
+          uid: "-1",
+          name: "thumbnail.png",
+          url: brandData.thumbnail,
+        },
+      ]);
       setInitialLoading(false);
     }
-  };
+  }, [brandData]);
 
   const onFinish = async (values) => {
     try {
@@ -63,7 +43,6 @@ const EditBrand = () => {
       const requestData = {
         name: values.name,
         description: values.description,
-        status: values.status,
       };
 
       formData.append("request", JSON.stringify(requestData));
@@ -74,7 +53,7 @@ const EditBrand = () => {
         requestData.thumbnail = imageUrl;
       }
 
-      const response = await updateBrand(id, formData);
+      const response = await updateBrand(brandData.id, formData);
 
       if (!response.error) {
         navigate("/admin/brand");
@@ -127,33 +106,22 @@ const EditBrand = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div> 
       <ToastContainer />
-      <div className="flex items-center pl-8 justify-between">
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate("/admin/brand")}
-          className="mb-4 hover:bg-gray-100 transition-colors"
-        >
-          Back to Brands
-        </Button>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4">
-        <Card className="shadow-md rounded-lg">
-          <div className="mb-6">
-            <h1 className="text-xl font-semibold text-gray-800">Edit Brand</h1>
-          </div>
-
-          <Form
+      <Modal
+    title="Edit Brand"
+    open={visible}
+    onCancel={onCancel}
+    footer={null}
+    width={800}
+  > 
+  <Form
             form={form}
             layout="vertical"
             onFinish={onFinish}
             autoComplete="off"
             className="space-y-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
                 <Form.Item
                   name="name"
                   label={
@@ -171,49 +139,52 @@ const EditBrand = () => {
                     className="rounded-md"
                   />
                 </Form.Item>
-
-                <Form.Item
-                  name="status"
-                  label={
-                    <span className="text-gray-700 font-medium">Status</span>
-                  }
-                  rules={[{ required: true, message: "Please select status" }]}
-                >
-                  <Select className="rounded-md">
-                    <Select.Option value="ACTIVE">Active</Select.Option>
-                    <Select.Option value="INACTIVE">Inactive</Select.Option>
-                  </Select>
-                </Form.Item>
-              </div>
-
-              <div>
-                <Form.Item
-                  name="description"
-                  label={
-                    <span className="text-gray-700 font-medium">
-                      Description
-                    </span>
-                  }
-                  rules={[
-                    { required: true, message: "Please enter description" },
-                    {
-                      min: 10,
-                      message: "Description must be at least 10 characters",
+              
+              
+              <Form.Item
+                label={<span className="text-gray-700 font-medium">Description</span>}
+                name="description"
+                rules={[
+                  { required: true, message: "Please enter description" },
+                  {
+                    validator: (_, value) => {
+                      const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
+                      return textContent.length >= 10
+                        ? Promise.resolve()
+                        : Promise.reject(new Error("Description must be at least 10 characters"));
                     },
-                  ]}
-                >
-                  <Input.TextArea
-                    rows={4}
-                    placeholder="Enter brand description"
-                    maxLength={500}
-                    showCount
-                    className="rounded-md"
+                  },
+                ]}
+              >
+                <div className="rounded-md p-2">
+                  <Editor
+                    apiKey="ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn"
+                    value={description}
+                    onEditorChange={(content) => {
+                      setDescription(content);
+                      form.setFieldsValue({ description: content }); 
+                      form.validateFields(["description"]); 
+                    }}
+                    init={{
+                      height: 250,
+                      menubar: false,
+                      plugins: [
+                        "advlist autolink lists link image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "insertdatetime media table paste code help wordcount",
+                      ],
+                      toolbar:
+                        "undo redo | formatselect | bold italic backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat | help",
+                      content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+                    }}
+                    className="w-full"
                   />
-                </Form.Item>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-6 mt-6">
+                </div>
+              </Form.Item>
+            
+            <div className="pt-2 mt-6">
               <div className="mb-6">
                 <h3 className="text-gray-700 font-medium mb-4">Brand Image</h3>
                 {imageUrl && (
@@ -238,7 +209,9 @@ const EditBrand = () => {
                   }
                   return e?.fileList;
                 }}
+                rules={[{ required: true, message: "Please upload an image" }]}
               >
+                
                 <Upload
                   beforeUpload={() => false}
                   maxCount={1}
@@ -256,10 +229,11 @@ const EditBrand = () => {
               </Form.Item>
             </div>
 
-            <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
+            <Form.Item className="mb-0">
+            <div className="flex justify-end">
               <Button
-                onClick={() => navigate("/admin/brand")}
-                className="rounded-md px-6"
+                onClick={onCancel}
+                className="mr-2 h-10 px-8 text-base font-medium"
               >
                 Cancel
               </Button>
@@ -267,14 +241,14 @@ const EditBrand = () => {
                 type="primary"
                 htmlType="submit"
                 loading={loading}
-                className="rounded-md px-8 bg-blue-600 hover:bg-blue-700"
+                className="h-10 px-8 text-base font-medium rounded-md px-8 bg-blue-600 hover:bg-blue-700"
               >
                 Update Brand
               </Button>
             </div>
+            </Form.Item>
           </Form>
-        </Card>
-      </div>
+  </Modal>
     </div>
   );
 };
