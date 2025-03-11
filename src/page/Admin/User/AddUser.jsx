@@ -23,7 +23,7 @@ const AddUser = ({ onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     let newErrors = {};
-  
+
     if (formData.username === "admin") {
       newErrors.username = "User name is already exist";
     }
@@ -41,7 +41,6 @@ const AddUser = ({ onClose }) => {
 
     setShowNotification(true);
 
-   
     setTimeout(() => {
       setShowNotification(false);
       onClose();
@@ -65,7 +64,9 @@ const AddUser = ({ onClose }) => {
               className="w-full p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
               required
             />
-            {errors.username && <p className="text-red-500 text-xs">{errors.username}</p>}
+            {errors.username && (
+              <p className="text-red-500 text-xs">{errors.username}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -92,25 +93,26 @@ const AddUser = ({ onClose }) => {
               className="w-full p-1 border bg-[#182237] rounded text-gray-300 focus:ring focus:ring-blue-500"
               required
             />
-            {errors.fullname && <p className="text-red-500 text-xs">{errors.fullname}</p>}
+            {errors.fullname && (
+              <p className="text-red-500 text-xs">{errors.fullname}</p>
+            )}
           </div>
-
 
           {/* Role & Phone */}
           <div className="flex gap-2 mb-3">
             <div className="w-1/2">
               <label className="block text-sm font-bold">Role</label>
               <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
-              required
-            >
-              <option value="">Choose</option>
-              <option value="Admin">Admin</option>
-              <option value="User">User</option>
-            </select>
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
+                required
+              >
+                <option value="">Choose</option>
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+              </select>
             </div>
             <div className="w-1/2">
               <label className="block text-sm font-bold">Phone number</label>
@@ -135,7 +137,9 @@ const AddUser = ({ onClose }) => {
               className="w-full p-1 border rounded bg-[#182237] text-gray-300 focus:ring focus:ring-blue-500"
               required
             />
-            {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs">{errors.email}</p>
+            )}
           </div>
 
           {/* Address */}
@@ -169,11 +173,13 @@ const AddUser = ({ onClose }) => {
         </form>
       </div>
 
-    {/* Thông báo thành công */}
-    {showNotification && (
+      {/* Thông báo thành công */}
+      {showNotification && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1E283A] text-gray-300 px-6 py-3 rounded-md shadow-lg">
           <h3 className="font-bold text-lg text-center">Notification</h3>
-          <p className="text-sm text-center text-gray-300">User added successfully!</p>
+          <p className="text-sm text-center text-gray-300">
+            User added successfully!
+          </p>
         </div>
       )}
     </div>

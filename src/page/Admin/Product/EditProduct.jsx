@@ -1,21 +1,26 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
   InputNumber,
   Button,
   Card,
-  Select,
   Spin,
   Upload,
+  Select,
 } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { getProductById, updateProduct } from "../../../service/product/index";
+import {
+  getProductById,
+  updateProduct,
+} from "../../../service/productManagement";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import CustomEditor from "./CustomEditor";
-import { AiFillCaretRight } from "react-icons/ai";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { getAllCategories } from "../../../service/category/index";
+import { getAllBrandsUser } from "../../../service/brand/index";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -23,50 +28,121 @@ const EditProduct = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [imageUrl, setImageUrl] = useState("");
-  const [fileList, setFileList] = useState([]);
+  const [currentThumbnail, setCurrentThumbnail] = useState("");
+  const [description, setDescription] = useState("");
+  const [ingredient, setIngredient] = useState("");
+  const [usageInstruction, setUsageInstruction] = useState("");
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
 
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "link",
+    "image",
+  ];
+
   useEffect(() => {
-    fetchProductDetails();
+    const initializeData = async () => {
+      await fetchCategoriesAndBrands();
+      await fetchProductDetails();
+    };
+
+    initializeData();
   }, [id]);
 
   const fetchProductDetails = async () => {
     try {
       const response = await getProductById(id);
       if (!response.error) {
+        const product = response.result;
+
+        const categoryExists = categories.some(
+          (cat) => cat.id === product.category_id
+        );
+        const brandExists = brands.some(
+          (brand) => brand.id === product.brand_id
+        );
+
         form.setFieldsValue({
-          name: response.result.name,
-          price: response.result.price,
-          description: response.result.description,
-          status: response.result.status,
-        });
-        setImageUrl(response.result.thumbnail);
-        setFileList([
-          {
-            uid: "-1",
-            name: "thumbnail.png",
-            status: "done",
-            url: response.result.thumbnail,
+          name: product.name,
+          price: product.price,
+          description: product.description,
+          ingredient: product.ingredient,
+          usageInstruction: product.usageInstruction,
+          status: product.status,
+          brand_id: brandExists ? product.brand_id : undefined,
+          category_id: categoryExists ? product.category_id : undefined,
+          specification: {
+            origin: product.specification?.origin || "",
+            brandOrigin: product.specification?.brandOrigin || "",
+            manufacturingLocation:
+              product.specification?.manufacturingLocation || "",
+            skinType: product.specification?.skinType || "",
           },
-        ]);
-      } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
         });
+        setDescription(product.description || "");
+        setIngredient(product.ingredient || "");
+        setUsageInstruction(product.usageInstruction || "");
+        setCurrentThumbnail(product.thumbnail);
+      } else {
+        toast.error(response.message);
         navigate("/admin/product");
       }
     } catch (error) {
-      toast.error("Failed to fetch product details", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Failed to fetch product details");
       navigate("/admin/product");
     } finally {
       setInitialLoading(false);
     }
+  };
+
+  const fetchCategoriesAndBrands = async () => {
+    try {
+      const [categoryResponse, brandResponse] = await Promise.all([
+        getAllCategories(),
+        getAllBrandsUser(),
+      ]);
+
+      if (!categoryResponse.error) {
+        setCategories(categoryResponse.result?.categoryResponses || []);
+      } else {
+        toast.error("Failed to fetch categories");
+      }
+
+      if (!brandResponse.error) {
+        setBrands(brandResponse.result?.brandResponses || []);
+      } else {
+        toast.error("Failed to fetch brands");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to fetch form data");
+    }
+  };
+
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
   };
 
   const onFinish = async (values) => {
@@ -75,62 +151,42 @@ const EditProduct = () => {
       const formData = new FormData();
 
       const requestData = {
-        name: values.name,
-        price: values.price,
-        description: values.description,
+        name: values.name.trim(),
+        price: parseFloat(values.price),
+        description: description,
+        ingredient: ingredient,
+        usageInstruction: usageInstruction,
         status: values.status,
+        brand_id: values.brand_id,
+        category_id: values.category_id,
+        specification: {
+          origin: values.specification.origin,
+          brandOrigin: values.specification.brandOrigin,
+          manufacturingLocation: values.specification.manufacturingLocation,
+          skinType: values.specification.skinType,
+        },
       };
 
       formData.append("request", JSON.stringify(requestData));
 
-      if (fileList[0]?.originFileObj) {
-        formData.append("thumbnail", fileList[0].originFileObj);
-      } else {
-        requestData.thumbnail = imageUrl;
+      if (values.thumbnail?.length > 0) {
+        formData.append("thumbnail", values.thumbnail[0].originFileObj);
       }
 
       const response = await updateProduct(id, formData);
 
       if (!response.error) {
         navigate("/admin/product");
-        toast.success("Product updated successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.success("Product updated successfully!");
       } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Failed to update product", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      console.error("Update error:", error);
+      toast.error("Failed to update product");
     } finally {
       setLoading(false);
     }
-  };
-
-  const uploadProps = {
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith("image/");
-      if (!isImage) {
-        toast.error("You can only upload image files!");
-        return false;
-      }
-      return false;
-    },
-    onChange: ({ fileList: newFileList }) => {
-      setFileList(newFileList);
-    },
-    fileList,
-    maxCount: 1,
   };
 
   if (initialLoading) {
@@ -142,273 +198,266 @@ const EditProduct = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <ToastContainer />
-      <div className="flex items-center pl-8 justify-between">
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate("/admin/product")}
-          className="mb-4 hover:bg-gray-100 transition-colors"
-        >
-          Back to Products
-        </Button>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4">
-        <Card className="shadow-md rounded-lg">
-          <div className="mb-6">
-            <h1 className="text-xl font-semibold text-gray-800">Edit Product</h1>
-          </div>
-
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            autoComplete="off"
-            className="space-y-4"
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <div className="flex flex-col items-center min-h-screen bg-gray-50 p-6">
+        <div className="w-full max-w-6xl">
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/admin/product")}
+            className="mb-4 hover:bg-gray-100"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-              <div className="flex items-center mb-2">
-                  <AiFillCaretRight />
-                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Basic Information</h1>
-                </div>
-                <hr className="border-t-2 border-gray-200 mb-4" />
-                <Form.Item
-                  name="name"
-                  label={
-                    <span className="text-gray-700 font-medium">Product Name</span>
-                  }
-                  rules={[
-                    { required: true, message: "Please enter product name" },
-                    { min: 3, message: "Name must be at least 3 characters" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter product name"
-                    className="rounded-md"
-                  />
-                </Form.Item>
+            Back to Products
+          </Button>
 
-                <Form.Item
-                  name="price"
-                  label={
-                    <span className="text-gray-700 font-medium">Price</span>
+          <Card
+            title="Edit Product"
+            className="w-full shadow-md"
+            headStyle={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              borderBottom: "2px solid #f0f0f0",
+            }}
+          >
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              autoComplete="off"
+            >
+              <Form.Item
+                name="name"
+                label="Product Name"
+                rules={[
+                  { required: true, message: "Please enter product name" },
+                  { min: 3, message: "Name must be at least 3 characters" },
+                ]}
+              >
+                <Input placeholder="Enter product name" />
+              </Form.Item>
+
+              <Form.Item
+                name="price"
+                label="Price"
+                rules={[
+                  { required: true, message: "Please enter price" },
+                  {
+                    type: "number",
+                    min: 0.01,
+                    message: "Price must be greater than 0",
+                  },
+                ]}
+              >
+                <InputNumber
+                  className="w-full"
+                  placeholder="Enter price"
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
-                  rules={[
-                    { required: true, message: "Please enter price" },
-                    {
-                      type: "number",
-                      min: 0.01,
-                      message: "Price must be greater than 0",
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="description"
+                label="Description"
+                rules={[
+                  { required: true, message: "Please enter description" },
+                  {
+                    validator: (_, value) => {
+                      if (!description || description.trim().length < 10) {
+                        return Promise.reject(
+                          "Description must be at least 10 characters"
+                        );
+                      }
+                      return Promise.resolve();
                     },
-                  ]}
-                >
-                  <InputNumber
-                    className="w-full rounded-md"
-                    min={0.01}
-                    step={0.01}
-                    placeholder="Enter product price"
-                    formatter={(value) =>
-                      `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  },
+                ]}
+              >
+                <ReactQuill
+                  theme="snow"
+                  value={description}
+                  onChange={setDescription}
+                  modules={modules}
+                  formats={formats}
+                  style={{ height: "200px", marginBottom: "40px" }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="ingredient"
+                label="Ingredient"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter ingredient information",
+                  },
+                ]}
+              >
+                <ReactQuill
+                  theme="snow"
+                  value={ingredient}
+                  onChange={setIngredient}
+                  modules={modules}
+                  formats={formats}
+                  style={{ height: "200px", marginBottom: "40px" }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="usageInstruction"
+                label="Usage Instruction"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter usage instructions",
+                  },
+                ]}
+              >
+                <ReactQuill
+                  theme="snow"
+                  value={usageInstruction}
+                  onChange={setUsageInstruction}
+                  modules={modules}
+                  formats={formats}
+                  style={{ height: "200px", marginBottom: "40px" }}
+                />
+              </Form.Item>
+
+              <Form.Item label="Current Thumbnail">
+                {currentThumbnail && (
+                  <img
+                    src={currentThumbnail}
+                    alt="Current thumbnail"
+                    className="max-w-xs mb-4"
+                    style={{ maxHeight: "200px" }}
                   />
-                </Form.Item>
-
-                <Form.Item
-                  name="status"
-                  label={
-                    <span className="text-gray-700 font-medium">Status</span>
-                  }
-                  rules={[{ required: true, message: "Please select status" }]}
-                >
-                  <Select className="rounded-md">
-                    <Select.Option value="ACTIVE">Active</Select.Option>
-                    <Select.Option value="INACTIVE">Inactive</Select.Option>
-                  </Select>
-                </Form.Item>
-
-                <Form.Item
-                  name="categoryId"
-                  label={
-                    <span className="text-gray-700 font-medium">Category</span>
-                  }
-                  rules={[{ required: true, message: "Please select a category" }]}
-                >
-                  <Select
-                    placeholder="Select a category"
-                    options={categories.map((category) => ({
-                      value: category.id,
-                      label: category.name,
-                    }))}
-                    className="w-full rounded-md"
-                  />
-                </Form.Item>
-              </div>
-
-              <div>
-                <div className="flex items-center mb-2">
-                  <AiFillCaretRight />
-                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Product Parameter</h1>
-                </div>
-                <hr className="border-t-2 border-gray-200 mb-4" />
-                <Form.Item
-                  name="brandId"
-                  label={
-                    <span className="text-gray-700 font-medium">Brand</span>
-                  }
-                  rules={[{ required: true, message: "Please select a brand" }]}
-                >
-                  <Select
-                    placeholder="Select a brand"
-                    options={brands.map((brand) => ({
-                      value: brand.id,
-                      label: brand.name,
-                    }))}
-                    className="w-full rounded-md"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="brandOrigin"
-                  label={
-                    <span className="text-gray-700 font-medium">Brand Origin</span>
-                  }
-                  rules={[
-                    { required: true, message: "Please enter brand origin" },
-                    { min: 3, message: "Name must be at least 3 characters" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter brand origin"
-                    className="rounded-md"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="manufacture"
-                  label={
-                    <span className="text-gray-700 font-medium">Place Of Manufacture</span>
-                  }
-                  rules={[
-                    { required: true, message: "Please enter place of mmanufacture" },
-                    { min: 3, message: "Name must be at least 3 characters" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter place of manufacture"
-                    className="rounded-md"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="skinType"
-                  label={
-                    <span className="text-gray-700 font-medium">Skin Type</span>
-                  }
-                  rules={[
-                    { required: true, message: "Please enter skin type" },
-                    { min: 3, message: "Name must be at least 3 characters" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter skin type"
-                    className="rounded-md"
-                  />
-                </Form.Item>
-              </div>
-            </div>
-
-            <div>
-              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
-              <div className="flex items-center mb-2">
-                <AiFillCaretRight />
-                <h1 className="text-xl font-semibold text-gray-800 ml-2">Description</h1>
-              </div>
-              <CustomEditor
-                initialValue={"Enter product description"}
-              />
-
-              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
-              <div className="flex items-center mb-2">
-                <AiFillCaretRight />
-                <h1 className="text-xl font-semibold text-gray-800 ml-2">Ingredient</h1>
-              </div>
-              <CustomEditor
-                initialValue={"Enter product ingredient"}
-              />
-
-              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
-              <div className="flex items-center mb-2">
-                <AiFillCaretRight />
-                <h1 className="text-xl font-semibold text-gray-800 ml-2">Instructions For Use</h1>
-              </div>
-              <CustomEditor
-                initialValue={"Enter product instruction"}
-              />
-            </div>
-
-            <div className="border-t border-gray-200 pt-6 mt-6">
-              <div className="mb-6">
-                <div className="flex items-center mb-2">
-                  <AiFillCaretRight />
-                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Product Image</h1>
-                </div>
-                {imageUrl && (
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-2">Current Image:</p>
-                    <img
-                      src={imageUrl}
-                      alt="Current thumbnail"
-                      className="max-w-xs rounded-lg shadow-sm"
-                      style={{ maxHeight: "200px" }}
-                    />
-                  </div>
                 )}
-              </div>
+              </Form.Item>
 
               <Form.Item
                 name="thumbnail"
+                label="New Thumbnail"
                 valuePropName="fileList"
-                getValueFromEvent={(e) => {
-                  if (Array.isArray(e)) {
-                    return e;
-                  }
-                  return e?.fileList;
-                }}
+                getValueFromEvent={normFile}
               >
-                <Upload {...uploadProps} listType="picture" className="upload-list-inline">
-                  <Button
-                    icon={<UploadOutlined />}
-                    className="rounded-md hover:bg-gray-50 border-dashed"
-                  >
-                    Upload New Image
-                  </Button>
+                <Upload
+                  beforeUpload={() => false}
+                  maxCount={1}
+                  accept="image/*"
+                  listType="picture"
+                >
+                  <Button icon={<UploadOutlined />}>Upload New Image</Button>
                 </Upload>
               </Form.Item>
-            </div>
 
-            <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
-              <Button
-                onClick={() => navigate("/admin/product")}
-                className="rounded-md px-6"
+              <Form.Item
+                name="status"
+                label="Status"
+                rules={[{ required: true, message: "Please select status" }]}
               >
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                className="rounded-md px-8 bg-blue-600 hover:bg-blue-700"
+                <Select>
+                  <Select.Option value="ACTIVE">Active</Select.Option>
+                  <Select.Option value="INACTIVE">Inactive</Select.Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="brand_id"
+                label="Brand"
+                rules={[{ required: true, message: "Please select brand" }]}
               >
-                Update Product
-              </Button>
-            </div>
-          </Form>
-        </Card>
+                <Select
+                  placeholder="Select a brand"
+                  options={brands.map((brand) => ({
+                    value: brand.id,
+                    label: brand.name,
+                  }))}
+                  className="w-full rounded-md"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="category_id"
+                label="Category"
+                rules={[{ required: true, message: "Please select category" }]}
+              >
+                <Select
+                  placeholder="Select a category"
+                  options={categories.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                  }))}
+                  className="w-full rounded-md"
+                />
+              </Form.Item>
+
+              <Form.Item label="Specification" className="mb-0">
+                <Card className="bg-gray-50">
+                  <Form.Item
+                    name={["specification", "origin"]}
+                    label="Origin"
+                    rules={[{ required: true, message: "Please enter origin" }]}
+                  >
+                    <Input placeholder="Enter origin" />
+                  </Form.Item>
+
+                  <Form.Item
+                    name={["specification", "brandOrigin"]}
+                    label="Brand Origin"
+                    rules={[
+                      { required: true, message: "Please enter brand origin" },
+                    ]}
+                  >
+                    <Input placeholder="Enter brand origin" />
+                  </Form.Item>
+
+                  <Form.Item
+                    name={["specification", "manufacturingLocation"]}
+                    label="Manufacturing Location"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter manufacturing location",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Enter manufacturing location" />
+                  </Form.Item>
+
+                  <Form.Item
+                    name={["specification", "skinType"]}
+                    label="Skin Type"
+                    rules={[
+                      { required: true, message: "Please enter skin type" },
+                    ]}
+                  >
+                    <Input placeholder="Enter skin type" />
+                  </Form.Item>
+                </Card>
+              </Form.Item>
+
+              <Form.Item className="mt-6">
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Update Product
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

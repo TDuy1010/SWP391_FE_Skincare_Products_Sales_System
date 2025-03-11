@@ -5,8 +5,9 @@ import Total from "../Total";
 import { useState } from "react";
 import { checkout } from "../../../../service/checkout";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
-const Paid = ({ selectedAddressId, cartId }) => {
+const Paid = ({ selectedAddressId, cartId, cartData }) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("VNPAY");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Paid = ({ selectedAddressId, cartId }) => {
         addressId: parseInt(selectedAddressId),
         cartId: parseInt(cartId),
         paymentMethod: selectedPaymentMethod,
+        returnUrl: `${window.location.origin}/payment/vnpay-return`,
       };
 
       const response = await checkout(checkoutData);
@@ -30,14 +32,19 @@ const Paid = ({ selectedAddressId, cartId }) => {
         console.log(selectedPaymentMethod);
         if (selectedPaymentMethod === "VNPAY" && response.result.redirectUrl) {
           window.location.href = response.result.redirectUrl;
+          console.log(response.result.redirectUrl);
         } else {
-          navigate("/");
+          navigate("/order-success", {
+            state: {
+              orderId: response.result.orderId,
+            },
+          });
         }
       } else {
-        alert(response.message);
+        toast.error(response.message);
       }
     } catch (error) {
-      alert("Có lỗi xảy ra khi đặt hàng");
+      toast.error("Có lỗi xảy ra khi đặt hàng");
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +103,7 @@ const Paid = ({ selectedAddressId, cartId }) => {
         buttonText={isLoading ? "Đang xử lý..." : "Đặt hàng"}
         onNext={handleOrder}
         disabled={isLoading}
+        cartData={cartData}
       />
     </div>
   );
@@ -105,6 +113,7 @@ Paid.propTypes = {
   selectedAddressId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     .isRequired,
   cartId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  cartData: PropTypes.object,
 };
 
 export default Paid;

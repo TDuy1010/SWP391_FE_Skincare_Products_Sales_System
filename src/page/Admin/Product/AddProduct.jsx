@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -10,42 +10,37 @@ import {
   Select,
 } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
-import { addProduct } from "../../../service/product/index";
+import { useNavigate } from "react-router-dom";
+import { addProduct } from "../../../service/productManagement/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllCategories } from "../../../service/category/index";
 import { getAllBrandsUser } from "../../../service/brand/index";
-import { useNavigate } from "react-router-dom";
-import CustomEditor from "./CustomEditor";
-import { AiFillCaretRight } from "react-icons/ai";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
-const AddProduct = ({ visible, onCancel, onSuccess }) => {
+const AddProduct = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  const navigate = useNavigate();
+  const [editorContent, setEditorContent] = useState("");
+  const [ingredientContent, setIngredientContent] = useState("");
+  const [usageInstructionContent, setUsageInstructionContent] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       const categoryResponse = await getAllCategories();
       if (!categoryResponse.error) {
-        const activeCategories =
-          categoryResponse.result?.categoryResponses.filter(
-            (category) => category.status === "ACTIVE"
-          ) || [];
-        setCategories(activeCategories);
+        setCategories(categoryResponse.result?.categoryResponses || []);
       } else {
         toast.error("Failed to fetch categories");
       }
 
       const brandResponse = await getAllBrandsUser();
       if (!brandResponse.error) {
-        const activeBrands =
-          brandResponse.result?.brandResponses.filter(
-            (brand) => brand.status === "ACTIVE"
-          ) || [];
-        setBrands(activeBrands);
+        setBrands(brandResponse.result?.brandResponses || []);
       } else {
         toast.error("Failed to fetch brands");
       }
@@ -60,19 +55,47 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
     return e?.fileList;
   };
 
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "link",
+    "image",
+  ];
+
   const onFinish = async (values) => {
     if (
       values.name &&
       values.price &&
-      values.description &&
+      editorContent &&
+      ingredientContent &&
+      usageInstructionContent &&
       values.thumbnail?.length > 0 &&
       values.categoryId &&
-      values.brandId
+      values.brandId &&
+      values.origin &&
+      values.brandOrigin &&
+      values.manufacturingLocation &&
+      values.skinType
     ) {
       try {
         setLoading(true);
-        const formData = new FormData();
-
         const file = values.thumbnail[0].originFileObj;
 
         if (!file) {
@@ -80,23 +103,32 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
           return;
         }
 
-        formData.append(
-          "request",
-          JSON.stringify({
-            name: values.name,
-            price: values.price,
-            description: values.description,
-            category_id: values.categoryId,
-            brand_id: values.brandId,
-          })
-        );
-        formData.append("thumbnail", file);
+        // Upload image first
+        const formData = new FormData();
+        formData.append("file", file);
 
-        const response = await addProduct(formData);
+        // Create product data
+        const productData = {
+          name: values.name,
+          price: values.price,
+          description: editorContent,
+          ingredient: ingredientContent,
+          usageInstruction: usageInstructionContent,
+          specification: {
+            origin: values.origin,
+            brandOrigin: values.brandOrigin,
+            manufacturingLocation: values.manufacturingLocation,
+            skinType: values.skinType,
+          },
+          category_id: values.categoryId,
+          brand_id: values.brandId,
+        };
+
+        const response = await addProduct(productData, file);
         if (!response.error) {
-          onSuccess(response.message);
-          form.resetFields();
-          onCancel();
+          navigate("/admin/product", {
+            state: { message: response.message, type: "success" },
+          });
         } else {
           toast.error(response.message);
         }
@@ -109,7 +141,7 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="h-[calc(100vh-64px)] bg-gray-50 p-6 overflow-y-auto">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -122,41 +154,39 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
         pauseOnHover
         theme="light"
       />
-      <div className="flex items-center pl-8 justify-between">
+
+      <div className="max-w-6xl mx-auto">
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate("/admin/product")}
-          className="mb-4 hover:bg-gray-100 transition-colors"
+          className="mb-4 hover:bg-gray-100"
         >
           Back to Products
         </Button>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4">
-        <Card className="shadow-md rounded-lg">
-          <div className="mb-6">
-            <h1 className="text-xl font-semibold text-gray-800">Add Product</h1>
-          </div>
-
+        <Card
+          title={
+            <h2 className="text-2xl font-semibold text-gray-800">
+              Add New Product
+            </h2>
+          }
+          className="shadow-md rounded-lg"
+        >
           <Form
             form={form}
             layout="vertical"
             onFinish={onFinish}
             autoComplete="off"
-            className="space-y-6"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="flex items-center mb-2">
-                  <AiFillCaretRight />
-                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Basic Information</h1>
-                </div>
-                <hr className="border-t-2 border-gray-200 mb-4" />
+            {/* Basic Information Section */}
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <h3 className="text-lg font-medium mb-4 text-gray-700">
+                Basic Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Form.Item
                   name="name"
-                  label={
-                    <span className="text-gray-700 font-medium">Product Name</span>
-                  }
+                  label="Product Name"
                   rules={[
                     { required: true, message: "Please enter product name" },
                     { min: 3, message: "Name must be at least 3 characters" },
@@ -170,9 +200,7 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
 
                 <Form.Item
                   name="price"
-                  label={
-                    <span className="text-gray-700 font-medium">Price</span>
-                  }
+                  label="Price"
                   rules={[
                     { required: true, message: "Please enter price" },
                     {
@@ -196,10 +224,10 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
 
                 <Form.Item
                   name="categoryId"
-                  label={
-                    <span className="text-gray-700 font-medium">Category</span>
-                  }
-                  rules={[{ required: true, message: "Please select a category" }]}
+                  label="Category"
+                  rules={[
+                    { required: true, message: "Please select a category" },
+                  ]}
                 >
                   <Select
                     placeholder="Select a category"
@@ -212,39 +240,8 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
                 </Form.Item>
 
                 <Form.Item
-                  name="thumbnail"
-                  label={
-                    <span className="text-gray-700 font-medium">Thumbnail</span>
-                  }
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                  rules={[{ required: true, message: "Please upload an image" }]}
-                >
-                  <Upload
-                    beforeUpload={() => false}
-                    maxCount={1}
-                    accept="image/*"
-                    listType="picture"
-                    className="upload-list-inline"
-                  >
-                    <Button icon={<UploadOutlined />} className="rounded-md h-12">
-                      Select Image
-                    </Button>
-                  </Upload>
-                </Form.Item>
-              </div>
-
-              <div>
-                <div className="flex items-center mb-2">
-                  <AiFillCaretRight />
-                  <h1 className="text-xl font-semibold text-gray-800 ml-2">Product Parameter</h1>
-                </div>
-                <hr className="border-t-2 border-gray-200 mb-4" />
-                <Form.Item
                   name="brandId"
-                  label={
-                    <span className="text-gray-700 font-medium">Brand</span>
-                  }
+                  label="Brand"
                   rules={[{ required: true, message: "Please select a brand" }]}
                 >
                   <Select
@@ -256,15 +253,148 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
                     className="w-full rounded-md"
                   />
                 </Form.Item>
+              </div>
+            </div>
+
+            {/* Product Details Section */}
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <h3 className="text-lg font-medium mb-4 text-gray-700">
+                Product Details
+              </h3>
+              <div className="space-y-6">
+                <Form.Item
+                  name="description"
+                  label="Description"
+                  rules={[
+                    { required: true, message: "Please enter description" },
+                    {
+                      validator: (_, value) => {
+                        if (
+                          !editorContent ||
+                          editorContent.trim().length < 10
+                        ) {
+                          return Promise.reject(
+                            "Description must be at least 10 characters"
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
+                  <ReactQuill
+                    theme="snow"
+                    value={editorContent}
+                    onChange={(content) => {
+                      setEditorContent(content);
+                      form.setFieldsValue({ description: content });
+                    }}
+                    modules={modules}
+                    formats={formats}
+                    style={{ height: "200px", marginBottom: "40px" }}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="ingredient"
+                  label="Ingredient"
+                  rules={[
+                    { required: true, message: "Please enter ingredient" },
+                    {
+                      validator: (_, value) => {
+                        if (
+                          !ingredientContent ||
+                          ingredientContent.trim().length < 10
+                        ) {
+                          return Promise.reject(
+                            "Ingredient must be at least 10 characters"
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
+                  <ReactQuill
+                    theme="snow"
+                    value={ingredientContent}
+                    onChange={(content) => {
+                      setIngredientContent(content);
+                      form.setFieldsValue({ ingredient: content });
+                    }}
+                    modules={modules}
+                    formats={formats}
+                    style={{ height: "150px", marginBottom: "40px" }}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="usageInstruction"
+                  label="Usage Instruction"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter usage instruction",
+                    },
+                    {
+                      validator: (_, value) => {
+                        if (
+                          !usageInstructionContent ||
+                          usageInstructionContent.trim().length < 10
+                        ) {
+                          return Promise.reject(
+                            "Usage instruction must be at least 10 characters"
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
+                  <ReactQuill
+                    theme="snow"
+                    value={usageInstructionContent}
+                    onChange={(content) => {
+                      setUsageInstructionContent(content);
+                      form.setFieldsValue({ usageInstruction: content });
+                    }}
+                    modules={modules}
+                    formats={formats}
+                    style={{ height: "150px", marginBottom: "40px" }}
+                  />
+                </Form.Item>
+              </div>
+            </div>
+
+            {/* Specification Section */}
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <h3 className="text-lg font-medium mb-4 text-gray-700">
+                Specification Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Form.Item
+                  name="origin"
+                  label="Origin"
+                  rules={[
+                    { required: true, message: "Please enter origin" },
+                    { min: 2, message: "Origin must be at least 2 characters" },
+                  ]}
+                >
+                  <Input
+                    placeholder="Enter product origin"
+                    className="rounded-md"
+                  />
+                </Form.Item>
 
                 <Form.Item
                   name="brandOrigin"
-                  label={
-                    <span className="text-gray-700 font-medium">Brand Origin</span>
-                  }
+                  label="Brand Origin"
                   rules={[
                     { required: true, message: "Please enter brand origin" },
-                    { min: 3, message: "Name must be at least 3 characters" },
+                    {
+                      min: 2,
+                      message: "Brand origin must be at least 2 characters",
+                    },
                   ]}
                 >
                   <Input
@@ -274,79 +404,78 @@ const AddProduct = ({ visible, onCancel, onSuccess }) => {
                 </Form.Item>
 
                 <Form.Item
-                  name="manufacture"
-                  label={
-                    <span className="text-gray-700 font-medium">Place Of Manufacture</span>
-                  }
+                  name="manufacturingLocation"
+                  label="Manufacturing Location"
                   rules={[
-                    { required: true, message: "Please enter place of manufacture" },
-                    { min: 3, message: "Name must be at least 3 characters" },
+                    {
+                      required: true,
+                      message: "Please enter manufacturing location",
+                    },
+                    {
+                      min: 2,
+                      message:
+                        "Manufacturing location must be at least 2 characters",
+                    },
                   ]}
                 >
                   <Input
-                    placeholder="Enter place of manufacture"
+                    placeholder="Enter manufacturing location"
                     className="rounded-md"
                   />
                 </Form.Item>
 
                 <Form.Item
                   name="skinType"
-                  label={
-                    <span className="text-gray-700 font-medium">Skin Type</span>
-                  }
+                  label="Skin Type"
                   rules={[
                     { required: true, message: "Please enter skin type" },
-                    { min: 3, message: "Name must be at least 3 characters" },
+                    {
+                      min: 2,
+                      message: "Skin type must be at least 2 characters",
+                    },
                   ]}
                 >
-                  <Input
-                    placeholder="Enter skin type"
-                    className="rounded-md"
-                  />
+                  <Input placeholder="Enter skin type" className="rounded-md" />
                 </Form.Item>
               </div>
             </div>
 
-            <div>
-              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
-              <div className="flex items-center mb-2">
-                <AiFillCaretRight />
-                <h1 className="text-xl font-semibold text-gray-800 ml-2">Description</h1>
-              </div>
-              <CustomEditor
-                initialValue={"Enter product description"}
-              />
-
-
-              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
-              <div className="flex items-center mb-2">
-                <AiFillCaretRight />
-                <h1 className="text-xl font-semibold text-gray-800 ml-2">Ingredient</h1>
-              </div>
-              <CustomEditor
-                initialValue={"Enter product ingredient"}
-              />
-
-              <hr className="border-t-2 border-gray-200 my-6 w-11/12 mx-auto" />
-              <div className="flex items-center mb-2">
-                <AiFillCaretRight />
-                <h1 className="text-xl font-semibold text-gray-800 ml-2">Instructions For Use</h1>
-              </div>
-              <CustomEditor
-                initialValue={"Enter product instruction"}
-              />
+            {/* Image Upload Section */}
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <h3 className="text-lg font-medium mb-4 text-gray-700">
+                Product Image
+              </h3>
+              <Form.Item
+                name="thumbnail"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                rules={[{ required: true, message: "Please upload an image" }]}
+              >
+                <Upload
+                  beforeUpload={() => false}
+                  maxCount={1}
+                  accept="image/*"
+                  listType="picture"
+                  className="upload-list-inline"
+                >
+                  <Button icon={<UploadOutlined />} className="rounded-md">
+                    Select Image
+                  </Button>
+                </Upload>
+              </Form.Item>
             </div>
 
-            <Form.Item className="mt-6">
+            {/* Submit Button */}
+            <div className="flex justify-end">
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={loading}
-                className="w-full md:w-auto px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
+                className="px-8 h-12 rounded-md bg-blue-600 hover:bg-blue-700"
               >
                 Add Product
               </Button>
-            </Form.Item>
+            </div>
           </Form>
         </Card>
       </div>
