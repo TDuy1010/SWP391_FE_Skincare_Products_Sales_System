@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Space, Tooltip, Modal, Tag, Switch } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { FaEye } from "react-icons/fa";
 import {
   getAllCategories,
   deleteCategory,
-  updateCategoryStatus,
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddCategory from './AddCategory';
+import EditCategory from './EditCategory';
 
 const CategoryManagement = () => {
   const navigate = useNavigate();
@@ -23,6 +24,16 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState("");
+
+  const showDetail = (category) => {
+        setSelectedDetail(category.description);
+        setDetailModalVisible(true);
+      };
+
 
   const fetchCategories = async (params = {}) => {
     try {
@@ -60,25 +71,22 @@ const CategoryManagement = () => {
     });
   };
 
-  const toggleCategoryStatus = async (category) => {
-    try {
-      setLoading(true);
-      const newStatus = category.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-      const response = await updateCategoryStatus(category.id, newStatus);
-      if (!response.error) {
-        toast.success("Category status updated successfully!");
-        fetchCategories({
-          page: pagination.current,
-          pageSize: pagination.pageSize,
-        });
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Failed to update category status");
-    } finally {
-      setLoading(false);
-    }
+
+  const handleEditCategory = (category) => {
+    setEditingCategory(category);
+    setIsEditModalVisible(true);
+  };
+  
+  
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    setEditingCategory(null);
+  };
+  
+  const handleEditSuccess = (message) => {
+    fetchCategories(); // Refresh danh sách danh mục
+    toast.success(message);
+    setIsEditModalVisible(false);
   };
 
   const showDeleteConfirm = (category) => {
@@ -142,23 +150,14 @@ const CategoryManagement = () => {
     },
     {
       title: "Description",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => (
-        <Switch
-          checked={status === "ACTIVE"}
-          onChange={() => toggleCategoryStatus(record)}
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-        />
+      key: "details",
+      render: (_, record) => (
+        <Button type="link" onClick={() => showDetail(record)}>
+                  <FaEye />
+                </Button>
       ),
     },
+    
     {
       title: "Actions",
       key: "actions",
@@ -168,7 +167,7 @@ const CategoryManagement = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/category/edit/${record.id}`)}
+              onClick={() => handleEditCategory(record)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -195,6 +194,7 @@ const CategoryManagement = () => {
           Add New Category
         </Button>
       </div>
+      <div className="shadow-md rounded-lg bg-white">
       <Table
         columns={columns}
         dataSource={categories}
@@ -204,6 +204,21 @@ const CategoryManagement = () => {
         onChange={handleTableChange}
         className="dark-table"
       />
+      </div>
+      
+      <Modal
+        title="Category Details"
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[
+        <Button key="close" onClick={() => setDetailModalVisible(false)}>
+         Close
+        </Button>,
+        ]}
+      >
+      <p>{selectedDetail}</p>
+      </Modal>
+
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -225,6 +240,12 @@ const CategoryManagement = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         onSuccess={handleSuccess}
+      />
+      <EditCategory
+        visible={isEditModalVisible}
+        onCancel={handleEditCancel}
+        categoryData={editingCategory}
+        onSuccess={handleEditSuccess}
       />
       <ToastContainer />
     </div>

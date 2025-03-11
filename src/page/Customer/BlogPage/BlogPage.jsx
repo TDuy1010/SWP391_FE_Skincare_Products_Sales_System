@@ -23,6 +23,47 @@ const BlogPage = () => {
     visible: { opacity: 1, y: 0 }
   };
 
+  const handleReadMore = (post) => {
+    setSelectedPost(post);
+  };
+
+  const handleAddBlog = (newBlog) => {
+    console.log("New Blog Data:", newBlog); // Debug to check the data before adding to state
+
+    setBlogs([
+      {
+        ...newBlog,
+        description: newBlog.descriptions[0], // Take the first description
+        images: newBlog.images // Ensure all images are saved
+      },
+      ...blogs
+    ]);
+    setShowAddBlog(false);
+  };
+
+  const handleEdit = (post) => {
+    navigate(`/edit-blog/${post.id}`, { state: { blog: post } }); // Navigate to EditBlog with the blog data
+  };
+
+  const handleDelete = (post) => {
+    // Implement delete functionality
+    console.log("Delete post:", post);
+  };
+
+  const truncateText = (text, length) => {
+    return text.length > length ? text.substring(0, length) + "..." : text;
+  };
+
+  const decodeHtmlEntities = (text) => {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = text;
+    return textarea.value;
+  };
+
+  const toggleOptions = (index) => {
+    setShowOptions(showOptions === index ? null : index);
+  };
+
   return (
     <motion.div
       variants={containerAnimation}
@@ -57,18 +98,19 @@ const BlogPage = () => {
 
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {blogPosts.map((post, index) => (
+            {blogs.map((post, index) => (
               <motion.div 
                 key={index}
-                className="group cursor-pointer"
+                className="group cursor-pointer relative"
                 whileHover={{ scale: 1.02 }}
                 onClick={() => handleReadMore(post.id || index + 1)}
               >
                 <div className="aspect-square overflow-hidden mb-4">
                   <img 
-                    src={post.image} 
-                    alt={post.title} 
+                    src={post.image || (post.images && post.images.length > 0 ? post.images[0] : 'path/to/placeholder-image.png')} 
+                    alt={post.title || 'No Title'} 
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'path/to/placeholder-image.png'; }}
                   />
                 </div>
                 <h3 className="text-lg mb-2">{post.title}</h3>
@@ -145,7 +187,7 @@ const BlogPage = () => {
             )}
           </div>
         </div>
-      ))}
+      )}
     </motion.div>
   );
 };
