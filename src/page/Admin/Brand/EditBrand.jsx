@@ -23,6 +23,7 @@ const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
         name: brandData.name,
         description: brandData.description,
       });
+      setDescription(brandData.description || "");
       setImageUrl(brandData.thumbnail);
       setFileList([
         {
@@ -33,7 +34,7 @@ const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
       ]);
       setInitialLoading(false);
     }
-  }, [brandData]);
+  }, [brandData, form]);
 
   const onFinish = async (values) => {
     try {
@@ -56,27 +57,20 @@ const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
       const response = await updateBrand(brandData.id, formData);
 
       if (!response.error) {
-        navigate("/admin/brand");
-        toast.success("Brand updated successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        onSuccess("Brand updated successfully!");
+        setLoading(false);
       } else {
         toast.error(response.message, {
           position: "top-right",
           autoClose: 3000,
         });
+        setLoading(false);
       }
     } catch (error) {
       toast.error("Failed to update brand", {
         position: "top-right",
         autoClose: 3000,
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -97,49 +91,51 @@ const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
     maxCount: 1,
   };
 
-  if (initialLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   return (
     <div> 
       <ToastContainer />
       <Modal
-    title="Edit Brand"
-    open={visible}
-    onCancel={onCancel}
-    footer={null}
-    width={800}
-  > 
-  <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            autoComplete="off"
-            className="space-y-4"
-          >
-                <Form.Item
-                  name="name"
-                  label={
-                    <span className="text-gray-700 font-medium">
-                      Brand Name
-                    </span>
-                  }
-                  rules={[
-                    { required: true, message: "Please enter brand name" },
-                    { min: 3, message: "Name must be at least 3 characters" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter brand name"
-                    className="rounded-md"
-                  />
-                </Form.Item>
-              
+        title="Edit Brand"
+        open={visible}
+        onCancel={onCancel}
+        footer={null}
+        width={800}
+        destroyOnClose={true}
+      > 
+        {initialLoading ? (
+          <div className="flex items-center justify-center py-10">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <Spin spinning={loading} tip="Updating...">
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              autoComplete="off"
+              className="space-y-4"
+              initialValues={{
+                name: brandData?.name || '',
+                description: brandData?.description || '',
+              }}
+            >
+              <Form.Item
+                name="name"
+                label={
+                  <span className="text-gray-700 font-medium">
+                    Brand Name
+                  </span>
+                }
+                rules={[
+                  { required: true, message: "Please enter brand name" },
+                  { min: 3, message: "Name must be at least 3 characters" },
+                ]}
+              >
+                <Input
+                  placeholder="Enter brand name"
+                  className="rounded-md"
+                />
+              </Form.Item>
               
               <Form.Item
                 label={<span className="text-gray-700 font-medium">Description</span>}
@@ -184,71 +180,69 @@ const EditBrand = ({ visible, onCancel, onSuccess, brandData }) => {
                 </div>
               </Form.Item>
             
-            <div className="pt-2 mt-6">
-              <div className="mb-6">
-                <h3 className="text-gray-700 font-medium mb-4">Brand Image</h3>
-                {imageUrl && (
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-2">Current Image:</p>
-                    <img
-                      src={imageUrl}
-                      alt="Current thumbnail"
-                      className="max-w-xs rounded-lg shadow-sm"
-                      style={{ maxHeight: "200px" }}
-                    />
-                  </div>
-                )}
+              <div className="pt-2 mt-6">
+                <div className="mb-6">
+                  <h3 className="text-gray-700 font-medium mb-4">Brand Image</h3>
+                  {imageUrl && (
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-500 mb-2">Current Image:</p>
+                      <img
+                        src={imageUrl}
+                        alt="Current thumbnail"
+                        className="max-w-xs rounded-lg shadow-sm"
+                        style={{ maxHeight: "200px" }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <Form.Item
+                  name="thumbnail"
+                  valuePropName="fileList"
+                  getValueFromEvent={(e) => {
+                    if (Array.isArray(e)) {
+                      return e;
+                    }
+                    return e?.fileList;
+                  }}
+                  rules={[{ required: false, message: "Please upload an image" }]}
+                >
+                  <Upload
+                    {...uploadProps}
+                    listType="picture"
+                    className="upload-list-inline"
+                  >
+                    <Button
+                      icon={<UploadOutlined />}
+                      className="rounded-md hover:bg-gray-50 border-dashed"
+                    >
+                      Upload New Image
+                    </Button>
+                  </Upload>
+                </Form.Item>
               </div>
 
-              <Form.Item
-                name="thumbnail"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => {
-                  if (Array.isArray(e)) {
-                    return e;
-                  }
-                  return e?.fileList;
-                }}
-                rules={[{ required: true, message: "Please upload an image" }]}
-              >
-                
-                <Upload
-                  beforeUpload={() => false}
-                  maxCount={1}
-                  accept="image/*"
-                  listType="picture"
-                  className="upload-list-inline"
-                >
+              <Form.Item className="mb-0">
+                <div className="flex justify-end">
                   <Button
-                    icon={<UploadOutlined />}
-                    className="rounded-md hover:bg-gray-50 border-dashed"
+                    onClick={onCancel}
+                    className="mr-2 h-10 px-8 text-base font-medium"
                   >
-                    Upload New Image
+                    Cancel
                   </Button>
-                </Upload>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="h-10 px-8 text-base font-medium rounded-md bg-blue-600 hover:bg-blue-700"
+                  >
+                    Update Brand
+                  </Button>
+                </div>
               </Form.Item>
-            </div>
-
-            <Form.Item className="mb-0">
-            <div className="flex justify-end">
-              <Button
-                onClick={onCancel}
-                className="mr-2 h-10 px-8 text-base font-medium"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                className="h-10 px-8 text-base font-medium rounded-md px-8 bg-blue-600 hover:bg-blue-700"
-              >
-                Update Brand
-              </Button>
-            </div>
-            </Form.Item>
-          </Form>
-  </Modal>
+            </Form>
+          </Spin>
+        )}
+      </Modal>
     </div>
   );
 };

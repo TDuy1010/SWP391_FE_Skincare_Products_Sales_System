@@ -5,12 +5,10 @@ import { motion } from 'framer-motion';
 import img1 from '../../../assets/img/hero-photo.png';
 import aboutImg2 from '../../../assets/img/product-1.png';
 import aboutImg3 from '../../../assets/img/trial-image.png';
-
-// Thêm một số hình ảnh tham khảo - thay thế URL thực của bạn
-const teamImg1 = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
-const teamImg2 = 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
-const teamImg3 = 'https://images.unsplash.com/photo-1541647376583-8934aaf3448a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
-const labImg = 'https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80';
+import teamImg1 from '../../../assets/img/photo-1573496359142-b8d87734a5a2.png';
+import teamImg2 from '../../../assets/img/photo-1580489944761-15a19d654956.png';
+import teamImg3 from '../../../assets/img/photo-1541647376583-8934aaf3448a.png';
+import labImg from '../../../assets/img/photo-1581093450021-4a7360e9a6b5.png';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 60 },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal, Tag, Switch } from "antd";
+import { Table, Button, Space, Tooltip, Modal, Tag, Switch, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { FaEye } from "react-icons/fa";
@@ -27,13 +27,12 @@ const BrandManagement = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-const [selectedDetail, setSelectedDetail] = useState("");
+  const [selectedDetail, setSelectedDetail] = useState("");
 
-const showDetail = (brand) => {
-  setSelectedDetail(brand.description);
-  setDetailModalVisible(true);
-};
-
+  const showDetail = (brand) => {
+    setSelectedDetail(brand.description);
+    setDetailModalVisible(true);
+  };
 
   const fetchBrands = async (params = {}) => {
     try {
@@ -158,7 +157,9 @@ const showDetail = (brand) => {
   };
 
   const handleAddSuccess = (message) => {
+    fetchBrands();
     toast.success(message);
+    setIsAddModalVisible(false);
   };
 
   const columns = [
@@ -221,32 +222,36 @@ const showDetail = (brand) => {
           type="primary"
           onClick={showAddModal}
           className="mb-4"
+          icon={<PlusOutlined />}
         >
           Add New Brand
         </Button>
       </div>
-      <div className="shadow-md rounded-lg bg-white">
-        <Table
-          columns={columns}
-          dataSource={brands}
-          rowKey="id"
-          pagination={pagination}
-          loading={loading}
-          onChange={handleTableChange}
-        />
+      <div className="shadow-md rounded-lg bg-white relative">
+        
+          <Table
+            columns={columns}
+            dataSource={brands}
+            rowKey="id"
+            pagination={pagination}
+            loading={false} // Tắt loading mặc định của Table
+            onChange={handleTableChange}
+            className="w-full"
+          />
+       
       </div>
       <Modal
-              title="Brand Details"
-              open={detailModalVisible}
-              onCancel={() => setDetailModalVisible(false)}
-              footer={[
-              <Button key="close" onClick={() => setDetailModalVisible(false)}>
-               Close
-              </Button>,
-              ]}
-            >
-            <p>{selectedDetail}</p>
-            </Modal>
+        title="Brand Details"
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setDetailModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+      >
+        <p>{selectedDetail}</p>
+      </Modal>
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -269,10 +274,10 @@ const showDetail = (brand) => {
       />
       <ToastContainer />
       <EditBrand
-      visible={isEditModalVisible}
-      onCancel={handleEditCancel}
-      brandData={editingBrand}
-      onSuccess={handleEditSuccess}
+        visible={isEditModalVisible}
+        onCancel={handleEditCancel}
+        brandData={editingBrand}
+        onSuccess={handleEditSuccess}
       />
     </div>
   );

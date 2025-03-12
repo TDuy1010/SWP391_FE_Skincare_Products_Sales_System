@@ -1,19 +1,30 @@
 import { motion } from 'framer-motion';
 import { blogPosts, featuredArticles } from './BlogPost';
 import img3 from '../../../assets/img/hero-landingPage.png';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
 const BlogPage = () => {
   const navigate = useNavigate();
+  const [blogs, setBlogs] = useState(blogPosts || []);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [showOptions, setShowOptions] = useState(null);
+  const [showAddBlog, setShowAddBlog] = useState(false);
   
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Hàm xử lý khi click vào Read More
-  const handleReadMore = (id) => {
-    navigate(`/blog/${id}`);
+  // Hàm xử lý khi click vào Read More - kết hợp cả hai chức năng
+  const handleReadMore = (idOrPost) => {
+    // Nếu là object (post) thì set selectedPost
+    if (typeof idOrPost === 'object') {
+      setSelectedPost(idOrPost);
+    }
+    // Nếu là id thì navigate
+    else {
+      navigate(`/blog/${idOrPost}`);
+    }
     // Sau này khi có API, bạn có thể thêm logic xử lý dữ liệu ở đây trước khi chuyển trang
     // Ví dụ: gọi API để lấy chi tiết bài viết, sau đó lưu vào state hoặc context
   };
@@ -21,10 +32,6 @@ const BlogPage = () => {
   const containerAnimation = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
-  };
-
-  const handleReadMore = (post) => {
-    setSelectedPost(post);
   };
 
   const handleAddBlog = (newBlog) => {
@@ -187,6 +194,7 @@ const BlogPage = () => {
             )}
           </div>
         </div>
+      )
       )}
     </motion.div>
   );
