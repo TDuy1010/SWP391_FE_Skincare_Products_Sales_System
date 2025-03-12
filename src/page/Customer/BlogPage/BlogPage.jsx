@@ -15,7 +15,7 @@ const BlogPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Hàm xử lý khi click vào Read More - kết hợp cả hai chức năng
+  // Hàm xử lý khi click vào Xem Thêm - kết hợp cả hai chức năng
   const handleReadMore = (idOrPost) => {
     // Nếu là object (post) thì set selectedPost
     if (typeof idOrPost === 'object') {
@@ -79,17 +79,16 @@ const BlogPage = () => {
       <div className="relative h-[500px] w-full">
         <img
           src={img3}
-          alt="Skin Care"
+          alt="Chăm Sóc Da"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center">
           <div className="container mx-auto px-4">
-            <h1 className="text-white text-5xl font-light">Skin Care</h1>
+            <h1 className="text-white text-5xl font-light">Chăm Sóc Da</h1>
             <p className="text-white mt-4 max-w-xl">
-              The skin is constantly changing, influenced by the environment,
-              lifestyle, and diet. Our range is crafted with this in
-              consideration, addressing various prevention and needs to help you
-              achieve optimal skin health.
+              Làn da luôn thay đổi theo môi trường, lối sống và chế độ ăn uống. 
+              Dòng sản phẩm của chúng tôi được tạo ra với sự cân nhắc này, giải quyết các vấn đề 
+              phòng ngừa và nhu cầu khác nhau để giúp bạn đạt được sức khỏe da tối ưu.
             </p>
           </div>
         </div>
@@ -99,8 +98,8 @@ const BlogPage = () => {
       <div className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
-            <h2 className="text-2xl font-light">Our Journal</h2>
-            <p className="text-gray-600">Insights into health and Well-being</p>
+            <h2 className="text-2xl font-light">Chuyên Mục Của Chúng Tôi</h2>
+            <p className="text-gray-600">Hiểu biết về sức khỏe và sắc đẹp</p>
           </div>
 
           {/* Blog Grid */}
@@ -120,7 +119,7 @@ const BlogPage = () => {
                         ? post.images[0]
                         : "path/to/placeholder-image.png")
                     }
-                    alt={post.title || "No Title"}
+                    alt={post.title || "Không có tiêu đề"}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => {
                       e.target.onerror = null;
@@ -137,7 +136,7 @@ const BlogPage = () => {
                   }}
                   className="text-sm text-gray-600 hover:text-black"
                 >
-                  Read More →
+                  Xem Thêm →
                 </button>
               </motion.div>
             ))}
@@ -178,7 +177,7 @@ const BlogPage = () => {
                     }
                     className="text-sm text-gray-600 hover:text-black self-start"
                   >
-                    Read More →
+                    Xem Thêm →
                   </button>
                 </div>
               </>
@@ -201,7 +200,7 @@ const BlogPage = () => {
                     }
                     className="text-sm text-gray-600 hover:text-black self-start"
                   >
-                    Read More →
+                    Xem Thêm →
                   </button>
                 </div>
                 <div className="aspect-square">

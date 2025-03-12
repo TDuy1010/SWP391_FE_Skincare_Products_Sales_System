@@ -37,7 +37,7 @@ const BlogDetail = () => {
           onClick={() => navigate('/blog')}
           className="text-gray-600 hover:text-black"
         >
-          ← Back to Blog
+          ← Quay lại Blog
         </button>
       </div>
 
@@ -47,11 +47,11 @@ const BlogDetail = () => {
             {article.title}
           </h1>
           <div className="flex items-center text-gray-600 text-sm">
-            <span>By Admin</span>
+            <span>Đăng bởi Admin</span>
             <span className="mx-2">•</span>
-            <span>{article.date || 'March 9, 2025'}</span>
+            <span>{article.date || 'Ngày 9 tháng 3, 2025'}</span>
             <span className="mx-2">•</span>
-            <span>{article.category || 'Skin Care'}</span>
+            <span>{article.category || 'Chăm Sóc Da'}</span>
           </div>
         </header>
 
@@ -74,18 +74,19 @@ const BlogDetail = () => {
             <>
               <p className="mb-6 text-gray-700">{article.description}</p>
               <p className="mb-6 text-gray-700">
-                The skin is our largest organ and acts as a protective barrier against environmental factors. 
-                Maintaining a consistent skincare routine is essential for keeping your skin healthy and radiant.
+                Da là cơ quan lớn nhất của chúng ta và đóng vai trò như một hàng rào bảo vệ 
+                chống lại các yếu tố môi trường. Duy trì thói quen chăm sóc da đều đặn là điều 
+                cần thiết để giữ cho làn da của bạn khỏe mạnh và rạng rỡ.
               </p>
               <p className="mb-6 text-gray-700">
-                Understanding your skin type is the first step toward developing an effective skincare regimen. 
-                Whether you have dry, oily, combination, or sensitive skin, there are specific ingredients and 
-                products that can help address your unique concerns.
+                Hiểu về loại da của bạn là bước đầu tiên để phát triển một chế độ chăm sóc da hiệu quả. 
+                Cho dù bạn có làn da khô, da dầu, da hỗn hợp hay da nhạy cảm, đều có những thành phần và 
+                sản phẩm cụ thể có thể giúp giải quyết các vấn đề đặc thù của bạn.
               </p>
               <p className="mb-6 text-gray-700">
-                Regular hydration, sun protection, and nourishment are key components of any successful skincare routine. 
-                Additionally, paying attention to your diet, sleep patterns, and stress levels can significantly 
-                impact the health and appearance of your skin.
+                Giữ ẩm đều đặn, bảo vệ khỏi ánh nắng mặt trời và nuôi dưỡng là những thành phần chính 
+                của bất kỳ quy trình chăm sóc da thành công nào. Ngoài ra, chú ý đến chế độ ăn uống, 
+                giấc ngủ và mức độ căng thẳng có thể ảnh hưởng đáng kể đến sức khỏe và vẻ ngoài của làn da bạn.
               </p>
             </>
           )}
@@ -93,7 +94,7 @@ const BlogDetail = () => {
       </article>
 
       <div className="mt-12 pt-8 border-t border-gray-200">
-        <h3 className="text-xl font-medium mb-6">Related Articles</h3>
+        <h3 className="text-xl font-medium mb-6">Bài Viết Liên Quan</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {blogPosts.slice(0, 3).map((post, index) => (
             <div 
@@ -109,7 +110,7 @@ const BlogDetail = () => {
                 />
               </div>
               <h4 className="font-medium mb-1 group-hover:text-gray-900">{post.title}</h4>
-              <p className="text-sm text-gray-600">{post.date || 'March 9, 2025'}</p>
+              <p className="text-sm text-gray-600">{post.date || 'Ngày 9 tháng 3, 2025'}</p>
             </div>
           ))}
         </div>

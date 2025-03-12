@@ -45,7 +45,7 @@ const FindRoutine = () => {
         [questionId]: answer
       }));
       
-      // Only move to next step if not on the concerns question (which allows multiple selections)
+      // Chỉ chuyển sang bước tiếp theo nếu không phải câu hỏi về mối quan tâm (cho phép chọn nhiều)
       if (questionId !== 'concerns' && currentStep < Object.keys(questions).length) {
         setCurrentStep(currentStep + 1);
       }
@@ -89,11 +89,11 @@ const FindRoutine = () => {
     >
       {!showResult ? (
         <div>
-          {/* Progress Bar */}
+          {/* Thanh Tiến Độ */}
           <div className="bg-gray-50 px-8 py-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-light">Find Your Perfect Routine</h2>
-              <span className="text-sm text-gray-500">Step {currentStep} of {Object.keys(questions).length}</span>
+              <h2 className="text-xl font-light">Tìm Quy Trình Chăm Sóc Da Hoàn Hảo</h2>
+              <span className="text-sm text-gray-500">Bước {currentStep} / {Object.keys(questions).length}</span>
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
@@ -103,7 +103,7 @@ const FindRoutine = () => {
             </div>
           </div>
 
-          {/* Current Question */}
+          {/* Câu Hỏi Hiện Tại */}
           <div className="p-8">
             {Object.entries(questions).map(([questionNumber, question]) => {
               const questionId = Object.keys(answers)[questionNumber - 1];
@@ -120,7 +120,7 @@ const FindRoutine = () => {
                 >
                   <h2 className="text-2xl font-light mb-2">{question.title}</h2>
                   <p className="text-gray-600 mb-8">
-                    {question.multiple ? "You can select multiple options" : "Please select one option"}
+                    {question.multiple ? "Bạn có thể chọn nhiều lựa chọn" : "Vui lòng chọn một lựa chọn"}
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
@@ -165,7 +165,7 @@ const FindRoutine = () => {
                           : 'border-gray-800 text-gray-800 hover:bg-gray-100'}
                       `}
                     >
-                      Back
+                      Quay Lại
                     </button>
                     
                     {currentStep < Object.keys(questions).length ? (
@@ -179,7 +179,7 @@ const FindRoutine = () => {
                             : 'bg-black text-white hover:bg-gray-800'}
                         `}
                       >
-                        Next
+                        Tiếp Theo
                       </button>
                     ) : (
                       <button
@@ -196,7 +196,7 @@ const FindRoutine = () => {
                             : 'bg-black text-white hover:bg-gray-800'}
                         `}
                       >
-                        See Your Routine
+                        Xem Quy Trình
                       </button>
                     )}
                   </div>
@@ -212,19 +212,19 @@ const FindRoutine = () => {
           transition={{ duration: 0.5 }}
           className="p-8"
         >
-          <h2 className="text-3xl font-light mb-8 text-center">Your Personalized Skincare Routine</h2>
+          <h2 className="text-3xl font-light mb-8 text-center">Quy Trình Chăm Sóc Da Cá Nhân Hóa</h2>
           
           <div className="mb-10 p-6 bg-gray-50 rounded-xl border border-gray-200">
-            <h3 className="text-xl font-medium mb-4">Your Profile</h3>
+            <h3 className="text-xl font-medium mb-4">Thông Tin Của Bạn</h3>
             <ul className="space-y-3">
               <li className="flex items-center">
-                <span className="font-medium w-32">Skin Type:</span> 
+                <span className="font-medium w-32">Loại Da:</span> 
                 <span className="bg-gray-100 px-4 py-1 rounded-full">
                   {questions[1].options.find(opt => opt.id === answers.skinType)?.label}
                 </span>
               </li>
               <li className="flex items-center flex-wrap">
-                <span className="font-medium w-32">Skin Concerns:</span> 
+                <span className="font-medium w-32">Vấn Đề Da:</span> 
                 <div className="flex flex-wrap gap-2">
                   {answers.concerns.map(c => (
                     <span key={c} className="bg-gray-100 px-4 py-1 rounded-full">
@@ -234,13 +234,13 @@ const FindRoutine = () => {
                 </div>
               </li>
               <li className="flex items-center">
-                <span className="font-medium w-32">Age:</span> 
+                <span className="font-medium w-32">Độ Tuổi:</span> 
                 <span className="bg-gray-100 px-4 py-1 rounded-full">
                   {questions[3].options.find(opt => opt.id === answers.age)?.label}
                 </span>
               </li>
               <li className="flex items-center">
-                <span className="font-medium w-32">Routine Type:</span> 
+                <span className="font-medium w-32">Loại Quy Trình:</span> 
                 <span className="bg-gray-100 px-4 py-1 rounded-full">
                   {questions[4].options.find(opt => opt.id === answers.routine)?.label}
                 </span>
@@ -248,7 +248,7 @@ const FindRoutine = () => {
             </ul>
           </div>
 
-          <h3 className="text-xl font-medium mb-6">Your Recommended Steps</h3>
+          <h3 className="text-xl font-medium mb-6">Các Bước Được Đề Xuất</h3>
           <div className="space-y-4 mb-12">
             {getRoutineSteps().map((step, index) => (
               <motion.div
@@ -267,7 +267,7 @@ const FindRoutine = () => {
                     <p className="text-gray-600 mb-3">{step.description}</p>
                     {step.product && (
                       <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                        <p className="text-sm font-medium">Recommended Product Types:</p>
+                        <p className="text-sm font-medium">Sản Phẩm Được Đề Xuất:</p>
                         <p className="text-sm text-gray-600">{step.product}</p>
                       </div>
                     )}
@@ -293,7 +293,7 @@ const FindRoutine = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              Take Test Again
+              Làm Lại Bài Kiểm Tra
             </motion.button>
           </div>
         </motion.div>

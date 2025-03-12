@@ -35,7 +35,7 @@ const AboutUsPage = () => {
         <div className="absolute inset-0">
           <img 
             src={img1} 
-            alt="Natural Skincare" 
+            alt="Chăm sóc da tự nhiên" 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -48,15 +48,15 @@ const AboutUsPage = () => {
               transition={{ duration: 0.8 }}
               className="max-w-2xl text-white"
             >
-              <h1 className="text-5xl font-light mb-6">The Art of Natural Beauty</h1>
+              <h1 className="text-5xl font-light mb-6">Nghệ Thuật Làm Đẹp Tự Nhiên</h1>
               <p className="text-xl mb-8 leading-relaxed">
-                Discover the perfect harmony between nature and science in our premium skincare collection.
+                Khám phá sự hòa quyện hoàn hảo giữa thiên nhiên và khoa học trong bộ sưu tập chăm sóc da cao cấp của chúng tôi.
               </p>
               <Link 
                 to="/shop" 
                 className="inline-flex items-center bg-white text-black px-8 py-4 transition-all hover:bg-opacity-90"
               >
-                <span className="mr-4">Explore Our Products</span>
+                <span className="mr-4">Khám Phá Sản Phẩm</span>
                 <FaArrowRight />
               </Link>
             </motion.div>
@@ -78,25 +78,25 @@ const AboutUsPage = () => {
               variants={fadeInUp}
               className="uppercase tracking-widest text-gray-500 mb-4"
             >
-              Our Story
+              Câu Chuyện Của Chúng Tôi
             </motion.span>
             <motion.h2 
               variants={fadeInUp}
               className="text-4xl font-light mb-8"
             >
-              Crafted with passion since 2010
+              Được chế tác với đam mê từ năm 2010
             </motion.h2>
             <motion.p 
               variants={fadeInUp}
               className="text-gray-600 text-lg leading-relaxed mb-6"
             >
-              Our journey began with a simple belief: skincare should be effective, natural, and a joy to use. Founded in 2010, Skyn Beauty has grown from a small laboratory into a trusted name in natural skincare, without ever compromising on our core values.
+              Hành trình của chúng tôi bắt đầu với một niềm tin đơn giản: chăm sóc da cần phải hiệu quả, tự nhiên và mang lại niềm vui khi sử dụng. Được thành lập vào năm 2010, Skyn Beauty đã phát triển từ một phòng thí nghiệm nhỏ thành một thương hiệu đáng tin cậy trong lĩnh vực chăm sóc da tự nhiên, mà không bao giờ từ bỏ những giá trị cốt lõi.
             </motion.p>
             <motion.p 
               variants={fadeInUp} 
               className="text-gray-600 text-lg leading-relaxed"
             >
-              We meticulously research plant-based and lab-made ingredients to ensure both safety and proven effectiveness. Our formulations are crafted with both efficacy and sensory delight in focus.
+              Chúng tôi nghiên cứu tỉ mỉ các thành phần từ thực vật và phòng thí nghiệm để đảm bảo cả sự an toàn và hiệu quả đã được chứng minh. Các công thức của chúng tôi được chế tạo với trọng tâm vào hiệu quả và trải nghiệm cảm giác thư giãn.
             </motion.p>
           </motion.div>
 
@@ -108,18 +108,18 @@ const AboutUsPage = () => {
             className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center"
           >
             <motion.div variants={fadeInUp} className="order-2 md:order-1">
-              <h3 className="text-2xl font-light mb-6">Our Philosophy</h3>
+              <h3 className="text-2xl font-light mb-6">Triết Lý Của Chúng Tôi</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                At Skyn Beauty, we believe that true beauty comes from balance. Balance between nature and science. Balance between effectiveness and sensory pleasure. Balance between caring for yourself and caring for the planet.
+                Tại Skyn Beauty, chúng tôi tin rằng vẻ đẹp thực sự đến từ sự cân bằng. Cân bằng giữa thiên nhiên và khoa học. Cân bằng giữa hiệu quả và cảm giác thư giãn. Cân bằng giữa chăm sóc bản thân và chăm sóc hành tinh.
               </p>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                Every product we create embodies this philosophy, resulting in skincare that delivers visible results while being a joy to use every day.
+                Mỗi sản phẩm chúng tôi tạo ra đều thể hiện triết lý này, tạo ra sản phẩm chăm sóc da mang lại kết quả rõ ràng đồng thời mang lại niềm vui khi sử dụng hàng ngày.
               </p>
               <Link 
                 to="/shop" 
                 className="inline-flex items-center border border-black px-8 py-4 hover:bg-black hover:text-white transition-all"
               >
-                <span className="mr-4">Discover Our Products</span>
+                <span className="mr-4">Khám Phá Sản Phẩm</span>
                 <FaArrowRight />
               </Link>
             </motion.div>
@@ -129,7 +129,7 @@ const AboutUsPage = () => {
             >
               <img 
                 src={aboutImg2} 
-                alt="Our Products" 
+                alt="Sản Phẩm Của Chúng Tôi" 
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </motion.div>
@@ -151,19 +151,19 @@ const AboutUsPage = () => {
               variants={fadeInUp}
               className="uppercase tracking-widest text-gray-500 mb-4 block"
             >
-              Our Values
+              Giá Trị Của Chúng Tôi
             </motion.span>
             <motion.h2 
               variants={fadeInUp}
               className="text-4xl font-light mb-6"
             >
-              What Guides Us
+              Những Điều Định Hướng Chúng Tôi
             </motion.h2>
             <motion.p 
               variants={fadeInUp}
               className="max-w-2xl mx-auto text-gray-600 text-lg"
             >
-              Every decision we make is guided by our core values, ensuring that we stay true to our mission of creating exceptional skincare.
+              Mọi quyết định chúng tôi đưa ra đều được định hướng bởi những giá trị cốt lõi, đảm bảo rằng chúng tôi luôn trung thành với sứ mệnh tạo ra sản phẩm chăm sóc da đặc biệt.
             </motion.p>
           </motion.div>
 
@@ -183,9 +183,9 @@ const AboutUsPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                 </svg>
               </div>
-              <h3 className="text-xl font-medium mb-4">Natural Ingredients</h3>
+              <h3 className="text-xl font-medium mb-4">Thành Phần Tự Nhiên</h3>
               <p className="text-gray-600 leading-relaxed">
-                We believe in the power of nature. Our products harness botanical extracts and natural ingredients that have been proven effective through centuries of use and modern research.
+                Chúng tôi tin vào sức mạnh của thiên nhiên. Các sản phẩm của chúng tôi sử dụng chiết xuất thực vật và các thành phần tự nhiên đã được chứng minh hiệu quả qua nhiều thế kỷ sử dụng và nghiên cứu hiện đại.
               </p>
             </motion.div>
             <motion.div 
@@ -197,9 +197,9 @@ const AboutUsPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-medium mb-4">Scientific Innovation</h3>
+              <h3 className="text-xl font-medium mb-4">Đổi Mới Khoa Học</h3>
               <p className="text-gray-600 leading-relaxed">
-                We enhance nature's gifts with cutting-edge science. Our lab team works tirelessly to create formulations that deliver visible results through innovative technology.
+                Chúng tôi nâng cao quà tặng của thiên nhiên với khoa học tiên tiến. Đội ngũ phòng thí nghiệm của chúng tôi làm việc không mệt mỏi để tạo ra các công thức mang lại kết quả rõ rệt thông qua công nghệ đổi mới.
               </p>
             </motion.div>
             <motion.div 
@@ -211,9 +211,9 @@ const AboutUsPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-medium mb-4">Sustainability</h3>
+              <h3 className="text-xl font-medium mb-4">Bền Vững</h3>
               <p className="text-gray-600 leading-relaxed">
-                We're committed to minimizing our environmental impact. From responsibly sourced ingredients to eco-friendly packaging, sustainability is at the heart of everything we do.
+                Chúng tôi cam kết giảm thiểu tác động đến môi trường. Từ nguồn nguyên liệu có trách nhiệm đến bao bì thân thiện với môi trường, tính bền vững là trọng tâm trong mọi hoạt động của chúng tôi.
               </p>
             </motion.div>
           </motion.div>
@@ -236,24 +236,24 @@ const AboutUsPage = () => {
             >
               <img 
                 src={labImg} 
-                alt="Our Laboratory" 
+                alt="Phòng Thí Nghiệm Của Chúng Tôi" 
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </motion.div>
             <motion.div variants={fadeInUp}>
-              <span className="uppercase tracking-widest text-gray-500 mb-4 block">Research & Innovation</span>
-              <h3 className="text-3xl font-light mb-6">High-Tech Natural Skin Care</h3>
+              <span className="uppercase tracking-widest text-gray-500 mb-4 block">Nghiên Cứu & Đổi Mới</span>
+              <h3 className="text-3xl font-light mb-6">Chăm Sóc Da Tự Nhiên Công Nghệ Cao</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Our state-of-the-art laboratory is where science and nature come together. Our team of cosmetic chemists and botanists work collaboratively to create formulations that push the boundaries of natural skincare.
+                Phòng thí nghiệm hiện đại của chúng tôi là nơi khoa học và thiên nhiên kết hợp với nhau. Đội ngũ nhà hóa học mỹ phẩm và nhà thực vật học của chúng tôi làm việc cộng tác để tạo ra các công thức vượt qua giới hạn của chăm sóc da tự nhiên.
               </p>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                We build our formulas on nature's most precious raw materials, refined with modern technologies to guarantee the best results for your skin. Each product undergoes rigorous testing to ensure safety, efficacy, and sensorial delight.
+                Chúng tôi xây dựng các công thức trên những nguyên liệu thô quý giá nhất của thiên nhiên, được tinh chế với công nghệ hiện đại để đảm bảo kết quả tốt nhất cho làn da của bạn. Mỗi sản phẩm đều trải qua quá trình kiểm tra nghiêm ngặt để đảm bảo an toàn, hiệu quả và trải nghiệm cảm giác thư giãn.
               </p>
               {/* <Link 
                 to="/shop" 
                 className="inline-flex items-center border border-black px-8 py-4 hover:bg-black hover:text-white transition-all"
               >
-                <span className="mr-4">Explore Our Technologies</span>
+                <span className="mr-4">Khám Phá Công Nghệ Của Chúng Tôi</span>
                 <FaArrowRight />
               </Link> */}
             </motion.div>
@@ -272,13 +272,13 @@ const AboutUsPage = () => {
             className="max-w-4xl mx-auto text-center"
           >
             <motion.span variants={fadeInUp} className="block text-3xl font-light italic mb-8">
-              "Our formulations are rooted in nature's most valuable raw materials, enhanced with modern technologies to ensure optimal results for your skin."
+              "Các công thức của chúng tôi bắt nguồn từ những nguyên liệu thô quý giá nhất của thiên nhiên, được tăng cường với công nghệ hiện đại để đảm bảo kết quả tối ưu cho làn da của bạn."
             </motion.span>
             <motion.div variants={fadeInUp} className="flex justify-center">
               <div className="w-20 h-1 bg-black"></div>
             </motion.div>
             <motion.p variants={fadeInUp} className="mt-6 text-gray-600 uppercase tracking-widest">
-              Dr. Sarah Chen, Head of Research & Development
+              TS. Sarah Chen, Trưởng Phòng Nghiên Cứu & Phát Triển
             </motion.p>
           </motion.div>
         </div>
@@ -295,13 +295,13 @@ const AboutUsPage = () => {
             className="text-center mb-16"
           >
             <motion.span variants={fadeInUp} className="uppercase tracking-widest text-gray-500 mb-4 block">
-              Our Team
+              Đội Ngũ Của Chúng Tôi
             </motion.span>
             <motion.h2 variants={fadeInUp} className="text-4xl font-light mb-6">
-              The Faces Behind Skyn Beauty
+              Những Gương Mặt Đứng Sau Skyn Beauty
             </motion.h2>
             <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-gray-600 text-lg">
-              Our passionate team combines expertise in botany, dermatology, and cosmetic chemistry to create products that deliver real results.
+              Đội ngũ đam mê của chúng tôi kết hợp chuyên môn về thực vật học, da liễu và hóa học mỹ phẩm để tạo ra các sản phẩm mang lại kết quả thực tế.
             </motion.p>
           </motion.div>
 
@@ -316,42 +316,42 @@ const AboutUsPage = () => {
               <div className="aspect-square overflow-hidden mb-6">
                 <img 
                   src={teamImg1} 
-                  alt="Team Member" 
+                  alt="Thành Viên Đội Ngũ" 
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <h3 className="text-xl font-medium mb-1">Emma Johnson</h3>
-              <p className="text-gray-500 mb-4">Founder & CEO</p>
+              <p className="text-gray-500 mb-4">Nhà Sáng Lập & CEO</p>
               <p className="text-gray-600 max-w-sm mx-auto">
-                With over 15 years in the beauty industry, Emma's vision drives our commitment to exceptional skincare.
+                Với hơn 15 năm trong ngành làm đẹp, tầm nhìn của Emma thúc đẩy cam kết của chúng tôi đối với sản phẩm chăm sóc da đặc biệt.
               </p>
             </motion.div>
             <motion.div variants={fadeInUp} className="text-center">
               <div className="aspect-square overflow-hidden mb-6">
                 <img 
                   src={teamImg2} 
-                  alt="Team Member" 
+                  alt="Thành Viên Đội Ngũ" 
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <h3 className="text-xl font-medium mb-1">Dr. Sarah Chen</h3>
-              <p className="text-gray-500 mb-4">Head of Research</p>
+              <h3 className="text-xl font-medium mb-1">TS. Sarah Chen</h3>
+              <p className="text-gray-500 mb-4">Trưởng Phòng Nghiên Cứu</p>
               <p className="text-gray-600 max-w-sm mx-auto">
-                A PhD in Biochemistry, Sarah leads our research team in developing innovative formulations.
+                Với bằng tiến sĩ Hóa Sinh, Sarah dẫn dắt đội ngũ nghiên cứu của chúng tôi trong việc phát triển các công thức đổi mới.
               </p>
             </motion.div>
             <motion.div variants={fadeInUp} className="text-center">
               <div className="aspect-square overflow-hidden mb-6">
                 <img 
                   src={teamImg3} 
-                  alt="Team Member" 
+                  alt="Thành Viên Đội Ngũ" 
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <h3 className="text-xl font-medium mb-1">Michael Nguyen</h3>
-              <p className="text-gray-500 mb-4">Sustainability Director</p>
+              <h3 className="text-xl font-medium mb-1">Michael Nguyễn</h3>
+              <p className="text-gray-500 mb-4">Giám Đốc Phát Triển Bền Vững</p>
               <p className="text-gray-600 max-w-sm mx-auto">
-                Michael ensures our practices and ingredients meet the highest standards of environmental responsibility.
+                Michael đảm bảo hoạt động và thành phần của chúng tôi đáp ứng các tiêu chuẩn cao nhất về trách nhiệm môi trường.
               </p>
             </motion.div>
           </motion.div>
@@ -370,17 +370,17 @@ const AboutUsPage = () => {
             className="max-w-2xl mx-auto text-center text-white"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-light mb-6">
-              Experience the Difference
+              Trải Nghiệm Sự Khác Biệt
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-lg mb-8">
-              Join thousands of satisfied customers who have transformed their skin with our natural, science-backed products.
+              Tham gia cùng hàng ngàn khách hàng hài lòng đã thay đổi làn da của họ với các sản phẩm tự nhiên, được hỗ trợ bởi khoa học của chúng tôi.
             </motion.p>
             <motion.div variants={fadeInUp}>
               <Link 
                 to="/shop" 
                 className="inline-flex items-center bg-white text-black px-10 py-4 hover:bg-opacity-90 transition-all"
               >
-                <span className="mr-4">Shop Collection</span>
+                <span className="mr-4">Mua Sắm Bộ Sưu Tập</span>
                 <FaArrowRight />
               </Link>
             </motion.div>

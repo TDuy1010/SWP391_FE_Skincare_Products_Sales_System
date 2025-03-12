@@ -1,23 +1,34 @@
-import HeroSection from "../../../components/HeroSection/HeroSection";
-import { Pagination } from "antd";
+import { Pagination, Spin, Empty } from "antd";
 import { motion } from "framer-motion";
 import ProductCardList from "../../../components/ProductCardList/ProductCardList";
 import { getAllProduct } from "../../../service/product/getAllProduct";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { SiDeluge } from "react-icons/si";
+import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
+import img3 from '../../../assets/img/Rectangle 24.png'; // Thêm import hình ảnh hero giống như BlogPage
 
 const ShopPage = () => {
   const fadeIn = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+  
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
   };
 
   //product state
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState(null);
-  const { slug, type } = useParams(); // Thêm type vào params
+  const { slug, type } = useParams();
 
   //pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,9 +38,15 @@ const ShopPage = () => {
   //search state
   const [searchKeyword, setSearchKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
-
+  
   // Thêm state để lưu trữ categories
   const [categories, setCategories] = useState([]);
+  
+  // Thêm state cho view mode (grid/list)
+  const [viewMode, setViewMode] = useState("grid");
+  
+  // Thêm state cho filter sidebar
+  const [showFilters, setShowFilters] = useState(false);
 
   // Thêm debounce effect để tránh gọi API quá nhiều
   useEffect(() => {
@@ -67,9 +84,6 @@ const ShopPage = () => {
         }
       }
 
-      // Log để debug
-      console.log("API Params:", params);
-
       const data = await getAllProduct(params);
       if (data.error) {
         setErrors(data.message);
@@ -91,153 +105,287 @@ const ShopPage = () => {
   };
 
   useEffect(() => {
-    console.log(slug);
+    window.scrollTo(0, 0);
     fetchProduct();
-  }, [slug, currentPage, pageSize, debouncedKeyword]); // Thêm debouncedKeyword vào dependencies
+  }, [slug, currentPage, pageSize, debouncedKeyword]);
 
   const onPageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // Sửa lại hàm onShowSizeChange
   const onShowSizeChange = (current, size) => {
-    console.log("Size changed to:", size); // Debug log
     setPageSize(size);
     setCurrentPage(1);
   };
 
   return (
-    <>
-      <div>
-        {/* Hero Section  */}
-        <HeroSection />
-
-        {/* Combined Search and Nav Section */}
-        <div className="bg-white p-5">
-          <div className="container mx-auto">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              {/* Categories Navigation */}
-              <div className="flex flex-wrap items-center gap-6 cursor-pointer">
-                <a
-                  className={`text-gray-700 hover:text-gray-600 transition-colors duration-200 ${
-                    !slug ? "font-bold text-gray-600" : ""
-                  }`}
-                  onClick={() => {
-                    window.location.href = "/shop";
-                  }}
-                >
-                  Tất cả sản phẩm
-                </a>
-                {categories.map((category) => (
-                  <a
-                    key={category.id}
-                    className={`text-gray-700 hover:text-gray-600 transition-colors duration-200 ${
-                      slug === category.slug ? "font-bold text-gray-600" : ""
-                    }`}
-                    onClick={() => {
-                      window.location.href = `/shop/category/${category.slug}`;
-                    }}
-                  >
-                    {category.name}
-                  </a>
-                ))}
-              </div>
-
-              {/* Search Bar */}
-              <div className="relative w-full md:w-72">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm sản phẩm..."
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200"
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section - Phong cách giống với BlogPage */}
+      <div className="relative h-[500px] w-full">
+        <img
+          src={img3}
+          alt="Sản Phẩm Chăm Sóc Da"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h1 className="text-white text-5xl font-light">Sản Phẩm Chăm Sóc Da</h1>
+              <p className="text-white mt-4 max-w-xl">
+                Khám phá bộ sưu tập các sản phẩm chăm sóc da cao cấp của chúng tôi, 
+                được thiết kế để nuôi dưỡng và làm đẹp làn da của bạn. Mỗi sản phẩm 
+                đều được nghiên cứu kỹ lưỡng để mang lại hiệu quả tối ưu cho mọi loại da.
+              </p>
+            </motion.div>
           </div>
         </div>
+      </div>
 
-        {/* Header product */}
-        <div className="p-8">
-          <h1 className="text-4xl ">Chăm sóc da thiết yếu</h1>
-        </div>
+      {/* Main Content Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Search & Filter Bar */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="bg-gray-50 rounded-lg p-4 mb-8 shadow-sm"
+        >
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-80">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm..."
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200"
+              />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <FiSearch className="h-5 w-5" />
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              {/* Items per page selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Hiển thị:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => onShowSizeChange(currentPage, parseInt(e.target.value))}
+                  className="border rounded-md p-1 text-sm bg-white"
+                >
+                  <option value="4">4</option>
+                  <option value="8">8</option>
+                  <option value="12">12</option>
+                  <option value="16">16</option>
+                </select>
+              </div>
+              
+              {/* View Mode Selector */}
+              <div className="flex items-center border rounded-md overflow-hidden">
+                <button 
+                  onClick={() => setViewMode("grid")}
+                  className={`p-2 ${viewMode === 'grid' ? 'bg-gray-200' : 'bg-white'}`}
+                >
+                  <FiGrid className="h-4 w-4" />
+                </button>
+                <button 
+                  onClick={() => setViewMode("list")}
+                  className={`p-2 ${viewMode === 'list' ? 'bg-gray-200' : 'bg-white'}`}
+                >
+                  <FiList className="h-4 w-4" />
+                </button>
+              </div>
+              
+              {/* Filter Toggle Button */}
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              >
+                <FiFilter className="h-4 w-4" />
+                <span>Bộ lọc</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Filter Section (conditionally rendered) */}
+          {showFilters && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 pt-4 border-t border-gray-200"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Price Range */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Khoảng Giá</h3>
+                  <div className="flex items-center gap-2">
+                    <input type="range" className="w-full" />
+                  </div>
+                </div>
+                
+                {/* Brands */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Thương Hiệu</h3>
+                  <div className="space-y-1">
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      <span className="text-sm">Tất cả thương hiệu</span>
+                    </label>
+                  </div>
+                </div>
+                
+                {/* Sort By */}
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Sắp Xếp Theo</h3>
+                  <select className="w-full border rounded-md p-2 text-sm bg-white">
+                    <option value="popularity">Phổ biến nhất</option>
+                    <option value="price_asc">Giá: Thấp đến cao</option>
+                    <option value="price_desc">Giá: Cao đến thấp</option>
+                    <option value="newest">Mới nhất</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
 
-        {/* Items per page selector */}
-        <div className="flex items-center justify-end px-8 gap-2">
-          <span>Hiển thị:</span>
-          <select
-            value={pageSize}
-            onChange={(e) =>
-              onShowSizeChange(currentPage, parseInt(e.target.value))
-            }
-            className="border rounded-md p-1"
-          >
-            <option value="4">4</option>
-            <option value="8">8</option>
-            <option value="12">12</option>
-            <option value="16">16</option>
-          </select>
-          <span>sản phẩm mỗi trang</span>
-        </div>
+        {/* Categories Navigation */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-8"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              className={`px-4 py-2 rounded-full transition-colors duration-200 ${
+                !slug 
+                  ? "bg-black text-white" 
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => {
+                window.location.href = "/shop";
+              }}
+            >
+              Tất cả sản phẩm
+            </a>
+            {categories.map((category) => (
+              <a
+                key={category.id}
+                className={`px-4 py-2 rounded-full transition-colors duration-200 ${
+                  slug === category.slug 
+                    ? "bg-black text-white" 
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+                onClick={() => {
+                  window.location.href = `/shop/category/${category.slug}`;
+                }}
+              >
+                {category.name}
+              </a>
+            ))}
+          </div>
+        </motion.div>
 
         {/* Product List */}
-        <div>
-          {loading ? (
-            <p className="flex justify-center alignitems-center">
-              Đang tải sản phẩm...
-            </p>
-          ) : errors ? (
-            <p className="flex justify-center">{errors}</p>
-          ) : products?.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeIn}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  <ProductCardList {...product} />
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <p className="flex justify-center">Không có sản phẩm nào.</p>
-          )}
-        </div>
-
-        {/* Update Pagination component */}
-        <div className="flex justify-center m-10">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={totalItems}
-            onChange={onPageChange}
-            showSizeChanger={false}
-            showTotal={(total, range) =>
-              `${range[0]}-${range[1]} trong ${total} sản phẩm`
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Spin size="large" />
+          </div>
+        ) : errors ? (
+          <div className="text-center py-20">
+            <p className="text-red-500">{errors}</p>
+          </div>
+        ) : products?.length > 0 ? (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className={viewMode === "grid" 
+              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" 
+              : "space-y-4"
             }
-          />
-        </div>
+          >
+            {products.map((product, index) => (
+              <motion.div
+                key={index}
+                variants={fadeIn}
+                className={viewMode === "list" ? "bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4" : ""}
+              >
+                {viewMode === "list" ? (
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="w-full md:w-1/3">
+                      <div className="aspect-square overflow-hidden rounded-md">
+                        <img 
+                          src={product.thumbnail} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </div>
+                    <div className="w-full md:w-2/3 flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-lg font-medium mb-2">{product.name}</h3>
+                        <p className="text-gray-600 mb-4 line-clamp-3">{product.description}</p>
+                        <div className="text-sm text-gray-500 mb-2">
+                          {product.category && (
+                            <span className="inline-block bg-gray-100 rounded-full px-3 py-1 mr-2">
+                              {product.category.name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-medium">{product.price} VND</span>
+                        <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
+                          Thêm vào giỏ hàng
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <ProductCardList {...product} />
+                )}
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <div className="py-20">
+            <Empty 
+              description="Không tìm thấy sản phẩm nào" 
+              image={Empty.PRESENTED_IMAGE_SIMPLE} 
+            />
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && products.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex justify-center mt-12"
+          >
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalItems}
+              onChange={onPageChange}
+              showSizeChanger={false}
+              showTotal={(total, range) =>
+                `${range[0]}-${range[1]} trong ${total} sản phẩm`
+              }
+            />
+          </motion.div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

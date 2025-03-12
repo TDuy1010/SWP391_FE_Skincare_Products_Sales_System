@@ -84,11 +84,11 @@ const Determine = () => {
     >
       {!result ? (
         <div>
-          {/* Progress Bar */}
+          {/* Thanh tiến độ */}
           <div className="bg-gray-50 px-8 py-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-light">Determine Your Skin Type</h2>
-              <span className="text-sm text-gray-500">Question {currentStep} of {totalQuestions}</span>
+              <h2 className="text-xl font-light">Xác Định Loại Da Của Bạn</h2>
+              <span className="text-sm text-gray-500">Câu hỏi {currentStep} trong {totalQuestions}</span>
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
@@ -98,7 +98,7 @@ const Determine = () => {
             </div>
           </div>
 
-          {/* Display current question */}
+          {/* Hiển thị câu hỏi hiện tại */}
           <div className="p-8">
             {Object.entries(skinTypeQuestions).map(([questionNumber, question]) => {
               const questionKey = Object.keys(answers)[questionNumber - 1];
@@ -157,7 +157,7 @@ const Determine = () => {
                           : 'border-gray-800 text-gray-800 hover:bg-gray-100'}
                       `}
                     >
-                      Back
+                      Quay Lại
                     </button>
                     
                     {currentStep < totalQuestions ? (
@@ -171,7 +171,7 @@ const Determine = () => {
                             : 'bg-black text-white hover:bg-gray-800'}
                         `}
                       >
-                        Next
+                        Tiếp Theo
                       </button>
                     ) : (
                       <button
@@ -184,7 +184,7 @@ const Determine = () => {
                             : 'bg-black text-white hover:bg-gray-800'}
                         `}
                       >
-                        See Results
+                        Xem Kết Quả
                       </button>
                     )}
                   </div>
@@ -200,7 +200,7 @@ const Determine = () => {
           transition={{ duration: 0.5 }}
           className="p-10"
         >
-          <h2 className="text-3xl font-light mb-2 text-center">Your Skin Type</h2>
+          <h2 className="text-3xl font-light mb-2 text-center">Loại Da Của Bạn</h2>
           <h3 className="text-4xl font-semibold mb-8 text-center">{skinTypeDescriptions[result].title}</h3>
           
           <div className="max-w-3xl mx-auto">
@@ -215,7 +215,7 @@ const Determine = () => {
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                 </span>
-                Recommendations for {skinTypeDescriptions[result].title}
+                Khuyến nghị cho {skinTypeDescriptions[result].title}
               </h4>
               <div className="space-y-4 pl-12">
                 {skinTypeDescriptions[result].tips.map((tip, index) => (
@@ -251,7 +251,7 @@ const Determine = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Take Test Again
+                Làm Bài Kiểm Tra Lại
               </motion.button>
               
               <motion.button
@@ -263,7 +263,7 @@ const Determine = () => {
                   // Ví dụ: navigate to routine finder với kết quả skin type
                 }}
               >
-                Find Products for Your Skin Type
+                Tìm Sản Phẩm Phù Hợp Với Da Của Bạn
               </motion.button>
             </div>
           </div>

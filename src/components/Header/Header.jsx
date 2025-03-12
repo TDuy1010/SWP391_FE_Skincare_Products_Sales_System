@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { FiSearch } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa";
+// import { FiSearch } from "react-icons/fi";
+// import { FaHeart } from "react-icons/fa";
 import { BsBag } from "react-icons/bs";
-import { FaArrowRightLong } from "react-icons/fa6";
+// import { FaArrowRightLong } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import LoginModal from "../../page/Customer/LoginPage/LoginPage";
 import ShopDropdown from "./ShopDropdown";
@@ -211,7 +211,7 @@ const Header = () => {
                 </Link>
               </div>
 
-              <div className="relative group">
+              {/* <div className="relative group">
                 <Link
                   to="/skinquiz"
                   className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
@@ -219,7 +219,7 @@ const Header = () => {
                   Xác định loại da
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>
-              </div>
+              </div> */}
             </nav>
 
             {/* Center Section: Logo */}
@@ -233,15 +233,15 @@ const Header = () => {
             {/* Right Section: Icons */}
             <div className="flex-1 flex items-center justify-end">
               {/* Consultation button */}
-              {user ? (
+              {/* {user ? (
                 <div className="mr-6">
                   <button className="border border-black rounded-md border-radius px-4 py-3 text-black font-medium hover:bg-zinc-200 hover:text-gray-800 transition duration-300 ease-in-out shadow-lg hover:shadow-xl">
                     <Link to="/skin-consultation">Tư vấn</Link>
                   </button>
                 </div>
-              ) : null}
+              ) : null} */}
 
-              {/* Wishlist Link */}
+              {/* Wishlist Link
               <div className="relative group">
                 <Link
                   to="/wishlist"
@@ -253,7 +253,7 @@ const Header = () => {
                   />
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>
-              </div>
+              </div> */}
 
               {/* Login/User Button */}
               <div className="relative group" ref={menuRef}>

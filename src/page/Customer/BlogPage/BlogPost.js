@@ -8,40 +8,40 @@ import featuredImg2 from '../../../assets/img/hero-landingPage.png';
 export const blogPosts = [
   {
     image: Journal1,
-    title: "Distinguishing Mineral Sunscreens from Chemical Sunscreens",
-    description: "Learn about the key differences between mineral and chemical UV protection"
+    title: "Phân Biệt Kem Chống Nắng Vật Lý và Hóa Học",
+    description: "Tìm hiểu về những khác biệt chính giữa phương pháp bảo vệ UV vật lý và hóa học"
   },
   {
     image: Journal2,
-    title: "The Science Behind Ocean-Safe Sunscreens",
-    description: "Discover how to protect both your skin and marine ecosystems"
+    title: "Khoa Học Đằng Sau Kem Chống Nắng An Toàn Cho Đại Dương",
+    description: "Khám phá cách bảo vệ cả làn da của bạn và hệ sinh thái biển"
   },
   {
     image: Journal3,
-    title: "Understanding Your Skin's Natural Protection",
-    description: "Explore how melanin works and why additional protection matters"
+    title: "Hiểu Về Cơ Chế Bảo Vệ Tự Nhiên Của Da",
+    description: "Khám phá cách melanin hoạt động và tại sao cần bổ sung bảo vệ"
   },
   {
     image: Journal4,
-    title: "Choosing the Right Sunscreen Formula",
-    description: "Find the perfect sunscreen texture for your skin type"
+    title: "Chọn Công Thức Kem Chống Nắng Phù Hợp",
+    description: "Tìm kem chống nắng có kết cấu hoàn hảo cho loại da của bạn"
   }
 ];
 export const featuredArticles = [
     {
       image: img4,
-      title: "Mastering The Art Of Well Aging",
+      title: "Làm Chủ Nghệ Thuật Chống Lão Hóa",
       description: [
-        "Our line features meticulous skin, hair and body care formulations, crafted with both efficacy and sensory delight in focus.",
-        "We are dedicated to creating top-quality skin, hair and body care products. We extensively research plant-based and lab-made ingredients, selecting only those with proven safety and effectiveness."
+        "Dòng sản phẩm của chúng tôi bao gồm các công thức chăm sóc da, tóc và cơ thể tỉ mỉ, được tạo ra với trọng tâm là hiệu quả và trải nghiệm cảm giác thư giãn.",
+        "Chúng tôi tận tâm tạo ra các sản phẩm chăm sóc da, tóc và cơ thể chất lượng cao. Chúng tôi nghiên cứu kỹ lưỡng các thành phần từ thực vật và phòng thí nghiệm, lựa chọn chỉ những thành phần đã được chứng minh an toàn và hiệu quả."
       ]
     },
     {
       image: featuredImg2,
-      title: "The Science of Skin Hydration",
+      title: "Khoa Học Về Dưỡng Ẩm Cho Da",
       description: [
-        "Understanding the importance of maintaining your skin's moisture barrier for optimal health and appearance.",
-        "Discover our innovative formulations that combine advanced hydrating compounds with natural moisturizing factors to support your skin's natural balance."
+        "Hiểu tầm quan trọng của việc duy trì hàng rào độ ẩm cho da để đạt được sức khỏe và vẻ ngoài tối ưu.",
+        "Khám phá các công thức đổi mới của chúng tôi kết hợp các hợp chất dưỡng ẩm tiên tiến với các yếu tố giữ ẩm tự nhiên để hỗ trợ cân bằng tự nhiên cho làn da của bạn."
       ]
     }
   ];

@@ -88,7 +88,7 @@ const ProductCard = ({
             onClick={handleAddToCart}
             disabled={isLoading}
           >
-            {isLoading ? "Adding..." : "Add to your Cart"}
+            {isLoading ? "Đang thêm vào giỏ hàng " : "Thêm vào giỏ hàng"}
           </button>
         </div>
       </div>

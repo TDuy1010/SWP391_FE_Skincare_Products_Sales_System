@@ -6,7 +6,7 @@ import HeroSection from "../../../components/HeroSection/HeroSection";
 import img1 from "../../../assets/img/hero-photo.png";
 import heroImg from "../../../assets/img/hero-landingPage.png";
 import img2 from "../../../assets/img/Section 01.png";
-import { useEffect, useState, useState } from "react";
+import { useEffect, useState} from "react";
 // import { getAllProduct } from "../../../service/getAllProduct/getAllProduct";
 import { getLatestProducts } from "../../../service/product";
 
@@ -50,7 +50,7 @@ const LandingPage = () => {
         <div className="absolute inset-0">
           <img 
             src={img2}
-            alt="Hero background" 
+            alt="Ảnh nền trang chủ" 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -65,15 +65,15 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h1 className="text-5xl font-light mb-6">Natural Beauty Essentials</h1>
+              <h1 className="text-5xl font-light mb-6">Tinh Chất Làm Đẹp Tự Nhiên</h1>
               <p className="text-xl mb-8 leading-relaxed">
-                Discover skincare products made with natural ingredients that nurture and enhance your skin's natural beauty.
+                Khám phá các sản phẩm chăm sóc da được làm từ thành phần tự nhiên, nuôi dưỡng và tôn lên vẻ đẹp tự nhiên của làn da bạn.
               </p>
               <Link 
                 to="/shop" 
                 className="inline-flex items-center bg-white text-black px-8 py-4 transition-all hover:bg-opacity-90"
               >
-                <span className="mr-4">Shop Collection</span>
+                <span className="mr-4">Mua Sắm Ngay</span>
                 <FaArrowRight />
               </Link>
             </motion.div>
@@ -156,14 +156,6 @@ const LandingPage = () => {
             rít và không hề thua kém các sản phẩm chăm sóc da mặt. Đã đến lúc
             quan tâm đến cơ thể như cách chúng ta chăm sóc gương mặt.
           </p>
-          <Link to="/shop">
-            <motion.button
-              className="bg-transparent border border-white text-white py-2 px-6 rounded-md hover:bg-white hover:text-black transition"
-              whileHover={{ scale: 1.1 }}
-            >
-              Discover More
-            </motion.button>
-          </Link>
           <motion.button
             className="bg-transparent border border-white text-white py-2 px-6 rounded-md hover:bg-white hover:text-black transition"
             whileHover={{ scale: 1.1 }}
@@ -219,7 +211,7 @@ const LandingPage = () => {
           >
             <img
               src={img1}
-              alt="Skincare Application"
+              alt="Chăm sóc da"
               className="w-full h-[500px] object-cover"
             />
           </motion.div>

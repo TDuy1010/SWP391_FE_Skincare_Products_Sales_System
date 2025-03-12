@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import FindRoutine from './FindRoutine/FindRoutine';
 import Determine from './Determine/Determine';
 import helpHeroImage from '../../../assets/img/hero-photo.png';
@@ -27,23 +27,29 @@ const staggerContainer = {
 
 const HelpPage = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const toolsRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const handleGetStarted = () => {
+    // Scroll đến phần công cụ chăm sóc da
+    toolsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const topics = [
     { 
       icon: <FaSearch className="text-[#34825B] text-2xl" />, 
-      title: "Determine your skin type", 
+      title: "Xác định loại da của bạn", 
       id: "determine",
-      description: "Answer a few questions to discover your skin type and get personalized recommendations."
+      description: "Trả lời một vài câu hỏi để khám phá loại da của bạn và nhận được những khuyến nghị cá nhân hóa."
     },
     { 
       icon: <FaSeedling className="text-[#34825B] text-2xl" />, 
-      title: "Find your skin care routine", 
+      title: "Tìm quy trình chăm sóc da", 
       id: "findRoutine",
-      description: "Create a customized skincare regimen based on your unique skin needs and concerns."
+      description: "Tạo một quy trình chăm sóc da tùy chỉnh dựa trên nhu cầu và vấn đề da riêng của bạn."
     },
   ];
 
@@ -66,12 +72,12 @@ const HelpPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Banner */}
+      {/* Banner Chính */}
       <section className="relative h-[60vh] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img 
             src={helpHeroImage} 
-            alt="Skincare Help" 
+            alt="Hướng Dẫn Chăm Sóc Da" 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -84,23 +90,25 @@ const HelpPage = () => {
               transition={{ duration: 0.8 }}
               className="max-w-2xl text-white"
             >
-              <h1 className="text-5xl font-light mb-6">Skin Care Guidance</h1>
+              <h1 className="text-5xl font-light mb-6">Hướng Dẫn Chăm Sóc Da</h1>
               <p className="text-xl mb-8 leading-relaxed">
-                Discover your perfect skincare routine with our personalized tools and expert recommendations.
+                Khám phá quy trình chăm sóc da hoàn hảo với các công cụ cá nhân hóa và khuyến nghị từ chuyên gia của chúng tôi.
               </p>
-              <motion.div
+              <motion.button
+                onClick={handleGetStarted}
                 whileHover={{ scale: 1.05 }}
                 className="inline-flex items-center bg-white text-black px-8 py-4 rounded-md transition-all hover:bg-opacity-90"
               >
-                <span className="mr-4">Get Started</span>
+                <span className="mr-4">Bắt Đầu Ngay</span>
                 <FaChevronRight />
-              </motion.div>
+              </motion.button>
             </motion.div>
           </div>
         </div>
       </section>
 
       <motion.div 
+        ref={toolsRef}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -109,15 +117,15 @@ const HelpPage = () => {
       >
         <motion.div variants={fadeInUp} className="mb-12 text-center max-w-3xl mx-auto">
           <span className="uppercase tracking-widest text-[#34825B] mb-4 block">
-            Personalized Guidance
+            Hướng Dẫn Cá Nhân Hóa
           </span>
-          <h2 className="text-4xl font-light mb-6">Find Your Perfect Skincare Solution</h2>
+          <h2 className="text-4xl font-light mb-6">Tìm Giải Pháp Chăm Sóc Da Hoàn Hảo</h2>
           <p className="text-gray-600 text-lg">
-            Every skin is unique and requires personalized care. Our interactive tools help you understand your skin better and develop a routine that works for you.
+            Mỗi làn da đều độc đáo và cần được chăm sóc riêng biệt. Các công cụ tương tác của chúng tôi giúp bạn hiểu rõ hơn về làn da của mình và phát triển quy trình phù hợp.
           </p>
         </motion.div>
 
-        {/* Topic Selection */}
+        {/* Lựa chọn chủ đề */}
         <motion.div 
           variants={fadeInUp}
           className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
@@ -132,7 +140,7 @@ const HelpPage = () => {
           ))}
         </motion.div>
 
-        {/* Content Section */}
+        {/* Phần nội dung */}
         <motion.div variants={fadeInUp}>
           {selectedTopic === 'findRoutine' ? (
             <FindRoutine />
@@ -142,18 +150,24 @@ const HelpPage = () => {
             <div className="text-center text-gray-500 py-24 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
               <div className="max-w-md mx-auto">
                 <FaRegLightbulb className="text-5xl mx-auto mb-6 text-[#34825B]" />
-                <h3 className="text-2xl font-light mb-4">Select a Tool to Begin</h3>
+                <h3 className="text-2xl font-light mb-4">Chọn Một Công Cụ Để Bắt Đầu</h3>
                 <p className="text-gray-600 mb-6">
-                  Choose one of the options above to start your personalized skincare journey. Our interactive tools will guide you step-by-step.
+                  Chọn một trong các lựa chọn bên trên để bắt đầu hành trình chăm sóc da cá nhân hóa của bạn. Các công cụ tương tác của chúng tôi sẽ hướng dẫn bạn từng bước.
                 </p>
                 <div className="flex justify-center space-x-10">
-                  <div className="flex flex-col items-center text-[#34825B]">
+                  <div 
+                    onClick={() => setSelectedTopic('determine')}
+                    className="flex flex-col items-center text-[#34825B] cursor-pointer hover:opacity-80 transition-opacity"
+                  >
                     <FaSearch className="text-3xl mb-2" />
-                    <span className="text-sm">Skin Type</span>
+                    <span className="text-sm">Loại Da</span>
                   </div>
-                  <div className="flex flex-col items-center text-[#34825B]">
+                  <div 
+                    onClick={() => setSelectedTopic('findRoutine')}
+                    className="flex flex-col items-center text-[#34825B] cursor-pointer hover:opacity-80 transition-opacity"
+                  >
                     <FaSeedling className="text-3xl mb-2" />
-                    <span className="text-sm">Skin Routine</span>
+                    <span className="text-sm">Quy Trình Da</span>
                   </div>
                 </div>
               </div>
