@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal, Switch } from "antd";
+import { Table, Button, Space, Tooltip, Modal } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
@@ -8,11 +8,7 @@ import {
   EyeOutlined, // 👁️ Import View Icon
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import {
-  getAllVouchers,
-  deleteVoucher,
-  updateVoucherStatus,
-} from "../../../service/voucher/index";
+import { getAllVouchers, deleteVoucher } from "../../../service/voucher/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -58,7 +54,6 @@ const VoucherManagement = () => {
   }, []);
 
   const handleTableChange = (newPagination) => {
-    // Convert from 1-based to 0-based page number for API
     fetchVouchers(newPagination.current, newPagination.pageSize);
   };
 
@@ -67,13 +62,11 @@ const VoucherManagement = () => {
     setDeleteModalVisible(true);
   };
 
-  // Show View Details Modal
   const showVoucherDetails = (voucher) => {
     setSelectedVoucher(voucher);
     setViewModalVisible(true);
   };
 
-  // Optimized Delete Function with Local State for Loading
   const handleDeleteConfirm = async () => {
     if (!selectedVoucher) return;
 
@@ -96,29 +89,6 @@ const VoucherManagement = () => {
       setDeletingVoucherId(null);
       setDeleteModalVisible(false);
       setSelectedVoucher(null);
-    }
-  };
-
-  const toggleVoucherStatus = async (voucher) => {
-    try {
-      setLoading(true);
-      const newStatus = voucher.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-      const response = await updateVoucherStatus(voucher.id, newStatus);
-
-      if (!response.error) {
-        toast.success("Voucher status updated successfully!");
-        setVouchers((prevVouchers) =>
-          prevVouchers.map((v) =>
-            v.id === voucher.id ? { ...v, status: newStatus } : v
-          )
-        );
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Failed to update voucher status");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -155,33 +125,17 @@ const VoucherManagement = () => {
       key: "point",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => (
-        <Switch
-          checked={status === "ACTIVE"}
-          onChange={() => toggleVoucherStatus(record)}
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-        />
-      ),
-    },
-    {
       title: "Actions",
       key: "actions",
       render: (_, record) =>
         deletingVoucherId === record.id ? null : (
           <Space>
-            {/* 👁️ View Details Button */}
             <Tooltip title="View Details">
               <Button
                 icon={<EyeOutlined />}
                 onClick={() => showVoucherDetails(record)}
               />
             </Tooltip>
-
-            {/* ✏️ Edit Button */}
             <Tooltip title="Edit">
               <Button
                 type="primary"
@@ -190,8 +144,6 @@ const VoucherManagement = () => {
                 disabled={deletingVoucherId === record.id}
               />
             </Tooltip>
-
-            {/* 🗑️ Delete Button */}
             <Tooltip title="Delete">
               <Button
                 danger
@@ -231,8 +183,6 @@ const VoucherManagement = () => {
         loading={loading}
         onChange={handleTableChange}
       />
-
-      {/* 🗑️ Delete Confirmation Modal */}
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -250,47 +200,6 @@ const VoucherManagement = () => {
         </p>
         <p>This action cannot be undone.</p>
       </Modal>
-
-      {/* 👁️ View Details Modal */}
-      <Modal
-        title="Voucher Details"
-        open={viewModalVisible}
-        onCancel={() => setViewModalVisible(false)}
-        footer={null}
-      >
-        {selectedVoucher && (
-          <div>
-            <p>
-              <strong>Voucher Code:</strong> {selectedVoucher.code}
-            </p>
-            <p>
-              <strong>Discount:</strong>{" "}
-              {selectedVoucher.discountType === "PERCENTAGE"
-                ? `${selectedVoucher.discount}%`
-                : `${selectedVoucher.discount.toLocaleString()}đ`}
-            </p>
-            <p>
-              <strong>Discount Type:</strong> {selectedVoucher.discountType}
-            </p>
-            <p>
-              <strong>Minimum Order Value:</strong>{" "}
-              {selectedVoucher.minOrderValue.toLocaleString()}đ
-            </p>
-            <p>
-              <strong>Points Required:</strong> {selectedVoucher.point}
-            </p>
-            <p>
-              <strong>Description:</strong> {selectedVoucher.description}
-            </p>
-            {selectedVoucher.quantity && (
-              <p>
-                <strong>Quantity:</strong> {selectedVoucher.quantity}
-              </p>
-            )}
-          </div>
-        )}
-      </Modal>
-
       <ToastContainer />
     </div>
   );
