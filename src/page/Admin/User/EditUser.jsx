@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Select, DatePicker, Upload, message } from "antd";
+import { Form, Input, Button, Select, DatePicker, Upload } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import {
@@ -17,7 +17,6 @@ const EditUser = () => {
   const { id } = useParams();
   const [imageUrl, setImageUrl] = useState(null);
   const [initialData, setInitialData] = useState(null);
-  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -28,7 +27,6 @@ const EditUser = () => {
           setInitialData(userData);
           setImageUrl(userData.avatar);
 
-          // Set giá trị cho form, xử lý các trường có thể null
           form.setFieldsValue({
             firstName: userData.firstName || "",
             lastName: userData.lastName || "",
@@ -36,8 +34,7 @@ const EditUser = () => {
             username: userData.username,
             roleName: userData.roleName,
             birthday: userData.birthday ? moment(userData.birthday) : undefined,
-            email: userData.email || "",
-            status: userData.status,
+            phone: userData.phone || "",
             avatar: userData.avatar
               ? [
                   {
@@ -53,7 +50,6 @@ const EditUser = () => {
           toast.error("Failed to fetch user data");
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
         toast.error("Error fetching user data");
       }
     };
@@ -66,10 +62,8 @@ const EditUser = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-
       let avatarUrl = imageUrl;
 
-      // Upload ảnh mới nếu có
       if (values.avatar?.length > 0 && values.avatar[0].originFileObj) {
         const file = values.avatar[0].originFileObj;
         try {
@@ -84,20 +78,15 @@ const EditUser = () => {
         }
       }
 
-      // Chuẩn bị dữ liệu gửi đi theo đúng format yêu cầu
-      const formData = {
-        firstName: values.firstName || "",
-        lastName: values.lastName || "",
-        birthday: values.birthday?.format("YYYY-MM-DD") || null,
-        gender: values.gender || null,
-        username: values.username,
-        password: values.password || undefined,
-        phone: values.phone || "",
-        roleName: values.roleName,
-        avatar: avatarUrl || "",
-      };
-
-      console.log("Sending data:", formData);
+      const formData = { ...initialData };
+      formData.avatar = avatarUrl;
+      formData.firstName = values.firstName;
+      formData.lastName = values.lastName;
+      formData.birthday = values.birthday?.format("YYYY-MM-DD");
+      formData.gender = values.gender;
+      if (values.password) formData.password = values.password;
+      formData.phone = values.phone;
+      formData.roleName = values.roleName;
 
       const response = await editUser(id, formData);
       if (response && response.code === 200) {
@@ -181,23 +170,11 @@ const EditUser = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="username"
-            label="Username"
-            rules={[{ required: true, message: "Please input username!" }]}
-          >
+          <Form.Item name="username" label="Username">
             <Input disabled />
           </Form.Item>
 
-          <Form.Item name="email" label="Email">
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="roleName"
-            label="Role"
-            rules={[{ required: true, message: "Please select role!" }]}
-          >
+          <Form.Item name="roleName" label="Role">
             <Select>
               <Select.Option value="CUSTOMER">Customer</Select.Option>
               <Select.Option value="DELIVERY">Delivery</Select.Option>
