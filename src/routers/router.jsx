@@ -39,6 +39,8 @@ import EditVoucher from "../page/Admin/Voucher/EditVoucher";
 import OrderSuccess from "../components/Order/OrderSuccess";
 import OrderFailed from "../components/Order/OrderFailed";
 import OrderDetail from "../page/Admin/Order/OrderDetail";
+import AddUser from "../page/Admin/User/AddUser";
+import EditUser from "../page/Admin/User/EditUser";
 
 export const router = createBrowserRouter([
   //Customer
@@ -136,6 +138,14 @@ export const router = createBrowserRouter([
           {
             path: "user",
             element: <UserManagement />,
+          },
+          {
+            path: "user/add",
+            element: <AddUser />,
+          },
+          {
+            path: "user/edit/:id",
+            element: <EditUser />,
           },
           {
             path: "order",
