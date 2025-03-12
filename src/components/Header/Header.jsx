@@ -184,16 +184,6 @@ const Header = () => {
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>
               </div>
-
-              <div className="relative group">
-                <Link
-                  to="/skinquiz"
-                  className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
-                >
-                  Xác định loại da
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </Link>
-              </div>
             </nav>
 
             {/* Center Section: Logo */}
@@ -206,29 +196,10 @@ const Header = () => {
 
             {/* Right Section: Icons */}
             <div className="flex-1 flex items-center justify-end">
-              {/* Consultation button */}
-              {user ? (
-                <div className="mr-6">
-                  <button className="border border-black rounded-md border-radius px-4 py-3 text-black font-medium hover:bg-zinc-200 hover:text-gray-800 transition duration-300 ease-in-out shadow-lg hover:shadow-xl">
-                    <Link to="/skin-consultation">Tư vấn</Link>
-                  </button>
-                </div>
-              ) : null}
+  
 
-              {/* Wishlist Link */}
-              <div className="relative group">
-                <Link
-                  to="/wishlist"
-                  className="relative h-16 px-4 flex items-center hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <FaHeart
-                    size={20}
-                    className="cursor-pointer text-gray-700 hover:text-black transition-colors"
-                  />
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </Link>
-              </div>
-
+             
+              
               {/* Login/User Button */}
               <div className="relative group" ref={menuRef}>
                 {user ? (
