@@ -14,7 +14,7 @@ import LoginModal from "../LoginPage/LoginPage";
 import imgProduct from "../../../assets/Rectangle 3.png";
 import { toast } from "react-toastify";
 import ProductDetailTabs from "./ProductDetailTabs"; 
-import { RatingStars } from "./ProductDetailTabs"; 
+import { RatingStars } from "./FeedbackSection"; 
 
 // ProductImages component definition (không thay đổi)
 const ProductImages = ({ product, mainImage, setMainImage }) => (
@@ -290,10 +290,6 @@ const ProductDetail = () => {
     setIsLoginModalOpen(true);
   };
   
-  // Xử lý filter reviews
-  const handleFilterChange = (filter) => {
-    setActiveFilter(filter);
-  };
   // Cập nhật hàm handleSubmitReview để gọi API đúng
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -509,19 +505,9 @@ const ProductDetail = () => {
               product={product}
               productSpecs={productSpecs}
               reviews={reviews}
-              filteredReviews={filteredReviews}
-              showReviewForm={showReviewForm}
-              setShowReviewForm={setShowReviewForm}
-              reviewForm={reviewForm}
-              setReviewForm={setReviewForm}
-              hasReviewed={hasReviewed}
+              setReviews={setReviews}
               handleLoginRequired={handleLoginRequired}
-              submitLoading={submitLoading}
-              handleSubmitReview={handleSubmitReview}
-              handleReviewChange={handleReviewChange}
-              handleFilterChange={handleFilterChange}
-              searchTerm={searchTerm}
-              activeFilter={activeFilter}
+              slug={slug}
               createMarkup={createMarkup}
             />
           </div>
