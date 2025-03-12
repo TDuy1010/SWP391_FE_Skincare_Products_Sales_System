@@ -1,19 +1,31 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import Total from "../Total";
+import { getAddresses } from "../../../../service/address";
 import AddressModal from "./AddressModal";
 import {
   addNewAddress,
   updateAddress,
-  getAddresses,
-} from "../../../../service/address";
+} from "../../../../service/address/index";
 
-const Address = ({ onNext, cartData }) => {
+const Address = ({
+  onNext,
+  cartData,
+  onVoucherApply,
+  appliedVoucher,
+  vouchers,
+}) => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  console.log("Address received props:", {
+    cartData,
+    vouchers,
+    appliedVoucher,
+  });
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -162,9 +174,12 @@ const Address = ({ onNext, cartData }) => {
         </div>
 
         <Total
-          buttonText="Tiếp tục mua hàng"
+          buttonText="Tiếp tục"
           onNext={handleContinue}
           cartData={cartData}
+          onVoucherApply={onVoucherApply}
+          appliedVoucher={appliedVoucher}
+          vouchers={vouchers}
         />
       </div>
 
@@ -185,6 +200,9 @@ const Address = ({ onNext, cartData }) => {
 Address.propTypes = {
   onNext: PropTypes.func.isRequired,
   cartData: PropTypes.object,
+  onVoucherApply: PropTypes.func.isRequired,
+  appliedVoucher: PropTypes.object,
+  vouchers: PropTypes.array,
 };
 
 export default Address;
