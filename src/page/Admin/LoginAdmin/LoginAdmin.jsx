@@ -13,6 +13,9 @@ const LoginAdmin = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Danh sách các vai trò được phép truy cập hệ thống quản trị
+  const ALLOWED_ROLES = ["ADMIN", "STAFF", "MANAGER", "DELIVERY"];
+
   useEffect(() => {
     const adminUser = JSON.parse(localStorage.getItem("adminUser"));
     if (adminUser?.token) {
@@ -34,13 +37,22 @@ const LoginAdmin = () => {
       }
 
       if (response?.code === 200) {
-        // Kiểm tra role ADMIN
-        if (response.result.roleName !== "ADMIN") {
+        // Kiểm tra xem vai trò có trong danh sách được phép không
+        if (!ALLOWED_ROLES.includes(response.result.roleName)) {
           setError("Bạn không có quyền truy cập vào trang quản trị");
           return;
         }
+        
         localStorage.setItem("admin", response.result.roleName);
         localStorage.setItem("token", response.result.token);
+        
+        // Lưu thông tin người dùng để sử dụng sau này nếu cần
+        localStorage.setItem("adminUser", JSON.stringify({
+          token: response.result.token,
+          role: response.result.roleName,
+          // Có thể lưu thêm thông tin khác từ response nếu có
+        }));
+        
         navigate("/admin");
       } else {
         setError("Tên đăng nhập hoặc mật khẩu không đúng");
@@ -68,7 +80,7 @@ const LoginAdmin = () => {
             <h1 className="text-3xl font-bold text-gray-800">SKYN Admin Portal</h1>
           </div>
           <h2 className="text-2xl font-light text-gray-600 mb-6">
-            Hệ thống quản lý dành cho quản trị viên
+            Hệ thống quản lý dành cho nhân viên SKYN
           </h2>
           <p className="text-gray-500 mb-8">
             Truy cập vào bảng điều khiển để quản lý sản phẩm, đơn hàng, người dùng
@@ -111,7 +123,7 @@ const LoginAdmin = () => {
           className="max-w-md w-full bg-white rounded-xl shadow-lg p-8"
         >
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-light text-gray-800">Đăng nhập Admin</h2>
+            <h2 className="text-3xl font-light text-gray-800">Đăng nhập Hệ thống</h2>
             <p className="text-gray-500 mt-2">Vui lòng đăng nhập để tiếp tục</p>
           </div>
 
