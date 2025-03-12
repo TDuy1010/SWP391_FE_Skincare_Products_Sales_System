@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal, Tag, Switch } from "antd";
+import { Table, Button, Space, Tooltip, Modal, Tag, Switch, Input } from "antd";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { FaEye } from "react-icons/fa";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import {
   getAllCategories,
   deleteCategory,
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AddCategory from './AddCategory';
-import EditCategory from './EditCategory';
 
 const CategoryManagement = () => {
   const navigate = useNavigate();
@@ -23,25 +25,25 @@ const CategoryManagement = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [selectedDetail, setSelectedDetail] = useState("");
-
-  const showDetail = (category) => {
-        setSelectedDetail(category.description);
-        setDetailModalVisible(true);
-      };
-
+  const [filters, setFilters] = useState({
+    keyword: "",
+    sortBy: "",
+    order: "",
+  });
 
   const fetchCategories = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await getAllCategories({
-        page: params.page - 1 || 0,
+      const queryParams = {
+        page: params.page !== undefined ? params.page - 1 : 0,
         size: params.pageSize || 10,
-      });
+      };
+
+      if (params.keyword) queryParams.keyword = params.keyword;
+      if (params.sortBy) queryParams.sortBy = params.sortBy;
+      if (params.order) queryParams.order = params.order;
+
+      const response = await getAllCategories(queryParams);
 
       if (!response.error) {
         setCategories(response.result.categoryResponses);
@@ -64,29 +66,19 @@ const CategoryManagement = () => {
     fetchCategories();
   }, []);
 
-  const handleTableChange = (newPagination) => {
-    fetchCategories({
+  const handleTableChange = (newPagination, tableFilters, sorter) => {
+    const params = {
+      ...filters,
       page: newPagination.current,
       pageSize: newPagination.pageSize,
-    });
-  };
+    };
 
+    if (sorter.field) {
+      params.sortBy = sorter.field;
+      params.order = sorter.order ? sorter.order.replace("end", "") : undefined;
+    }
 
-  const handleEditCategory = (category) => {
-    setEditingCategory(category);
-    setIsEditModalVisible(true);
-  };
-  
-  
-  const handleEditCancel = () => {
-    setIsEditModalVisible(false);
-    setEditingCategory(null);
-  };
-  
-  const handleEditSuccess = (message) => {
-    fetchCategories(); // Refresh danh sách danh mục
-    toast.success(message);
-    setIsEditModalVisible(false);
+    fetchCategories(params);
   };
 
   const showDeleteConfirm = (category) => {
@@ -117,19 +109,6 @@ const CategoryManagement = () => {
     }
   };
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleSuccess = (message) => {
-    fetchCategories();
-    toast.success(message);
-  };
-
   const columns = [
     {
       title: "Image",
@@ -147,27 +126,25 @@ const CategoryManagement = () => {
       title: "Category Name",
       dataIndex: "name",
       key: "name",
+      sorter: true,
     },
-    {
-      title: "Description",
-      key: "details",
-      render: (_, record) => (
-        <Button type="link" onClick={() => showDetail(record)}>
-                  <FaEye />
-                </Button>
-      ),
-    },
-    
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
         <Space>
+          <Tooltip title="Details">
+            <Button
+              type="default"
+              icon={<InfoCircleOutlined />}
+              onClick={() => navigate(`/admin/category/detail/${record.id}`)}
+            />
+          </Tooltip>
           <Tooltip title="Edit">
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => handleEditCategory(record)}
+              onClick={() => navigate(`/admin/category/edit/${record.id}`)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -188,37 +165,41 @@ const CategoryManagement = () => {
         <h2 className="text-2xl font-bold">Category Management</h2>
         <Button
           type="primary"
-          onClick={showModal}
-          className="mb-4"
+          icon={<PlusOutlined />}
+          onClick={() => navigate("/admin/category/add")}
         >
           Add New Category
         </Button>
       </div>
-      <div className="shadow-md rounded-lg bg-white">
+      <div className="mb-4">
+        <Input.Search
+          placeholder="Search by category name"
+          onSearch={(value) => {
+            const params = {
+              page: pagination.current,
+              pageSize: pagination.pageSize,
+              keyword: value,
+            };
+            fetchCategories(params);
+          }}
+          style={{ width: 300 }}
+          allowClear
+        />
+      </div>
       <Table
         columns={columns}
         dataSource={categories}
         rowKey="id"
-        pagination={pagination}
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
+          pageSizeOptions: ["10", "20", "50", "100"],
+        }}
         loading={loading}
         onChange={handleTableChange}
-        className="dark-table"
       />
-      </div>
-      
-      <Modal
-        title="Category Details"
-        open={detailModalVisible}
-        onCancel={() => setDetailModalVisible(false)}
-        footer={[
-        <Button key="close" onClick={() => setDetailModalVisible(false)}>
-         Close
-        </Button>,
-        ]}
-      >
-      <p>{selectedDetail}</p>
-      </Modal>
-
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -236,17 +217,6 @@ const CategoryManagement = () => {
         </p>
         <p>This action cannot be undone.</p>
       </Modal>
-      <AddCategory
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        onSuccess={handleSuccess}
-      />
-      <EditCategory
-        visible={isEditModalVisible}
-        onCancel={handleEditCancel}
-        categoryData={editingCategory}
-        onSuccess={handleEditSuccess}
-      />
       <ToastContainer />
     </div>
   );

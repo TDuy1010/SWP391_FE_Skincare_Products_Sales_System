@@ -1,50 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { motion } from "framer-motion";
-import ProductCard from "./ProductCard";
+import ProductCard from "./ProductCard.jsx";
+import HeroSection from "../../../components/HeroSection/HeroSection";
 import img1 from "../../../assets/img/hero-photo.png";
 import heroImg from "../../../assets/img/hero-landingPage.png";
 import img2 from "../../../assets/img/Section 01.png";
-import { useEffect, useState } from "react";
-import { getAllProduct } from "../../../service/getAllProduct/getAllProduct";
+import { useEffect, useState, useState } from "react";
+// import { getAllProduct } from "../../../service/getAllProduct/getAllProduct";
+import { getLatestProducts } from "../../../service/product";
 
 const LandingPage = () => {
-  // State để lưu danh sách sản phẩm
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [latestProducts, setLatestProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Cuộn lên đầu trang khi component được mount
     window.scrollTo(0, 0);
-    
-    // Gọi API để lấy sản phẩm
-    const fetchFeaturedProducts = async () => {
-      try {
-        // Lấy 4 sản phẩm mới nhất để hiển thị
-        const params = {
-          page: 1,
-          size: 4,
-          sort: "createdAt,desc" // Sắp xếp theo ngày tạo, mới nhất trước
-        };
-        
-        const response = await getAllProduct(params);
-        
-        if (response.error) {
-          setError(response.message);
-        } else {
-          setFeaturedProducts(response.result.productResponses || []);
-        }
-      } catch (err) {
-        console.error("Failed to fetch featured products:", err);
-        setError("Failed to load featured products");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFeaturedProducts();
+    fetchLatestProducts();
   }, []);
+
+  const fetchLatestProducts = async () => {
+    const response = await getLatestProducts(4);
+    if (!response.error) {
+      setLatestProducts(response.result || []);
+    }
+  };
 
   const fadeIn = {
     hidden: { opacity: 0, y: 50 },
@@ -100,72 +81,48 @@ const LandingPage = () => {
         </div>
       </motion.div>
 
-      {/* Featured Product */}
-      <div className="py-16 bg-white">
-        <div className="container mx-auto px-8">
-          <motion.div 
-            variants={fadeIn}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="mb-12 text-center"
-          >
-            <h2 className="text-3xl font-light mb-4">Featured Products</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Discover our most loved products, carefully formulated to give you the best results for your skin.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-            variants={fadeIn}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {loading ? (
-              <div className="col-span-4 text-center py-12">
-                <p className="text-gray-500">Loading featured products...</p>
-              </div>
-            ) : error ? (
-              <div className="col-span-4 text-center py-12">
-                <p className="text-red-500">{error}</p>
-              </div>
-            ) : featuredProducts.length === 0 ? (
-              <div className="col-span-4 text-center py-12">
-                <p className="text-gray-500">No products available at the moment.</p>
-              </div>
-            ) : (
-              featuredProducts.map((product) => (
-                <motion.div
-                  key={product.id}
-                  variants={fadeIn}
-                  whileHover={{ y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <ProductCard {...product} />
-                </motion.div>
-              ))
-            )}
-          </motion.div>
-          
-          <motion.div 
-            className="text-center mt-12"
-            variants={fadeIn}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <Link 
-              to="/shop"
-              className="inline-flex items-center text-gray-800 hover:text-black"
+      {/* List Product */}
+      <motion.div
+        className="max-w-7xl mx-auto p-8"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+      >
+        <h1 className="text-3xl font-semibold mb-2">Bảo Vệ Da Tối Ưu</h1>
+        <p className="text-gray-500 mb-6">
+          Khám phá dòng sản phẩm Chăm sóc da Parsley Seed giàu chất chống oxy
+          hóa của chúng tôi, phù hợp với mọi loại da.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {latestProducts.map((product, index) => (
+            <motion.div
+              key={product.id || index}
+              variants={fadeIn}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <span className="mr-2">View All Products</span>
-              <FaArrowRight size={14} />
-            </Link>
-          </motion.div>
+              <ProductCard
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                thumbnail={product.thumbnail}
+                tag={product.tag}
+                size={product.size}
+              />
+            </motion.div>
+          ))}
         </div>
-      </div>
+        <motion.div className="mt-8" whileHover={{ x: 10 }}>
+          <Link
+            to="/shop"
+            className="text-sm font-medium underline hover:text-black"
+          >
+            Tất cả sản phẩm →
+          </Link>
+        </motion.div>
+      </motion.div>
 
       {/* Banner Section */}
       <motion.div
@@ -179,7 +136,7 @@ const LandingPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${heroImg})`
+            backgroundImage: `url(${heroImg})`,
           }}
         ></div>
 
@@ -188,15 +145,16 @@ const LandingPage = () => {
 
         {/* Content */}
         <div className="relative flex flex-col items-start pt-12 max-w-4xl ml-12 mt-4 px-6 text-white">
-          <p className="text-sm uppercase tracking-wide mb-4">Revitalize Your Body</p>
+          <p className="text-sm uppercase tracking-wide mb-4">Làm Mới Cơ Thể</p>
           <h1 className="text-4xl font-semibold mb-6">
-            Effective Ingredients for Visible Results
+            Thành Phần Hiệu Quả Cho Kết Quả Rõ Rệt
           </h1>
           <p className="text-lg mb-8 leading-relaxed">
-            Our body products are rich in highly effective ingredients, achieve
-            visible results, firm the skin and leave it feeling soft and supple.
-            Fine textures that are quickly absorbed, non-greasy and in no way
-            inferior to facial care.
+            Các sản phẩm chăm sóc cơ thể của chúng tôi giàu thành phần hiệu quả
+            cao, mang lại kết quả có thể nhìn thấy, làm săn chắc da và để lại
+            cảm giác mềm mại, mịn màng. Kết cấu mỏng nhẹ thấm nhanh, không nhờn
+            rít và không hề thua kém các sản phẩm chăm sóc da mặt. Đã đến lúc
+            quan tâm đến cơ thể như cách chúng ta chăm sóc gương mặt.
           </p>
           <Link to="/shop">
             <motion.button
@@ -206,6 +164,13 @@ const LandingPage = () => {
               Discover More
             </motion.button>
           </Link>
+          <motion.button
+            className="bg-transparent border border-white text-white py-2 px-6 rounded-md hover:bg-white hover:text-black transition"
+            whileHover={{ scale: 1.1 }}
+            onClick={() => navigate("/blog")}
+          >
+            Tìm Hiểu Thêm
+          </motion.button>
         </div>
       </motion.div>
 
@@ -218,23 +183,30 @@ const LandingPage = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <h1 className="text-3xl font-light mb-6">Our Story</h1>
+            <h1 className="text-3xl font-light mb-6">
+              Câu Chuyện Của Chúng Tôi
+            </h1>
             <p className="text-gray-600 mb-6">
-              Our line features meticulous skin, face and body care
-              formulations, crafted with both efficacy and sensory delight in
-              focus.
+              Dòng sản phẩm của chúng tôi bao gồm các công thức chăm sóc da, mặt
+              và cơ thể tỉ mỉ, được tạo ra với trọng tâm là hiệu quả và trải
+              nghiệm cảm giác thư giãn.
             </p>
             <p className="text-gray-600 mb-8">
-              We are dedicated to creating top-quality skin, face and body care
-              products. We extensively research plant-based and lab-made
-              ingredients to ensure both safety and proven effectiveness.
+              Chúng tôi tận tâm tạo ra các sản phẩm chăm sóc da, mặt và cơ thể
+              chất lượng cao. Chúng tôi nghiên cứu kỹ lưỡng các thành phần từ
+              thực vật và phòng thí nghiệm để đảm bảo cả độ an toàn và hiệu quả
+              đã được chứng minh. Tại các cửa hàng đặc trưng của chúng tôi, các
+              chuyên viên tư vấn am hiểu luôn sẵn sàng giới thiệu về dòng sản
+              phẩm và hỗ trợ bạn trong việc lựa chọn.
             </p>
             <Link
               to="/about-us"
               className="inline-flex items-center text-black hover:opacity-75 transition-opacity"
             >
               <div className="border border-black px-8 py-4 flex items-center justify-between min-w-[300px]">
-                <span className="text-gray-700">Learn about our story</span>
+                <span className="text-gray-700">
+                  Cách tiếp cận sản phẩm của chúng tôi
+                </span>
                 <FaArrowRight className="ml-4" />
               </div>
             </Link>

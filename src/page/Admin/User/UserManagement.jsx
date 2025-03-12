@@ -1,130 +1,153 @@
-import { useState, useEffect } from 'react';
-import { Button, Input, Select, message } from 'antd';
-import { UserAddOutlined, SearchOutlined } from '@ant-design/icons';
-import TableUser from './UserComponent/TableUser';
-import AddUser from './UserComponent/AddUser';
+import React, { useEffect, useState } from "react";
+import { Table, Button, Space, Tooltip, Modal, Select } from "antd";
+import {
+  getUsersAdmin,
+  updateUserStatus,
+} from "../../../service/userManagement";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([
-    { username: 'taile03', fullname: 'Le Thanh Tai', email: 'taile03@gmail.com', phone: '0909 113 114', address: 'Thu Duc', points: 50, role: 'Admin' },
-    { username: 'phamhieu', fullname: 'Pham Van Tuan Hieu', email: 'phamhieu@gmail.com', phone: '0989 889 889', address: 'Long An', points: 50, role: 'Admin' }
-  ]);
-  
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [selectedRole, setSelectedRole] = useState('All');
-  
-  const roles = ['All', 'Admin', 'Staff', 'User'];
+  const [users, setUsers] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+  const navigate = useNavigate();
+
+  const fetchUsers = async (params = {}) => {
+    try {
+      setLoading(true);
+      const response = await getUsersAdmin(
+        params.page || pagination.current,
+        params.pageSize || pagination.pageSize
+      );
+
+      if (response && response.code === 200) {
+        setUsers(response.result.userResponses);
+        setPagination({
+          current: response.result.pageNumber + 1,
+          pageSize: response.result.pageSize,
+          total: response.result.totalElements,
+        });
+      } else {
+        toast.error("Failed to fetch users");
+      }
+    } catch (error) {
+      toast.error("Error loading users");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    filterUsers();
-  }, [searchText, selectedRole, users]);
+    fetchUsers();
+  }, []);
 
-  const filterUsers = () => {
-    let result = [...users];
-    
-    // Filter by search text
-    if (searchText) {
-      result = result.filter(user => 
-        user.username.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.fullname.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchText.toLowerCase())
-      );
+  const handleTableChange = (newPagination) => {
+    fetchUsers({
+      page: newPagination.current,
+      pageSize: newPagination.pageSize,
+    });
+  };
+
+  const handleStatusChange = async (userId, newStatus) => {
+    try {
+      setLoading(true);
+      const response = await updateUserStatus(userId, newStatus);
+      if (response && response.code === 200) {
+        toast.success("User status updated successfully!");
+        fetchUsers();
+      } else {
+        toast.error("Failed to update user status");
+      }
+    } catch (error) {
+      toast.error("Error updating user status");
+    } finally {
+      setLoading(false);
     }
-    
-    // Filter by role
-    if (selectedRole !== 'All') {
-      result = result.filter(user => user.role === selectedRole);
-    }
-    
-    setFilteredUsers(result);
   };
 
-  const handleEdit = (userData, index) => {
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const updatedUsers = [...users];
-      updatedUsers[index] = userData;
-      setUsers(updatedUsers);
-      setLoading(false);
-      message.success('Cập nhật người dùng thành công!');
-    }, 500);
-  };
-
-  const handleDelete = (index) => {
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const updatedUsers = users.filter((_, i) => i !== index);
-      setUsers(updatedUsers);
-      setLoading(false);
-      message.success('Xóa người dùng thành công!');
-    }, 500);
-  };
-
-  const handleAddUser = (newUser) => {
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setUsers([...users, newUser]);
-      setLoading(false);
-    }, 500);
-  };
+  const columns = [
+    {
+      title: "STT",
+      key: "index",
+      render: (_, __, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
+      width: 80,
+    },
+    {
+      title: "Avatar",
+      dataIndex: "avatar",
+      key: "avatar",
+      render: (avatar) =>
+        avatar ? (
+          <img
+            src={avatar}
+            alt="User avatar"
+            style={{ width: 40, height: 40, borderRadius: "50%" }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          "No avatar"
+        ),
+    },
+    {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (email) => email || "N/A",
+    },
+    {
+      title: "Full Name",
+      key: "fullName",
+      render: (_, record) => {
+        const firstName = record.firstName || "";
+        const lastName = record.lastName || "";
+        return firstName || lastName
+          ? `${firstName} ${lastName}`.trim()
+          : "N/A";
+      },
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+      render: (gender) => gender || "N/A",
+    },
+    {
+      title: "Role",
+      dataIndex: "roleName",
+      key: "roleName",
+    },
+  ];
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Quản lý người dùng</h2>
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex space-x-4">
-            <Input
-              placeholder="Tìm kiếm người dùng"
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 250 }}
-            />
-            <Select
-              value={selectedRole}
-              onChange={setSelectedRole}
-              style={{ width: 150 }}
-            >
-              {roles.map((role) => (
-                <Select.Option key={role} value={role}>
-                  {role}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setShowAddUser(true)}
-          >
-            Thêm người dùng
-          </Button>
-        </div>
-
-        <TableUser 
-          users={filteredUsers}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">User Management</h2>
       </div>
-      
-      {showAddUser && (
-        <AddUser 
-          onClose={() => setShowAddUser(false)} 
-          onAddUser={handleAddUser} 
-        />
-      )}
+      <Table
+        columns={columns}
+        dataSource={users}
+        rowKey="id"
+        pagination={pagination}
+        loading={loading}
+        onChange={handleTableChange}
+        onRow={(record) => ({
+          onClick: () => navigate(`/admin/users/${record.id}`),
+          style: { cursor: "pointer" },
+        })}
+      />
+      <ToastContainer />
     </div>
   );
 };

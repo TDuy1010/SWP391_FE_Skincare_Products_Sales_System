@@ -9,9 +9,9 @@ import LandingPage from "../page/Customer/LandingPage/LandingPage";
 import LoginModal from "../page/Customer/LoginPage/LoginPage";
 import AboutUsPage from "../page/Customer/AboutUsPage/AboutUsPage";
 import BlogPage from "../page/Customer/BlogPage/BlogPage";
-import BlogDetail from "../page/Customer/BlogPage/BlogDetail";  // Đảm bảo import đúng
+import BlogDetail from "../page/Customer/BlogPage/BlogDetail"; // Đảm bảo import đúng
 import CartPage from "../page/Customer/CartPage/CartPage";
-import ShopPagce from "../page/Customer/ShopPage/ShopPagce";
+import ShopPage from "../page/Customer/ShopPage/ShopPage";
 import ProductDetail from "../page/Customer/ProductPage/ProductDetail";
 import HelpPage from "../page/Customer/HelpPage/HelpPage";
 import Payment from "../page/Customer/PaymentPage/Payment";
@@ -27,14 +27,20 @@ import EditProduct from "../page/Admin/Product/EditProduct";
 import BrandManagement from "../page/Admin/Brand/BrandManagement";
 import EditBrand from "../page/Admin/Brand/EditBrand";
 import AddBrand from "../page/Admin/Brand/AddBrand";
-
+import ProductDetailAdmin from "../page/Admin/Product/ProductDetail";
 import EditBlog from "../page/Admin/Blog/EditBlog";
 import AddBlog from "../page/Admin/Blog/AddBlog";
 import BlogManagement from "../page/Admin/Blog/BlogManagement";
+import CategoryDetail from "../page/Admin/Category/CategoryDetail";
+import BrandDetail from "../page/Admin/Brand/BrandDetail";
+import VoucherManagement from "../page/Admin/Voucher/VoucherManagement";
+import AddNewVoucher from "../page/Admin/Voucher/AddNewVoucher";
+import EditVoucher from "../page/Admin/Voucher/EditVoucher";
+import OrderSuccess from "../components/Order/OrderSuccess";
+import OrderFailed from "../components/Order/OrderFailed";
+import OrderDetail from "../page/Admin/Order/OrderDetail";
 
 export const router = createBrowserRouter([
-  
-  
   //Customer
   {
     path: "/",
@@ -57,7 +63,7 @@ export const router = createBrowserRouter([
         element: <BlogPage />,
       },
       {
-        path: "/blog/:id",  // Thêm đường dẫn cho trang chi tiết blog
+        path: "/blog/:id", // Thêm đường dẫn cho trang chi tiết blog
         element: <BlogDetail />,
       },
       {
@@ -66,15 +72,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "/shop",
-        element: <ShopPagce />,
+        element: <ShopPage />,
       },
       {
         path: "/shop/category/:slug",
-        element: <ShopPagce />,
+        element: <ShopPage />,
       },
       {
         path: "/shop/brand/:slug",
-        element: <ShopPagce />,
+        element: <ShopPage />,
       },
       {
         path: "/product/:slug",
@@ -92,9 +98,17 @@ export const router = createBrowserRouter([
         path: "/profile",
         element: <ProfilePage />,
       },
+      {
+        path: "/order-success",
+        element: <OrderSuccess />,
+      },
+      {
+        path: "/order-failed",
+        element: <OrderFailed />,
+      },
     ],
   },
-  
+
   //Admin
   {
     path: "/admin/login",
@@ -128,21 +142,36 @@ export const router = createBrowserRouter([
             element: <OrderManagement />,
           },
           {
+            path: "order/:id",
+            element: <OrderDetail />,
+          },
+          {
             path: "product",
-            element: <ProductManagement />,
+            children: [
+              {
+                path: "",
+                element: <ProductManagement />,
+              },
+              {
+                path: "add",
+                element: <AddProduct />,
+              },
+              {
+                path: "edit/:id",
+                element: <EditProduct />,
+              },
+              {
+                path: "detail/:id",
+                element: <ProductDetailAdmin />,
+              },
+            ],
           },
-          {
-            path: "product/add",
-            element: <AddProduct />,
-          },
-          {
-            path: "product/edit/:id",
-            element: <EditProduct />,
-          },
+
           {
             path: "category",
             element: <CategoryManagement />,
           },
+
           {
             path: "category/edit/:id",
             element: <EditCategory />,
@@ -150,6 +179,10 @@ export const router = createBrowserRouter([
           {
             path: "category/add",
             element: <AddCategory />,
+          },
+          {
+            path: "category/detail/:id",
+            element: <CategoryDetail />,
           },
           {
             path: "brand",
@@ -164,6 +197,10 @@ export const router = createBrowserRouter([
             element: <AddBrand />,
           },
           {
+            path: "brand/detail/:id",
+            element: <BrandDetail />,
+          },
+          {
             path: "blog",
             element: <BlogManagement />,
           },
@@ -174,6 +211,18 @@ export const router = createBrowserRouter([
           {
             path: "blog/add",
             element: <AddBlog />,
+          },
+          {
+            path: "vouchers",
+            element: <VoucherManagement />,
+          },
+          {
+            path: "vouchers/add",
+            element: <AddNewVoucher />,
+          },
+          {
+            path: "vouchers/edit/:id",
+            element: <EditVoucher />,
           },
         ],
       },

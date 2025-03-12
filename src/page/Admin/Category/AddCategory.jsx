@@ -1,22 +1,48 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Modal, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, message, Upload } from "antd";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { addCategory } from "../../../service/category/index";
-import { toast, ToastContainer } from "react-toastify";
-import { Editor } from "@tinymce/tinymce-react";
-import { div } from "framer-motion/client";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
-const AddCategory = ({ visible, onCancel, onSuccess }) => {
+const AddCategory = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [description, setDescription] = useState("");
+  const [editorContent, setEditorContent] = useState("");
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "link",
+    "image",
+  ];
 
   const onFinish = async (values) => {
-    if (values.name && values.description && values.thumbnail?.length > 0) {
+    if (values.name && editorContent && values.thumbnail?.length > 0) {
       try {
         setLoading(true);
         const formData = new FormData();
-
         const file = values.thumbnail[0].originFileObj;
 
         if (!file) {
@@ -24,26 +50,48 @@ const AddCategory = ({ visible, onCancel, onSuccess }) => {
           return;
         }
 
-        formData.append(
-          "request",
-          JSON.stringify({ name: values.name, description: values.description })
-        );
+        const cleanDescription = editorContent
+          .replace(/<p><br><\/p>/g, "")
+          .trim();
+
+        if (cleanDescription.length < 10) {
+          toast.error("Description must be at least 10 characters");
+          return;
+        }
+
+        const requestData = {
+          name: values.name.trim(),
+          description: cleanDescription,
+          status: 1,
+        };
+
+        console.log("Sending data:", requestData);
+
+        formData.append("request", JSON.stringify(requestData));
         formData.append("thumbnail", file);
 
         const response = await addCategory(formData);
+        console.log("Server response:", response);
+
         if (!response.error) {
-          onSuccess(response.message);
-          form.resetFields();
-          onCancel();
+          navigate("/admin/category", {
+            state: { message: response.message, type: "success" },
+          });
         } else {
-          toast.error(response.message);
+          toast.error(response.message || "Failed to add category");
         }
       } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to add category");
+        console.error("Error details:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+        });
+        toast.error(error.response?.data?.message || "Failed to add category");
       } finally {
         setLoading(false);
       }
+    } else {
+      toast.error("Please fill in all required fields");
     }
   };
 
@@ -55,111 +103,120 @@ const AddCategory = ({ visible, onCancel, onSuccess }) => {
   };
 
   return (
-    <div>
-      <ToastContainer/>
-      <Modal
-      title="Add New Category"
-      open={visible}
-      onCancel={onCancel}
-      footer={null}
-      width={800}
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        autoComplete="off"
-        className="space-y-4"
-      >
-        <Form.Item
-          name="name"
-          label="Category Name"
-          rules={[
-            { required: true, message: "Please enter category name" },
-            { min: 3, message: "Name must be at least 3 characters" },
-          ]}
+    <div className="flex flex-col items-center min-h-screen bg-gray-50 p-6">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="w-full max-w-6xl">
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/admin/category")}
+          className="mb-4 hover:bg-gray-100"
         >
-          <Input
-            placeholder="Enter category name"
-            className="h-10 text-base"
-          />
-        </Form.Item>
+          Back to Categories
+        </Button>
 
-        <Form.Item
-          label={<span className="text-gray-700 font-medium">Description</span>}
-          name="description"
-          rules={[
-            { required: true, message: "Please enter description" },
-            {
-              validator: (_, value) => {
-                const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
-                return textContent.length >= 10
-                  ? Promise.resolve()
-                  : Promise.reject(new Error("Description must be at least 10 characters"));
-              },
-            },
-          ]}
+        <Card
+          title="Add New Category"
+          className="w-full shadow-md"
+          headStyle={{
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            borderBottom: "2px solid #f0f0f0",
+          }}
         >
-          <div className="rounded-md p-2">
-            <Editor
-              apiKey="ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn"
-              value={description}
-              onEditorChange={(content) => {
-                setDescription(content);
-                form.setFieldsValue({ description: content }); 
-                form.validateFields(["description"]); 
-              }}
-              init={{
-                height: 250,
-                menubar: false,
-                plugins: [
-                  "advlist autolink lists link image charmap print preview anchor",
-                  "searchreplace visualblocks code fullscreen",
-                  "insertdatetime media table paste code help wordcount",
-                ],
-                toolbar:
-                  "undo redo | formatselect | bold italic backcolor | \
-                  alignleft aligncenter alignright alignjustify | \
-                  bullist numlist outdent indent | removeformat | help",
-                content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
-              }}
-              className="w-full"
-            />
-          </div>
-        </Form.Item>
-
-        <Form.Item
-          name="thumbnail"
-          label="Thumbnail"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-          rules={[{ required: true, message: "Please upload an image" }]}
-        >
-          <Upload
-            beforeUpload={() => false}
-            maxCount={1}
-            accept="image/*"
-            listType="picture"
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            autoComplete="off"
+            className="space-y-4"
           >
-            <Button icon={<UploadOutlined />}>Select Image</Button>
-          </Upload>
-        </Form.Item>
+            <Form.Item
+              name="name"
+              label="Category Name"
+              rules={[
+                { required: true, message: "Please enter category name" },
+                { min: 3, message: "Name must be at least 3 characters" },
+                { whitespace: true, message: "Name cannot be empty" },
+              ]}
+            >
+              <Input
+                placeholder="Enter category name"
+                className="h-10 text-base"
+                maxLength={100}
+              />
+            </Form.Item>
 
-        <Form.Item className="flex justify-end mb-0">
-          <Button onClick={onCancel} className="mr-2 h-10 px-8 text-base font-medium">
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            className="h-10 px-8 text-base font-medium"
-          >
-            Add Category
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+            <Form.Item
+              name="description"
+              label="Description"
+              rules={[
+                { required: true, message: "Please enter description" },
+                {
+                  validator: (_, value) => {
+                    if (!editorContent || editorContent.trim().length < 10) {
+                      return Promise.reject(
+                        "Description must be at least 10 characters"
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <ReactQuill
+                theme="snow"
+                value={editorContent}
+                onChange={(content) => {
+                  setEditorContent(content);
+                  form.setFieldsValue({ description: content });
+                }}
+                modules={modules}
+                formats={formats}
+                style={{ height: "300px", marginBottom: "50px" }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="thumbnail"
+              label="Thumbnail"
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+              rules={[{ required: true, message: "Please upload an image" }]}
+            >
+              <Upload
+                beforeUpload={() => false}
+                maxCount={1}
+                accept="image/*"
+                listType="picture"
+              >
+                <Button icon={<UploadOutlined />}>Select Image</Button>
+              </Upload>
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="h-10 px-8 text-base font-medium"
+              >
+                Add Category
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
     </div>
   );
 };

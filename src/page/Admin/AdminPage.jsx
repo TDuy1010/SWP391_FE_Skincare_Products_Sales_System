@@ -10,13 +10,10 @@ const { Content } = Layout;
 const AdminPage = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const adminUser = JSON.parse(localStorage.getItem("adminUser"));
-
-  console.log("AdminPage Rendered, User:", adminUser); // ✅ Kiểm tra user có load đúng không
 
   const handleLogout = async () => {
     try {
-      const token = adminUser?.token;
+      const token = localStorage.getItem("token");
       if (token) {
         const response = await logout(token);
         if (!response.error) {
@@ -60,12 +57,11 @@ const AdminPage = () => {
         <AdminHeader
           collapsed={collapsed}
           toggleCollapsed={toggleCollapsed}
-          adminUser={adminUser}
-          style={{ 
+          style={{
             position: "sticky",
             top: 0,
             zIndex: 1,
-            width: "100%"
+            width: "100%",
           }}
         />
         <Content

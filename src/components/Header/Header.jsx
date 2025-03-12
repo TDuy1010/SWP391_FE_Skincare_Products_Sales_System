@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import LoginModal from "../../page/Customer/LoginPage/LoginPage";
 import ShopDropdown from "./ShopDropdown";
 import { FiUser } from "react-icons/fi";
-import { logout } from "../../service/logout/index";
+import { logout } from "../../service/logout";
 import { getCart } from "../../service/cart/cart";
 
 const Header = () => {
@@ -24,6 +24,7 @@ const Header = () => {
   const [user, setUser] = useState(null);
   const menuRef = useRef(null);
   const [cartCount, setCartCount] = useState(0);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("username");
@@ -58,13 +59,6 @@ const Header = () => {
 
     fetchCartCount();
   }, [user]); // Re-fetch when user changes
-
-  const handleSearch = () => {
-    if (searchValue.trim()) {
-      console.log(`Searching for: ${searchValue}`);
-      // Ví dụ: window.location.href = `/search?query=${searchValue}`;
-    }
-  };
 
   const handleClickOutside = (event) => {
     if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -142,7 +136,9 @@ const Header = () => {
       if (response?.code === 200) {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
-        window.location.reload();
+        setUser(null);
+        setShowUserMenu(false);
+        window.location.href = "/"; // Redirect to home page
       } else {
         setError(response.message);
       }
@@ -150,8 +146,6 @@ const Header = () => {
       console.error("Logout failed:", err);
       setError("Logout failed");
     }
-    setUser(null);
-    setShowUserMenu(false);
   };
 
   const handleProfileClick = () => {
@@ -175,9 +169,9 @@ const Header = () => {
                 <button
                   ref={shopButtonRef}
                   onClick={handleShopClick}
-                  className="relative px-6 py-5 h-16 hover:text-black hover:bg-gray-100 transition-colors duration-200 text-gray-700 group"
+                  className="relative px-4 py-5 h-16 hover:text-black hover:bg-gray-100 transition-colors duration-200 text-gray-700 group whitespace-nowrap"
                 >
-                  Shop
+                  Cửa hàng
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </button>
                 <ShopDropdown
@@ -190,9 +184,9 @@ const Header = () => {
               <div className="relative group">
                 <Link
                   to="/about-us"
-                  className="relative px-6 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block"
+                  className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
                 >
-                  About Us
+                  Về chúng tôi
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>
               </div>
@@ -200,9 +194,9 @@ const Header = () => {
               <div className="relative group">
                 <Link
                   to="/blog"
-                  className="relative px-6 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block"
+                  className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
                 >
-                  Blogs
+                  Bảng tin
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>
               </div>
@@ -210,9 +204,19 @@ const Header = () => {
               <div className="relative group">
                 <Link
                   to="/helps"
-                  className="relative px-6 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block"
+                  className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
                 >
-                  Helps
+                  Hỗ trợ
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
+                </Link>
+              </div>
+
+              <div className="relative group">
+                <Link
+                  to="/skinquiz"
+                  className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
+                >
+                  Xác định loại da
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>
               </div>
@@ -228,38 +232,14 @@ const Header = () => {
 
             {/* Right Section: Icons */}
             <div className="flex-1 flex items-center justify-end">
-              {/* Search Icon */}
-              <div className="relative group" ref={searchRef}>
-                {showSearch ? (
-                  <div className="flex items-center w-full border-b border-gray-400">
-                    <input
-                      type="text"
-                      className="w-full text-sm border-none focus:ring-0 outline-none placeholder-gray-400"
-                      placeholder="Search..."
-                      value={searchValue}
-                      onChange={(e) => setSearchValue(e.target.value)}
-                    />
-                    <button
-                      className="ml-2 text-gray-500 hover:text-black transition-colors"
-                      onClick={handleSearch}
-                    >
-                      <FaArrowRightLong size={16} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="relative h-16 px-4 flex items-center hover:bg-gray-100 transition-colors duration-200">
-                    <FiSearch
-                      size={20}
-                      className="cursor-pointer text-gray-700 hover:text-black transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSearch(true);
-                      }}
-                    />
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                  </div>
-                )}
-              </div>
+              {/* Consultation button */}
+              {user ? (
+                <div className="mr-6">
+                  <button className="border border-black rounded-md border-radius px-4 py-3 text-black font-medium hover:bg-zinc-200 hover:text-gray-800 transition duration-300 ease-in-out shadow-lg hover:shadow-xl">
+                    <Link to="/skin-consultation">Tư vấn</Link>
+                  </button>
+                </div>
+              ) : null}
 
               {/* Wishlist Link */}
               <div className="relative group">
@@ -296,13 +276,13 @@ const Header = () => {
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={handleProfileClick}
                         >
-                          Profile
+                          Thông tin cá nhân
                         </Link>
                         <button
                           onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          Logout
+                          Đăng xuất
                         </button>
                       </div>
                     )}
@@ -312,7 +292,7 @@ const Header = () => {
                     onClick={() => setShowLoginModal(true)}
                     className="relative h-16 px-4 flex items-center hover:bg-gray-100 transition-colors duration-200 text-sm font-medium text-gray-700 hover:text-black"
                   >
-                    Login
+                    Đăng nhập
                   </button>
                 )}
               </div>
@@ -346,7 +326,7 @@ const Header = () => {
               Menu
             </button>
             <Link to="/shop" className="text-sm font-medium hover:text-black">
-              Shop
+              Cửa hàng
             </Link>
           </div>
         </div>

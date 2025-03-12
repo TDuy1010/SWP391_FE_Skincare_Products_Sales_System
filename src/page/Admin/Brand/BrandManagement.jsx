@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal, Tag, Switch, Spin } from "antd";
+import { Table, Button, Space, Tooltip, Modal, Tag, Switch, Input } from "antd";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { FaEye } from "react-icons/fa";
 import {
-  getAllBrands,
-  deleteBrand,
-} from "../../../service/brand/index";
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
+import { getAllBrands, deleteBrand } from "../../../service/brand/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AddBrand from './AddBrand';
-import EditBrand from './EditBrand';
 
 const BrandManagement = () => {
   const navigate = useNavigate();
@@ -23,24 +22,26 @@ const BrandManagement = () => {
   });
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [editingBrand, setEditingBrand] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [selectedDetail, setSelectedDetail] = useState("");
-
-  const showDetail = (brand) => {
-    setSelectedDetail(brand.description);
-    setDetailModalVisible(true);
-  };
+  const [filters, setFilters] = useState({
+    keyword: "",
+    sortBy: "",
+    order: "",
+  });
 
   const fetchBrands = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await getAllBrands({
-        page: params.page - 1 || 0,
+      const queryParams = {
+        page: params.page !== undefined ? params.page - 1 : 0,
         size: params.pageSize || 10,
-      });
+      };
+
+      if (params.keyword) queryParams.keyword = params.keyword;
+      if (params.sortBy) queryParams.sortBy = params.sortBy;
+      if (params.order) queryParams.order = params.order;
+
+      const response = await getAllBrands(queryParams);
 
       if (!response.error) {
         setBrands(response.result.brandResponses);
@@ -77,11 +78,19 @@ const BrandManagement = () => {
     fetchBrands();
   }, []);
 
-  const handleTableChange = (newPagination) => {
-    fetchBrands({
+  const handleTableChange = (newPagination, tableFilters, sorter) => {
+    const params = {
+      ...filters,
       page: newPagination.current,
       pageSize: newPagination.pageSize,
-    });
+    };
+
+    if (sorter.field) {
+      params.sortBy = sorter.field;
+      params.order = sorter.order ? sorter.order.replace("end", "") : undefined;
+    }
+
+    fetchBrands(params);
   };
 
   const showDeleteConfirm = (brand) => {
@@ -136,32 +145,6 @@ const BrandManagement = () => {
     }
   };
 
-  const handleEditBrand = (brand) => {
-    setEditingBrand(brand);
-    setIsEditModalVisible(true);
-  };
-  
-  const handleEditCancel = () => {
-    setIsEditModalVisible(false);
-    setEditingBrand(null);
-  };
-  
-  const handleEditSuccess = (message) => {
-    fetchBrands();
-    toast.success(message);
-    setIsEditModalVisible(false);
-  };
-
-  const showAddModal = () => {
-    setIsAddModalVisible(true);
-  };
-
-  const handleAddSuccess = (message) => {
-    fetchBrands();
-    toast.success(message);
-    setIsAddModalVisible(false);
-  };
-
   const columns = [
     {
       title: "Image",
@@ -179,27 +162,25 @@ const BrandManagement = () => {
       title: "Brand Name",
       dataIndex: "name",
       key: "name",
+      sorter: true,
     },
-    {
-      title: "Description",
-      key: "details",
-      render: (_, record) => (
-        <Button type="link" onClick={() => showDetail(record)}>
-          <FaEye />
-        </Button>
-      ),
-    },
-    
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
         <Space>
+          <Tooltip title="Details">
+            <Button
+              type="default"
+              icon={<InfoCircleOutlined />}
+              onClick={() => navigate(`/admin/brand/detail/${record.id}`)}
+            />
+          </Tooltip>
           <Tooltip title="Edit">
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => handleEditBrand(record)}
+              onClick={() => navigate(`/admin/brand/edit/${record.id}`)}
             />
           </Tooltip>
           <Tooltip title="Delete">
@@ -220,38 +201,41 @@ const BrandManagement = () => {
         <h2 className="text-2xl font-bold">Brand Management</h2>
         <Button
           type="primary"
-          onClick={showAddModal}
-          className="mb-4"
           icon={<PlusOutlined />}
+          onClick={() => navigate("/admin/brand/add")}
         >
           Add New Brand
         </Button>
       </div>
-      <div className="shadow-md rounded-lg bg-white relative">
-        
-          <Table
-            columns={columns}
-            dataSource={brands}
-            rowKey="id"
-            pagination={pagination}
-            loading={false} // Tắt loading mặc định của Table
-            onChange={handleTableChange}
-            className="w-full"
-          />
-       
+      <div className="mb-4">
+        <Input.Search
+          placeholder="Search by brand name"
+          onSearch={(value) => {
+            const params = {
+              page: pagination.current,
+              pageSize: pagination.pageSize,
+              keyword: value,
+            };
+            fetchBrands(params);
+          }}
+          style={{ width: 300 }}
+          allowClear
+        />
       </div>
-      <Modal
-        title="Brand Details"
-        open={detailModalVisible}
-        onCancel={() => setDetailModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setDetailModalVisible(false)}>
-            Close
-          </Button>,
-        ]}
-      >
-        <p>{selectedDetail}</p>
-      </Modal>
+      <Table
+        columns={columns}
+        dataSource={brands}
+        rowKey="id"
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
+          pageSizeOptions: ["10", "20", "50", "100"],
+        }}
+        loading={loading}
+        onChange={handleTableChange}
+      />
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -267,18 +251,7 @@ const BrandManagement = () => {
         <p>Are you sure you want to delete brand "{selectedBrand?.name}"?</p>
         <p>This action cannot be undone.</p>
       </Modal>
-      <AddBrand
-        visible={isAddModalVisible}
-        onCancel={() => setIsAddModalVisible(false)}
-        onSuccess={handleAddSuccess}
-      />
       <ToastContainer />
-      <EditBrand
-        visible={isEditModalVisible}
-        onCancel={handleEditCancel}
-        brandData={editingBrand}
-        onSuccess={handleEditSuccess}
-      />
     </div>
   );
 };

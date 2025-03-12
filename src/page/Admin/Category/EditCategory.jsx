@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Select, Spin, Upload, Modal } from "antd";
+import { Form, Input, Button, Card, Spin, Upload } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -9,31 +9,45 @@ import {
 } from "../../../service/category/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Editor } from "@tinymce/tinymce-react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
-const EditCategory = ({ visible, onCancel, onSuccess, categoryData }) => {
+const EditCategory = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [currentThumbnail, setCurrentThumbnail] = useState("");
-  const [description, setDescription] = useState("");
+  const [editorContent, setEditorContent] = useState("");
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "link",
+    "image",
+  ];
 
   useEffect(() => {
     fetchCategoryDetails();
   }, [id]);
-
-  useEffect(() => {
-    if (categoryData) {
-      form.setFieldsValue({
-        name: categoryData.name,
-        description: categoryData.description,
-      });
-      setCurrentThumbnail(categoryData.thumbnail);
-      setDescription(categoryData.description);
-    }
-  }, [categoryData]);
 
   const fetchCategoryDetails = async () => {
     try {
@@ -43,19 +57,14 @@ const EditCategory = ({ visible, onCancel, onSuccess, categoryData }) => {
           name: response.result.name,
           description: response.result.description,
         });
+        setEditorContent(response.result.description);
         setCurrentThumbnail(response.result.thumbnail);
       } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.error(response.message);
         navigate("/admin/category");
       }
     } catch (error) {
-      toast.error("Failed to fetch category details", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Failed to fetch category details");
       navigate("/admin/category");
     } finally {
       setInitialLoading(false);
@@ -74,42 +83,27 @@ const EditCategory = ({ visible, onCancel, onSuccess, categoryData }) => {
       setLoading(true);
       let thumbnailUrl = currentThumbnail;
 
-      // Nếu có file ảnh mới được upload
       if (values.thumbnail?.length > 0) {
         const file = values.thumbnail[0].originFileObj;
-        const formData = new FormData();
-        formData.append("file", file);
         thumbnailUrl = await uploadToCloudinary(file);
       }
 
       const updateData = {
-        ...values,
+        name: values.name,
+        description: editorContent,
         thumbnail: thumbnailUrl,
       };
 
-      const response = await updateCategory(categoryData.id, updateData);
+      const response = await updateCategory(id, updateData);
 
       if (!response.error) {
         navigate("/admin/category");
-        toast.success("Category updated successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.success("Category updated successfully!");
       } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Failed to update category", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Failed to update category");
     } finally {
       setLoading(false);
     }
@@ -124,138 +118,121 @@ const EditCategory = ({ visible, onCancel, onSuccess, categoryData }) => {
   }
 
   return (
-    <div>
-      <ToastContainer />
-      <Modal
-      title="Edit Category"
-      open={visible}
-      onCancel={onCancel}
-      footer={null}
-      width={800}
-      >
-      <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            autoComplete="off"
-            className="space-y-4"
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <div className="flex flex-col items-center min-h-screen bg-gray-50 p-6">
+        <div className="w-full max-w-6xl">
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/admin/category")}
+            className="mb-4 hover:bg-gray-100"
           >
+            Back to Categories
+          </Button>
 
-                <Form.Item
-                  name="name"
-                  label={<span className="text-gray-700 font-medium">Category Name</span>}
-                  rules={[
-                    { required: true, message: "Please enter category name" },
-                    { min: 3, message: "Name must be at least 3 characters" },
-                  ]}
-                >
-                  <Input 
-                    placeholder="Enter category name"
-                    className="rounded-md"
-                  />
-                </Form.Item>
+          <Card
+            title="Edit Category"
+            className="w-full shadow-md"
+            headStyle={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              borderBottom: "2px solid #f0f0f0",
+            }}
+          >
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              autoComplete="off"
+            >
+              <Form.Item
+                name="name"
+                label="Category Name"
+                rules={[
+                  { required: true, message: "Please enter category name" },
+                  { min: 3, message: "Name must be at least 3 characters" },
+                ]}
+              >
+                <Input placeholder="Enter category name" />
+              </Form.Item>
 
-                <Form.Item
-  label={<span className="text-gray-700 font-medium">Description</span>}
-  name="description"
-  rules={[
-    { required: true, message: "Please enter description" },
-    {
-      validator: (_, value) => {
-        const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
-        return textContent.length >= 10
-          ? Promise.resolve()
-          : Promise.reject(new Error("Description must be at least 10 characters"));
-      },
-    },
-  ]}
->
-  <div className="rounded-md p-2">
-    <Editor
-      apiKey="ytrevybtd39tq9vrjvg8k0wxog5pd59dbv7v9me7xwz43rkn"
-      value={description}
-      onEditorChange={(content) => {
-        setDescription(content);
-        form.setFieldsValue({ description: content }); 
-        form.validateFields(["description"]); 
-      }}
-      init={{
-        height: 250,
-        menubar: false,
-        plugins: [
-          "advlist autolink lists link image charmap print preview anchor",
-          "searchreplace visualblocks code fullscreen",
-          "insertdatetime media table paste code help wordcount",
-        ],
-        toolbar:
-          "undo redo | formatselect | bold italic backcolor | \
-          alignleft aligncenter alignright alignjustify | \
-          bullist numlist outdent indent | removeformat | help",
-        content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
-      }}
-      className="w-full"
-    />
-  </div>
-</Form.Item>
-            <div className=" pt-2 mt-6">
-              <div className="mb-6">
-                <h3 className="text-gray-700 font-medium mb-4">Category Image</h3>
+              <Form.Item
+                name="description"
+                label="Description"
+                rules={[
+                  { required: true, message: "Please enter description" },
+                  {
+                    validator: (_, value) => {
+                      if (!editorContent || editorContent.trim().length < 10) {
+                        return Promise.reject(
+                          "Description must be at least 10 characters"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
+              >
+                <ReactQuill
+                  theme="snow"
+                  value={editorContent}
+                  onChange={(content) => {
+                    setEditorContent(content);
+                    form.setFieldsValue({ description: content });
+                  }}
+                  modules={modules}
+                  formats={formats}
+                  style={{ height: "300px", marginBottom: "50px" }}
+                />
+              </Form.Item>
+
+              <Form.Item label="Current Thumbnail">
                 {currentThumbnail && (
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-2">Current Image:</p>
-                    <img
-                      src={currentThumbnail}
-                      alt="Current thumbnail"
-                      className="max-w-xs rounded-lg shadow-sm"
-                      style={{ maxHeight: "200px" }}
-                    />
-                  </div>
+                  <img
+                    src={currentThumbnail}
+                    alt="Current thumbnail"
+                    className="max-w-xs mb-4"
+                    style={{ maxHeight: "200px" }}
+                  />
                 )}
-              </div>
+              </Form.Item>
 
               <Form.Item
                 name="thumbnail"
+                label="New Thumbnail"
                 valuePropName="fileList"
                 getValueFromEvent={normFile}
-                rules={[{ required: true, message: "Please upload an image" }]}
               >
                 <Upload
                   beforeUpload={() => false}
                   maxCount={1}
                   accept="image/*"
                   listType="picture"
-                  className="upload-list-inline"
                 >
-                  <Button 
-                    icon={<UploadOutlined />}
-                    className="rounded-md hover:bg-gray-50 border-dashed"
-                  >
-                    Upload New Image
-                  </Button>
+                  <Button icon={<UploadOutlined />}>Upload New Image</Button>
                 </Upload>
               </Form.Item>
-            </div>
 
-            <div className="flex justify-end">
-              <Button 
-                onClick={onCancel}
-                className="mr-2 h-10 px-8 text-base font-medium"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={loading}
-                className="h-10 px-8 text-base font-medium rounded-md px-8 bg-blue-600 hover:bg-blue-700"
-              >
-                Update Category
-              </Button>
-            </div>
-          </Form>
-      </Modal>
-     
-    </div>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Update Category
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
+        </div>
+      </div>
+    </>
   );
 };
 
