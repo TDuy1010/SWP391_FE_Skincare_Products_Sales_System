@@ -379,4 +379,3 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
-D;
