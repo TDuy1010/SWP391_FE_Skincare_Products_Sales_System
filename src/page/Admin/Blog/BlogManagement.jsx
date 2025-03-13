@@ -1,16 +1,58 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal } from "antd";
+import { Button, Space, Modal, Input } from "antd";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { FaEye } from "react-icons/fa";
+import { PlusOutlined } from "@ant-design/icons";
 import {
   getAllBlogs,
   deleteBlog,
+  changeBlogStatus,
 } from "../../../service/blog/index";
-import { ToastContainer, toast } from "react-toastify";
+import AddBlog from "./AddBlog";
+import EditBlog from "./EditBlog";
+import BlogTable from "./BlogTable";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AddBlog from './AddBlog';
-import EditBlog from './EditBlog';
+
+// Hàm hiển thị toast với ID duy nhất để tránh lặp lại
+const showToast = (type, message, options = {}) => {
+  // Đóng tất cả toast hiện tại trước khi hiển thị toast mới
+  toast.dismiss();
+  
+  // Hiển thị toast mới với ID duy nhất
+  const toastId = `toast-${Date.now()}`;
+  
+  const defaultOptions = {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    toastId: toastId,
+    ...options
+  };
+  
+  switch (type) {
+    case "success":
+      toast.success(message, defaultOptions);
+      break;
+    case "error":
+      toast.error(message, defaultOptions);
+      break;
+    case "warning":
+      toast.warning(message, defaultOptions);
+      break;
+    case "info":
+      toast.info(message, defaultOptions);
+      break;
+    default:
+      toast(message, defaultOptions);
+  }
+  
+  return toastId;
+};
 
 const BlogManagement = () => {
   const navigate = useNavigate();
@@ -26,48 +68,41 @@ const BlogManagement = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [selectedDetail, setSelectedDetail] = useState("");
-
-  const showDetail = (blog) => {
-    setSelectedDetail(blog.contents.join("\n\n"));
-    setDetailModalVisible(true);
-  };
+  const [filters, setFilters] = useState({
+    keyword: "",
+  });
 
   const fetchBlogs = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await getAllBlogs({
-        page: params.page - 1 || 0,
+      const queryParams = {
+        page: params.page !== undefined ? params.page - 1 : 0,
         size: params.pageSize || 10,
-      });
+      };
+
+      if (params.keyword) queryParams.keyword = params.keyword;
+
+      const response = await getAllBlogs(queryParams);
 
       if (!response.error) {
-        setBlogs(response.result.blogResponses);
+        const blogData = response.result.content || [];
+        const processedBlogs = blogData.map((blog) => ({
+          ...blog,
+          thumbnails: blog.thumbnails || [],
+        }));
+
+        setBlogs(processedBlogs);
         setPagination({
-          current: response.result.pageNumber + 1,
-          pageSize: response.result.pageSize,
-          total: response.result.totalElements,
+          current: (response.result.pageNumber || 0) + 1,
+          pageSize: response.result.pageSize || 10,
+          total: response.result.totalElements || 0,
         });
       } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        showToast("error", response.message);
       }
     } catch (error) {
-      toast.error("Failed to fetch blogs", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      console.error("Fetch blogs error:", error);
+      showToast("error", "Không thể tải danh sách blog");
     } finally {
       setLoading(false);
     }
@@ -77,11 +112,19 @@ const BlogManagement = () => {
     fetchBlogs();
   }, []);
 
-  const handleTableChange = (newPagination) => {
-    fetchBlogs({
+  const handleTableChange = (newPagination, tableFilters, sorter) => {
+    const params = {
+      ...filters,
       page: newPagination.current,
       pageSize: newPagination.pageSize,
-    });
+    };
+
+    if (sorter.field) {
+      params.sortBy = sorter.field;
+      params.order = sorter.order ? sorter.order.replace("end", "") : undefined;
+    }
+
+    fetchBlogs(params);
   };
 
   const showDeleteConfirm = (blog) => {
@@ -101,34 +144,13 @@ const BlogManagement = () => {
           page: pagination.current,
           pageSize: pagination.pageSize,
         });
-        toast.success("Blog deleted successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        showToast("success", "Xóa blog thành công");
       } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        showToast("error", response.message);
       }
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("Failed to delete blog", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      showToast("error", "Không thể xóa blog");
     } finally {
       setLoading(false);
       setDeleteModalVisible(false);
@@ -146,9 +168,9 @@ const BlogManagement = () => {
     setEditingBlog(null);
   };
   
-  const handleEditSuccess = (message) => {
+  const handleEditSuccess = (msg) => {
     fetchBlogs();
-    toast.success(message);
+    showToast("success", msg || "Cập nhật blog thành công");
     setIsEditModalVisible(false);
   };
 
@@ -156,71 +178,45 @@ const BlogManagement = () => {
     setIsAddModalVisible(true);
   };
 
-  const handleAddSuccess = (message) => {
-    toast.success(message);
+  const handleAddSuccess = (msg) => {
+    fetchBlogs();
+    showToast("success", msg || "Thêm blog thành công");
+    setIsAddModalVisible(false);
   };
 
-  const columns = [
-    {
-      title: "Image",
-      dataIndex: "thumbnails",
-      key: "image",
-      render: (thumbnails) => (
-        <div className="flex flex-wrap">
-          {thumbnails.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt="blog"
-              className="w-16 h-16 object-cover rounded m-1"
-              style={{ flexBasis: "calc(33.33% - 8px)" }}
-            />
-          ))}
-        </div>
-      ),
-    },
-    {
-      title: "Blog Title",
-      dataIndex: "title",
-      key: "title",
-    },
-    {
-      title: "Author",
-      dataIndex: "author",
-      key: "author",
-    },
-    {
-      title: "Content",
-      key: "details",
-      render: (_, record) => (
-        <Button type="link" onClick={() => showDetail(record)}>
-          <FaEye />
-        </Button>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="Edit">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => handleEditBlog(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => showDeleteConfirm(record)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
+  const handleStatusChange = async (checked, record) => {
+    try {
+      setLoading(true);
+      const newStatus = checked ? "ACTIVE" : "INACTIVE";
+      const response = await changeBlogStatus(record.id, newStatus);
+
+      if (!response.error) {
+        showToast("success", "Thay đổi trạng thái blog thành công");
+        // Refresh trang hiện tại
+        fetchBlogs({
+          page: pagination.current,
+          pageSize: pagination.pageSize,
+        });
+      } else {
+        showToast("error", response.message);
+        // Revert lại trạng thái switch nếu có lỗi
+        record.status = !checked ? "ACTIVE" : "INACTIVE";
+        
+        if (response.message.includes("đăng nhập lại")) {
+          localStorage.removeItem("token");
+          navigate("/login");
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Status change error:", error);
+      showToast("error", "Có lỗi xảy ra khi thay đổi trạng thái blog");
+      // Revert lại trạng thái switch nếu có lỗi
+      record.status = !checked ? "ACTIVE" : "INACTIVE";
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -228,36 +224,22 @@ const BlogManagement = () => {
         <h2 className="text-2xl font-bold">Blog Management</h2>
         <Button
           type="primary"
+          icon={<PlusOutlined />}
           onClick={showAddModal}
-          className="mb-4"
         >
           Add New Blog
         </Button>
       </div>
-      <div className="shadow-md rounded-lg bg-white">
-        <Table
-          columns={columns}
-          dataSource={blogs}
-          rowKey="id"
-          pagination={pagination}
-          loading={loading}
-          onChange={handleTableChange}
-        />
-      </div>
-      <Modal
-        title="Blog Details"
-        open={detailModalVisible}
-        onCancel={() => setDetailModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setDetailModalVisible(false)}>
-            Close
-          </Button>,
-        ]}
-      >
-        {selectedDetail.split("\n\n").map((content, index) => (
-          <p key={index}>{content}</p>
-        ))}
-      </Modal>
+      <BlogTable
+        blogs={blogs}
+        loading={loading}
+        pagination={pagination}
+        onTableChange={handleTableChange}
+        onStatusChange={handleStatusChange}
+        onEditBlog={handleEditBlog}
+        onDeleteBlog={showDeleteConfirm}
+        onViewDetail={(id) => navigate(`/admin/blog/detail/${id}`)}
+      />
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -277,13 +259,30 @@ const BlogManagement = () => {
         visible={isAddModalVisible}
         onCancel={() => setIsAddModalVisible(false)}
         onSuccess={handleAddSuccess}
+        showToast={showToast}
       />
-      <ToastContainer />
       <EditBlog
         visible={isEditModalVisible}
         onCancel={handleEditCancel}
         blogData={editingBlog}
         onSuccess={handleEditSuccess}
+        showToast={showToast}
+      />
+      
+      {/* Cấu hình ToastContainer */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+        limit={1}
+        style={{ zIndex: 9999 }}
       />
     </div>
   );

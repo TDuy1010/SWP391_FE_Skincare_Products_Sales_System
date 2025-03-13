@@ -9,7 +9,8 @@ import LandingPage from "../page/Customer/LandingPage/LandingPage";
 import LoginModal from "../page/Customer/LoginPage/LoginPage";
 import AboutUsPage from "../page/Customer/AboutUsPage/AboutUsPage";
 import BlogPage from "../page/Customer/BlogPage/BlogPage";
-import BlogDetail from "../page/Customer/BlogPage/BlogDetail"; // Đảm bảo import đúng
+import BlogDetail from "../page/Customer/BlogPage/BlogDetail";
+import BlogDetailA from "../page/Admin/Blog/BlogDetail" // Đảm bảo import đúng
 import CartPage from "../page/Customer/CartPage/CartPage";
 import ShopPage from "../page/Customer/ShopPage/ShopPage";
 import ProductDetail from "../page/Customer/ProductPage/ProductDetail";
@@ -217,6 +218,10 @@ export const router = createBrowserRouter([
           {
             path: "blog",
             element: <BlogManagement />,
+          },
+          {
+            path: "blog/detail/:id",
+            element: <BlogDetailA/>
           },
           {
             path: "blog/edit/:id",
