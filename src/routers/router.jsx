@@ -108,6 +108,10 @@ export const router = createBrowserRouter([
         path: "/order-failed",
         element: <OrderFailed />,
       },
+      {
+        path: "/payment-success",
+        element: <OrderSuccess />,
+      },
     ],
   },
 

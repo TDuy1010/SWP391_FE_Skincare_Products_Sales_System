@@ -24,6 +24,8 @@ import {
 } from "../../../service/productManagement/index";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -371,8 +373,10 @@ const ProductDetail = () => {
           />
         </Modal>
       </div>
+      <ToastContainer />
     </div>
   );
 };
 
 export default ProductDetail;
+D;
