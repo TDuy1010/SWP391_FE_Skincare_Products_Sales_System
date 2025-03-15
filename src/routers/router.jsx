@@ -45,6 +45,7 @@ import QuizManagement from "../page/Admin/Quiz/QuizManagement";
 import AddQuiz from "../page/Admin/Quiz/AddQuiz";
 import EditQuiz from "../page/Admin/Quiz/EditQuiz";
 import PaymentSuccess from "../page/Customer/PaymentPage/Paid/PaymentSuccess";
+import QuizDetail from "../page/Admin/Quiz/QuizDetail";
 
 export const router = createBrowserRouter([
   //Customer
@@ -253,6 +254,10 @@ export const router = createBrowserRouter([
           {
             path: "quiz/edit/:id",
             element: <EditQuiz />,
+          },
+          {
+            path: "quiz/detail/:id",
+            element: <QuizDetail />,
           },
         ],
       },

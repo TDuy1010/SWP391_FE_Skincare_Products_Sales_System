@@ -77,6 +77,29 @@ export const getQuizById = async (id) => {
   }
 };
 
+export const updateQuiz = async (id, data) => {
+  try {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem("token");
+
+    // Log the exact data being sent to the API
+    console.log("Sending to API:", JSON.stringify(data, null, 2));
+
+    const response = await instance.put(`/admin/quizs/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("API Error:", error.response?.data);
+    return {
+      error: true,
+      message: error.response?.message || "Failed to update quiz",
+    };
+  }
+};
+
 export const changeQuizStatus = async (quizId, status) => {
   try {
     // Lấy token từ localStorage
