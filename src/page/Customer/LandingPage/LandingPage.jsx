@@ -6,7 +6,7 @@ import HeroSection from "../../../components/HeroSection/HeroSection";
 import img1 from "../../../assets/img/hero-photo.png";
 import heroImg from "../../../assets/img/hero-landingPage.png";
 import img2 from "../../../assets/img/Section 01.png";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 // import { getAllProduct } from "../../../service/getAllProduct/getAllProduct";
 import { getLatestProducts } from "../../../service/product";
 
@@ -48,29 +48,32 @@ const LandingPage = () => {
       >
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
+          <img
             src={img2}
-            alt="Ảnh nền trang chủ" 
+            alt="Ảnh nền trang chủ"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         </div>
-        
+
         {/* Hero Content */}
         <div className="relative z-10 h-full flex items-center">
           <div className="container mx-auto px-8">
-            <motion.div 
+            <motion.div
               className="max-w-2xl text-white"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h1 className="text-5xl font-light mb-6">Tinh Chất Làm Đẹp Tự Nhiên</h1>
+              <h1 className="text-5xl font-light mb-6">
+                Tinh Chất Làm Đẹp Tự Nhiên
+              </h1>
               <p className="text-xl mb-8 leading-relaxed">
-                Khám phá các sản phẩm chăm sóc da được làm từ thành phần tự nhiên, nuôi dưỡng và tôn lên vẻ đẹp tự nhiên của làn da bạn.
+                Khám phá các sản phẩm chăm sóc da được làm từ thành phần tự
+                nhiên, nuôi dưỡng và tôn lên vẻ đẹp tự nhiên của làn da bạn.
               </p>
-              <Link 
-                to="/shop" 
+              <Link
+                to="/shop"
                 className="inline-flex items-center bg-white text-black px-8 py-4 transition-all hover:bg-opacity-90"
               >
                 <span className="mr-4">Mua Sắm Ngay</span>
@@ -110,6 +113,7 @@ const LandingPage = () => {
                 thumbnail={product.thumbnail}
                 tag={product.tag}
                 size={product.size}
+                slug={product.slug}
               />
             </motion.div>
           ))}

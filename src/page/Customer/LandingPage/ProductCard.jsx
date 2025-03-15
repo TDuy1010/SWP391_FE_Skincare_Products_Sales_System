@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import LoginModal from "../LoginPage/LoginPage";
 import { addItemToCart } from "../../../service/cart/cart";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
   id,
@@ -11,7 +12,9 @@ const ProductCard = ({
   size,
   price,
   thumbnail,
+  slug,
 }) => {
+  const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,7 +23,14 @@ const ProductCard = ({
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  const handleAddToCart = async () => {
+  const handleCardClick = () => {
+    navigate(`/product/${slug}`);
+  };
+
+  const handleAddToCart = async (e) => {
+    // Stop propagation to prevent navigation when clicking the button
+    e.stopPropagation();
+
     const token = localStorage.getItem("token");
     if (!token) {
       setShowLoginModal(true);
@@ -29,9 +39,6 @@ const ProductCard = ({
 
     setIsLoading(true);
     try {
-      if (!id) {
-        throw new Error("Product ID is missing");
-      }
       const response = await addItemToCart(id, 1);
       if (response.error) {
         toast.error(response.message);
@@ -47,7 +54,10 @@ const ProductCard = ({
 
   return (
     <>
-      <div className="group cursor-pointer relative flex flex-col items-center text-center bg-white p-4 hover:shadow-xl transition duration-300 rounded-lg h-[500px] w-[300px]">
+      <div
+        className="group cursor-pointer relative flex flex-col items-center text-center bg-white p-4 hover:shadow-xl transition duration-300 rounded-lg h-[500px] w-[300px]"
+        onClick={handleCardClick}
+      >
         {/* Tag */}
         {tag && (
           <span className="absolute top-2 left-2 text-xs font-semibold bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
@@ -88,7 +98,7 @@ const ProductCard = ({
             onClick={handleAddToCart}
             disabled={isLoading}
           >
-            {isLoading ? "Đang thêm vào giỏ hàng " : "Thêm vào giỏ hàng"}
+            {isLoading ? "Adding..." : "Add to your Cart"}
           </button>
         </div>
       </div>

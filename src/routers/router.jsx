@@ -41,6 +41,10 @@ import OrderFailed from "../components/Order/OrderFailed";
 import OrderDetail from "../page/Admin/Order/OrderDetail";
 import AddUser from "../page/Admin/User/AddUser";
 import EditUser from "../page/Admin/User/EditUser";
+import QuizManagement from "../page/Admin/Quiz/QuizManagement";
+import AddQuiz from "../page/Admin/Quiz/AddQuiz";
+import EditQuiz from "../page/Admin/Quiz/EditQuiz";
+import PaymentSuccess from "../page/Customer/PaymentPage/Paid/PaymentSuccess";
 
 export const router = createBrowserRouter([
   //Customer
@@ -110,7 +114,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/payment-success",
-        element: <OrderSuccess />,
+        element: <PaymentSuccess />,
       },
     ],
   },
@@ -237,6 +241,18 @@ export const router = createBrowserRouter([
           {
             path: "vouchers/edit/:id",
             element: <EditVoucher />,
+          },
+          {
+            path: "quiz",
+            element: <QuizManagement />,
+          },
+          {
+            path: "quiz/add",
+            element: <AddQuiz />,
+          },
+          {
+            path: "quiz/edit/:id",
+            element: <EditQuiz />,
           },
         ],
       },

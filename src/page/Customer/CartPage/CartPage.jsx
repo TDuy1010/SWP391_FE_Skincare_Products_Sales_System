@@ -163,7 +163,6 @@ function Cart() {
                               product.quantity + 1
                             )
                           }
-                          disabled={product.quantity >= 5}
                           className="border rounded-md p-2 hover:bg-gray-100 disabled:opacity-50"
                         >
                           +
