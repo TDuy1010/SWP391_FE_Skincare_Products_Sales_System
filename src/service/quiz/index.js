@@ -20,6 +20,21 @@ export const getAllQuizzes = async (params) => {
   }
 };
 
+export const getAllQuizzesUser = async (params) => {
+  try {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem("token");
+
+    const response = await instance.get(`/quizs`, params);
+    return response;
+  } catch (error) {
+    return {
+      error: true,
+      message: error.response?.message || "Failed to fetch quizzes",
+    };
+  }
+};
+
 export const addQuiz = async (data) => {
   try {
     // Lấy token từ localStorage
@@ -119,6 +134,47 @@ export const changeQuizStatus = async (quizId, status) => {
     return {
       error: true,
       message: error.response?.message || "Failed to change quiz status",
+    };
+  }
+};
+
+export const submitQuizAnswers = async (quizId, answers) => {
+  try {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem("token");
+
+    // Format dữ liệu câu trả lời theo yêu cầu của API
+    const formattedAnswers = {};
+
+    // Đánh số additionalProp từ 1 đến n, không phụ thuộc vào ID câu hỏi
+    Object.keys(answers).forEach((questionId, index) => {
+      formattedAnswers[`additionalProp${index + 1}`] = answers[questionId];
+    });
+
+    const requestData = {
+      answers: formattedAnswers,
+    };
+
+    console.log("Submitting quiz answers:", requestData);
+
+    const response = await instance.post(
+      `/quizs/submit/${quizId}`,
+      requestData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error submitting quiz answers:", error);
+    return {
+      error: true,
+      message: error.response?.message || "Failed to submit quiz answers",
+      details: error.response?.data,
     };
   }
 };

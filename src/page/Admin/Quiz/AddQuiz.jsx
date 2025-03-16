@@ -51,7 +51,7 @@ const AddQuiz = () => {
       } else {
         message.success("Quiz added successfully");
         form.resetFields();
-        navigate("/admin/quizs"); // Navigate to quiz list page
+        navigate("/admin/quiz"); // Navigate to quiz list page
       }
     } catch (error) {
       message.error("An error occurred while adding the quiz");

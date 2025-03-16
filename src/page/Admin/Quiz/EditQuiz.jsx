@@ -49,16 +49,14 @@ const EditQuiz = () => {
 
         if (response && response.code === 200) {
           setQuiz(response.result);
-
-          // Format the data for the form - map id to questionId and answerId
           const formattedQuestions = response.result.questions.map(
             (question) => ({
               title: question.title,
-              questionId: question.id, // Changed from question.questionId to question.id
+              questionId: question.id,
               answers: question.answers.map((answer) => ({
                 answerText: answer.answerText,
                 skinType: answer.skinType,
-                answerId: answer.id, // Changed from answer.answerId to answer.id
+                answerId: answer.id,
               })),
             })
           );
@@ -89,7 +87,6 @@ const EditQuiz = () => {
     try {
       setSubmitting(true);
 
-      // Format the values to match the expected API request structure
       const formattedValues = {
         description: values.description,
         title: values.title,
@@ -104,8 +101,6 @@ const EditQuiz = () => {
           })),
         })),
       };
-
-      console.log("Submitting data:", JSON.stringify(formattedValues, null, 2));
 
       const response = await updateQuiz(id, formattedValues);
 
