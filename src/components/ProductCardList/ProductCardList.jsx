@@ -26,7 +26,7 @@ function ProductCardList({
       return;
     }
 
-    setIsLoading(true); // Bắt đầu loading
+    setIsLoading(true);
     try {
       const response = await addItemToCart(id);
       console.log("Add to cart response:", response); // Debug log
