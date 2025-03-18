@@ -1,29 +1,78 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { blogPosts, featuredArticles } from './BlogPost';
+import { getBlogDetail, getPublicBlogs } from '../../../service/Blog/customerBlog';
+import { Spin, message } from 'antd';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
 
 const BlogDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const allArticles = [...blogPosts, ...featuredArticles];
-  const article = allArticles.find(post => post.id === parseInt(id)) || allArticles[0];
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [relatedBlogs, setRelatedBlogs] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
-    // Sau này khi có API, bạn có thể thêm logic fetch dữ liệu ở đây
-    // const fetchBlogDetail = async () => {
-    //   try {
-    //     const response = await fetch(`/api/blogs/${id}`);
-    //     const data = await response.json();
-    //     setArticle(data);
-    //   } catch (error) {
-    //     console.error("Failed to fetch blog details", error);
-    //   }
-    // };
-    // fetchBlogDetail();
+    fetchBlogDetail();
   }, [id]);
+
+  const fetchBlogDetail = async () => {
+    try {
+      setLoading(true);
+      const response = await getBlogDetail(id);
+
+      if (!response.error) {
+        setBlog(response.result);
+        // Sau khi lấy được chi tiết blog, fetch các blog liên quan
+        fetchRelatedBlogs();
+      } else {
+        message.error(response.message);
+        navigate('/blog'); // Chuyển về trang blog nếu không tìm thấy
+      }
+    } catch (error) {
+      console.error("Failed to fetch blog details", error);
+      message.error("Không thể tải thông tin blog");
+      navigate('/blog');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRelatedBlogs = async () => {
+    try {
+      const response = await getPublicBlogs({
+        page: 0,
+        size: 3,
+        status: "ACTIVE"
+      });
+
+      if (!response.error) {
+        // Lọc bỏ blog hiện tại khỏi danh sách blog liên quan
+        const filteredBlogs = response.result.content.filter(b => b.id !== parseInt(id));
+        setRelatedBlogs(filteredBlogs.slice(0, 3));
+      }
+    } catch (error) {
+      console.error("Failed to fetch related blogs", error);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return dayjs(dateString).locale('vi').format('DD MMMM, YYYY');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!blog) {
+    return null;
+  }
 
   return (
     <motion.div 
@@ -41,80 +90,74 @@ const BlogDetail = () => {
         </button>
       </div>
 
-      <article>
+      <article className="overflow-hidden">
         <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-light mb-4">
-            {article.title}
+          <h1 className="text-3xl md:text-4xl font-light mb-4 break-words">
+            {blog.title}
           </h1>
           <div className="flex items-center text-gray-600 text-sm">
-            <span>Đăng bởi Admin</span>
+            <span>Đăng bởi {blog.createdBy || 'Admin'}</span>
             <span className="mx-2">•</span>
-            <span>{article.date || 'Ngày 9 tháng 3, 2025'}</span>
-            <span className="mx-2">•</span>
-            <span>{article.category || 'Chăm Sóc Da'}</span>
+            <span>{formatDate(blog.createdDate)}</span>
           </div>
         </header>
 
-        <div className="mb-10 aspect-video w-full">
-          <img 
-            src={article.image} 
-            alt={article.title} 
-            className="w-full h-full object-cover rounded-lg"
-          />
-        </div>
+        {blog.image && (
+          <div className="mb-10 aspect-video w-full">
+            <img 
+              src={blog.image} 
+              alt={blog.title} 
+              className="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+        )}
 
-        <div className="prose prose-lg max-w-none">
-          {Array.isArray(article.description) ? (
-            article.description.map((paragraph, index) => (
-              <p key={index} className="mb-6 text-gray-700">
-                {paragraph}
-              </p>
-            ))
-          ) : (
-            <>
-              <p className="mb-6 text-gray-700">{article.description}</p>
-              <p className="mb-6 text-gray-700">
-                Da là cơ quan lớn nhất của chúng ta và đóng vai trò như một hàng rào bảo vệ 
-                chống lại các yếu tố môi trường. Duy trì thói quen chăm sóc da đều đặn là điều 
-                cần thiết để giữ cho làn da của bạn khỏe mạnh và rạng rỡ.
-              </p>
-              <p className="mb-6 text-gray-700">
-                Hiểu về loại da của bạn là bước đầu tiên để phát triển một chế độ chăm sóc da hiệu quả. 
-                Cho dù bạn có làn da khô, da dầu, da hỗn hợp hay da nhạy cảm, đều có những thành phần và 
-                sản phẩm cụ thể có thể giúp giải quyết các vấn đề đặc thù của bạn.
-              </p>
-              <p className="mb-6 text-gray-700">
-                Giữ ẩm đều đặn, bảo vệ khỏi ánh nắng mặt trời và nuôi dưỡng là những thành phần chính 
-                của bất kỳ quy trình chăm sóc da thành công nào. Ngoài ra, chú ý đến chế độ ăn uống, 
-                giấc ngủ và mức độ căng thẳng có thể ảnh hưởng đáng kể đến sức khỏe và vẻ ngoài của làn da bạn.
-              </p>
-            </>
-          )}
-        </div>
+        <div 
+          className="prose prose-lg max-w-none break-words whitespace-pre-wrap overflow-hidden"
+          style={{
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            wordBreak: 'break-word',
+          }}
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
       </article>
 
-      <div className="mt-12 pt-8 border-t border-gray-200">
-        <h3 className="text-xl font-medium mb-6">Bài Viết Liên Quan</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {blogPosts.slice(0, 3).map((post, index) => (
-            <div 
-              key={index} 
-              className="group cursor-pointer"
-              onClick={() => navigate(`/blog/${post.id || index + 1}`)}
-            >
-              <div className="aspect-square overflow-hidden mb-3">
-                <img 
-                  src={post.image} 
-                  alt={post.title} 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+      {relatedBlogs.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <h3 className="text-xl font-medium mb-6">Bài Viết Khác</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {relatedBlogs.map((relatedBlog) => (
+              <div 
+                key={relatedBlog.id} 
+                className="group cursor-pointer"
+                onClick={() => {
+                  navigate(`/blog/${relatedBlog.id}`);
+                  window.scrollTo(0, 0);
+                }}
+              >
+                <div className="aspect-square overflow-hidden mb-3">
+                  <img 
+                    src={relatedBlog.image} 
+                    alt={relatedBlog.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/path/to/placeholder-image.png";
+                    }}
+                  />
+                </div>
+                <h4 className="font-medium mb-1 group-hover:text-gray-900 line-clamp-2 break-words">
+                  {relatedBlog.title}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {formatDate(relatedBlog.createdDate)}
+                </p>
               </div>
-              <h4 className="font-medium mb-1 group-hover:text-gray-900">{post.title}</h4>
-              <p className="text-sm text-gray-600">{post.date || 'Ngày 9 tháng 3, 2025'}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 };

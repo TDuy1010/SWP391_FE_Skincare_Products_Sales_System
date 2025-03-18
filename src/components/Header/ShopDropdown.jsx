@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllCategoriesUser } from "../../service/category/index";
 import { getAllBrandsUser } from "../../service/brand/index";

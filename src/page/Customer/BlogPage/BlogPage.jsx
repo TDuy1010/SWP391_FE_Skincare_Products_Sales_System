@@ -1,71 +1,60 @@
 import { motion } from 'framer-motion';
-import { blogPosts, featuredArticles } from './BlogPost';
+import { featuredArticles } from './BlogPost';
 import img3 from '../../../assets/img/hero-landingPage.png';
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { getPublicBlogs } from '../../../service/Blog/customerBlog';
+import { Spin, message } from 'antd';
 
 const BlogPage = () => {
   const navigate = useNavigate();
-  const [blogs, setBlogs] = useState(blogPosts || []);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [showOptions, setShowOptions] = useState(null);
-  const [showAddBlog, setShowAddBlog] = useState(false);
-  
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 8,
+    total: 0
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBlogs();
   }, []);
 
-  // Hàm xử lý khi click vào Xem Thêm - kết hợp cả hai chức năng
-  const handleReadMore = (idOrPost) => {
-    // Nếu là object (post) thì set selectedPost
-    if (typeof idOrPost === 'object') {
-      setSelectedPost(idOrPost);
+  const fetchBlogs = async (params = {}) => {
+    try {
+      setLoading(true);
+      const response = await getPublicBlogs({
+        page: params.page !== undefined ? params.page - 1 : 0,
+        size: params.pageSize || pagination.pageSize,
+      });
+
+      if (!response.error) {
+        const blogData = response.result.content || [];
+        setBlogs(blogData);
+        setPagination({
+          current: (response.result.pageNumber || 0) + 1,
+          pageSize: response.result.pageSize || 8,
+          total: response.result.totalElements || 0,
+        });
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      console.error("Fetch blogs error:", error);
+      message.error("Không thể tải danh sách blog");
+    } finally {
+      setLoading(false);
     }
-    // Nếu là id thì navigate
-    else {
-      navigate(`/blog/${idOrPost}`);
-    }
-    // Sau này khi có API, bạn có thể thêm logic xử lý dữ liệu ở đây trước khi chuyển trang
-    // Ví dụ: gọi API để lấy chi tiết bài viết, sau đó lưu vào state hoặc context
+  };
+
+  const handleReadMore = (blogId) => {
+    navigate(`/blog/${blogId}`);
   };
 
   const containerAnimation = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
-  };
-
-  const handleAddBlog = (newBlog) => {
-    console.log("New Blog Data:", newBlog);
-    setBlogs([
-      {
-        ...newBlog,
-        description: newBlog.descriptions[0],
-        images: newBlog.images,
-      },
-      ...blogs,
-    ]);
-  };
-
-  const handleEdit = (post) => {
-    navigate(`/edit-blog/${post.id}`, { state: { blog: post } });
-  };
-
-  const handleDelete = (post) => {
-    console.log("Delete post:", post);
-  };
-
-  const truncateText = (text, length) => {
-    return text.length > length ? text.substring(0, length) + "..." : text;
-  };
-
-  const decodeHtmlEntities = (text) => {
-    const textarea = document.createElement("textarea");
-    textarea.innerHTML = text;
-    return textarea.value;
-  };
-
-  const toggleOptions = (index) => {
-    setShowOptions(showOptions === index ? null : index);
   };
 
   return (
@@ -94,7 +83,7 @@ const BlogPage = () => {
         </div>
       </div>
 
-      {/* Journal Section */}
+      {/* Blog Grid Section */}
       <div className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
@@ -102,45 +91,48 @@ const BlogPage = () => {
             <p className="text-gray-600">Hiểu biết về sức khỏe và sắc đẹp</p>
           </div>
 
-          {/* Blog Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {blogs.map((post, index) => (
-              <motion.div
-                key={index}
-                className="group cursor-pointer relative"
-                whileHover={{ scale: 1.02 }}
-                onClick={() => handleReadMore(post.id || index + 1)}
-              >
-                <div className="aspect-square overflow-hidden mb-4">
-                  <img
-                    src={
-                      post.image ||
-                      (post.images && post.images.length > 0
-                        ? post.images[0]
-                        : "path/to/placeholder-image.png")
-                    }
-                    alt={post.title || "Không có tiêu đề"}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "path/to/placeholder-image.png";
-                    }}
-                  />
-                </div>
-                <h3 className="text-lg mb-2">{post.title}</h3>
-                <p className="text-sm text-gray-600 mb-3">{post.description}</p>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleReadMore(post.id || index + 1);
-                  }}
-                  className="text-sm text-gray-600 hover:text-black"
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {blogs.map((blog) => (
+                <motion.div
+                  key={blog.id}
+                  className="group cursor-pointer relative"
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => handleReadMore(blog.id)}
                 >
-                  Xem Thêm →
-                </button>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="aspect-square overflow-hidden mb-4">
+                    <img
+                      src={blog.image || "path/to/placeholder-image.png"}
+                      alt={blog.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "path/to/placeholder-image.png";
+                      }}
+                    />
+                  </div>
+                  <h3 className="text-lg mb-2 line-clamp-2">{blog.title}</h3>
+                  <div 
+                    className="text-sm text-gray-600 mb-3 line-clamp-3"
+                    dangerouslySetInnerHTML={{ __html: blog.content }}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReadMore(blog.id);
+                    }}
+                    className="text-sm text-gray-600 hover:text-black"
+                  >
+                    Xem Thêm →
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { FiSearch } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa";
 import { BsBag } from "react-icons/bs";
-import { FaArrowRightLong } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "../../page/Customer/LoginPage/LoginPage";
 import ShopDropdown from "./ShopDropdown";
 import { FiUser } from "react-icons/fi";
@@ -26,6 +23,7 @@ const Header = () => {
   const menuRef = useRef(null);
   const [error, setError] = useState(null);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("username");
@@ -143,7 +141,7 @@ const Header = () => {
                 <button
                   ref={shopButtonRef}
                   onClick={handleShopClick}
-                  className="relative px-4 py-5 h-16 hover:text-black hover:bg-gray-100 transition-colors duration-200 text-gray-700 group whitespace-nowrap"
+                  className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 text-gray-700 group whitespace-nowrap"
                 >
                   Cửa hàng
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
@@ -156,33 +154,33 @@ const Header = () => {
               </div>
 
               <div className="relative group">
-                <Link
-                  to="/about-us"
+                <button
+                  onClick={() => navigate('/about-us')}
                   className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
                 >
                   Về chúng tôi
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </Link>
+                </button>
               </div>
 
               <div className="relative group">
-                <Link
-                  to="/blog"
+                <button
+                  onClick={() => navigate('/blog')}
                   className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
                 >
                   Bảng tin
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </Link>
+                </button>
               </div>
 
               <div className="relative group">
-                <Link
-                  to="/helps"
+                <button
+                  onClick={() => navigate('/helps')}
                   className="relative px-4 py-5 hover:text-black h-16 hover:bg-gray-100 transition-colors duration-200 block whitespace-nowrap"
                 >
                   Hỗ trợ
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </Link>
+                </button>
               </div>
             </nav>
 

@@ -1,7 +1,62 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
+import FeedbackModal from "./FeedbackModal";
+import { toast } from "react-hot-toast";
+import { getOrderDetail } from "../../../../service/order";
 
-const MyOrderedDetail = ({ order, onBack }) => {
+const MyOrderedDetail = ({ order: initialOrder, onBack }) => {
+  const [order, setOrder] = useState(initialOrder);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchOrderDetail = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getOrderDetail(order.orderId);
+      if (!response.error) {
+        setOrder(response.result);
+      } else {
+        toast.error("Không thể cập nhật thông tin đơn hàng");
+      }
+    } catch (error) {
+      console.error("Error fetching order detail:", error);
+      toast.error("Đã có lỗi xảy ra khi cập nhật đơn hàng");
+    } finally {
+      setLoading(false);
+    }
+  }, [order.orderId]);
+
   if (!order) return null;
+
+  const handleOpenFeedback = (item) => {
+    if (item.isFeedback) {
+      toast.warning("Bạn đã đánh giá sản phẩm này rồi!");
+      return;
+    }
+
+    const productData = {
+      orderId: order.orderId,
+      orderItemId: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      thumbnailProduct: item.thumbnailProduct
+    };
+
+    console.log("Product data to be sent:", productData);
+    setSelectedProduct(productData);
+  };
+
+  const handleCloseFeedback = (updatedItemId = null) => {
+    if (updatedItemId) {
+      // Cập nhật trạng thái đánh giá của sản phẩm trong state
+      setOrder(prevOrder => ({
+        ...prevOrder,
+        orderResponseItemList: prevOrder.orderResponseItemList.map(item => 
+          item.id === updatedItemId ? { ...item, isFeedback: true } : item
+        )
+      }));
+    }
+    setSelectedProduct(null);
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
@@ -107,7 +162,7 @@ const MyOrderedDetail = ({ order, onBack }) => {
             {order.orderResponseItemList.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 border-b last:border-0"
+                className="flex items-center justify-between p-4 border-b last:border-0 hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -122,9 +177,24 @@ const MyOrderedDetail = ({ order, onBack }) => {
                     <p className="text-gray-600">Số lượng: {item.quantity}</p>
                   </div>
                 </div>
-                <span className="font-semibold text-gray-800">
-                  {(item.price * item.quantity).toLocaleString()} đ
-                </span>
+                <div className="flex items-center gap-4">
+                  <span className="font-semibold text-gray-800">
+                    {(item.price * item.quantity).toLocaleString()} đ
+                  </span>
+                  {!item.isFeedback && (
+                    <button
+                      onClick={() => handleOpenFeedback(item)}
+                      className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                    >
+                      Đánh giá
+                    </button>
+                  )}
+                  {item.isFeedback && (
+                    <span className="text-green-600 text-sm">
+                      Đã đánh giá
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -148,6 +218,21 @@ const MyOrderedDetail = ({ order, onBack }) => {
           </div>
         )}
       </div>
+
+      {/* Thêm FeedbackModal */}
+      <FeedbackModal
+        isOpen={selectedProduct !== null}
+        onClose={handleCloseFeedback}
+        product={selectedProduct}
+        onSuccess={fetchOrderDetail}
+      />
+
+      {/* Loading overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+        </div>
+      )}
     </div>
   );
 };
