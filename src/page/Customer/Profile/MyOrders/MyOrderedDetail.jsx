@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
-const MyOrderedDetail = ({ order, onBack }) => {
+const MyOrderedDetail = ({ order, onBack, onOrderUpdate }) => {
   if (!order) return null;
 
   return (
@@ -28,8 +29,16 @@ const MyOrderedDetail = ({ order, onBack }) => {
         className={`mb-6 p-4 rounded-lg ${
           order.status === "PENDING"
             ? "bg-yellow-50 text-yellow-700"
-            : order.status === "COMPLETED"
+            : order.status === "DONE"
             ? "bg-green-50 text-green-700"
+            : order.status === "PROCESSING"
+            ? "bg-indigo-50 text-indigo-700"
+            : order.status === "DELIVERING"
+            ? "bg-blue-50 text-blue-700"
+            : order.status === "DELIVERING_FAIL"
+            ? "bg-orange-50 text-orange-700"
+            : order.status === "CANCELLED"
+            ? "bg-red-50 text-red-700"
             : "bg-gray-50 text-gray-700"
         }`}
       >
@@ -37,8 +46,16 @@ const MyOrderedDetail = ({ order, onBack }) => {
           Trạng thái:{" "}
           {order.status === "PENDING"
             ? "Đang xử lý"
-            : order.status === "COMPLETED"
+            : order.status === "DONE"
             ? "Hoàn thành"
+            : order.status === "PROCESSING"
+            ? "Đang chuẩn bị"
+            : order.status === "DELIVERING"
+            ? "Đang giao hàng"
+            : order.status === "DELIVERING_FAIL"
+            ? "Giao hàng thất bại"
+            : order.status === "CANCELLED"
+            ? "Đã hủy"
             : order.status}
         </div>
         {order.orderInfo && (
@@ -139,14 +156,6 @@ const MyOrderedDetail = ({ order, onBack }) => {
             {order.totalAmount.toLocaleString()} đ
           </span>
         </div>
-
-        {order.status === "PENDING" && (
-          <div className="flex justify-end">
-            <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-              Hủy đơn hàng
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

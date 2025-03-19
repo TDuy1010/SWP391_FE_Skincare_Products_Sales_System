@@ -94,6 +94,7 @@ const Determine = () => {
   const [skinTypeResults, setSkinTypeResults] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [recommendation, setRecommendation] = useState("");
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -188,18 +189,21 @@ const Determine = () => {
 
     try {
       // Gọi API để submit câu trả lời
-      // Không cần format lại answers vì hàm submitQuizAnswers đã xử lý
       const response = await submitQuizAnswers(selectedQuiz.id, answers);
 
       if (response.error) {
         setSubmitError(response.message || "Có lỗi xảy ra khi gửi câu trả lời");
         console.error("Submit error:", response);
       } else {
-        // Nếu API trả về kết quả loại da, sử dụng kết quả đó
-        if (response.data?.skinType) {
-          setResult(response.data.skinType);
+        // Sử dụng kết quả từ API response
+        if (response.result?.skinType) {
+          setResult(response.result.skinType);
+          // Lưu recommendation từ API nếu có
+          if (response.result.recommendation) {
+            setRecommendation(response.result.recommendation);
+          }
         } else {
-          // Nếu không, tính toán loại da dựa trên câu trả lời
+          // Fallback nếu API không trả về kết quả
           const skinType = calculateSkinType();
           setResult(skinType);
         }
@@ -457,6 +461,16 @@ const Determine = () => {
                 {skinTypeDescriptions[result]?.description ||
                   "Mô tả về loại da của bạn."}
               </p>
+
+              {/* Hiển thị recommendation từ API nếu có */}
+              {recommendation && (
+                <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
+                  <p className="text-lg font-medium">
+                    Khuyến nghị từ chuyên gia:
+                  </p>
+                  <p className="text-gray-700">{recommendation}</p>
+                </div>
+              )}
             </div>
 
             <div className="mb-12">

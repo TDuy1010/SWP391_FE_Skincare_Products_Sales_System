@@ -1,87 +1,57 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { instance } from "../../../../service/instance";
 import { motion } from "framer-motion";
 import { FaCheckCircle, FaShoppingBag, FaRegCreditCard } from "react-icons/fa";
+import { confirmPaymentSuccess } from "../../../../service/checkout";
 
 const PaymentSuccess = () => {
   const [loading, setLoading] = useState(true);
+  const [paymentDetails, setPaymentDetails] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const processPayment = async () => {
       try {
+        // Lấy toàn bộ URL callback từ VNPay (bao gồm cả query string)
+        const fullCallbackUrl = window.location.href;
+        const queryString = location.search; // Phần query string của URL
         const queryParams = new URLSearchParams(location.search);
-
-        // Lấy các thông tin từ URL
         const responseCode = queryParams.get("vnp_ResponseCode");
         const orderInfo = queryParams.get("vnp_OrderInfo");
         const orderId =
           queryParams.get("orderId") || queryParams.get("vnp_TxnRef");
 
-        console.log("Payment success URL params:", {
-          responseCode,
-          orderInfo,
+        // Lưu thông tin để hiển thị
+        setPaymentDetails({
           orderId,
-          allParams: Object.fromEntries(queryParams.entries()),
+          orderInfo,
+          responseCode,
+          // Các thông tin khác nếu cần
         });
 
         if (responseCode === "00" || !responseCode) {
           toast.success("Thanh toán thành công!");
 
-          // Gọi API payment-success
           try {
-            const paymentData = {
-              additionalProp1: orderId,
-              additionalProp2: orderInfo || `Thanh toán đơn hàng #${orderId}`,
-              additionalProp3: "success",
-            };
+            const paymentResponse = await confirmPaymentSuccess(queryString);
 
-            console.log("Calling payment-success API with data:", paymentData);
-
-            const paymentResponse = await instance.post(
-              "/orders/payment-success",
-              paymentData,
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-
-            console.log("Payment success API response:", paymentResponse);
-            toast.success("Đã cập nhật trạng thái đơn hàng thành công");
-
-            // Tạm thời tắt chuyển hướng để kiểm tra API
-            // setTimeout(() => {
-            //   navigate("/order-success", {
-            //     state: {
-            //       orderId: orderId,
-            //       message: "Thanh toán thành công!",
-            //       orderInfo: orderInfo,
-            //     },
-            //   });
-            // }, 1000);
+            if (!paymentResponse.error) {
+              toast.success("Đã cập nhật trạng thái đơn hàng thành công");
+            } else {
+              toast.error(
+                paymentResponse.message ||
+                  "Có lỗi xảy ra khi cập nhật trạng thái đơn hàng"
+              );
+            }
           } catch (confirmError) {
-            console.error("Payment success API error:", confirmError);
             toast.error("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng");
           }
         } else {
           toast.error("Thanh toán thất bại!");
-
-          // Tạm thời tắt chuyển hướng để kiểm tra API
-          // navigate("/order-failed", {
-          //   state: {
-          //     message: "Thanh toán thất bại!",
-          //     orderId: orderId,
-          //   },
-          // });
         }
       } catch (error) {
-        console.error("Payment processing error:", error);
         toast.error("Có lỗi xảy ra trong quá trình xử lý thanh toán");
       } finally {
         setLoading(false);

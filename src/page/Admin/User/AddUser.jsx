@@ -16,7 +16,6 @@ const AddUser = () => {
       setLoading(true);
 
       let avatarUrl = null;
-      // Upload image first if exists
       if (values.avatar?.length > 0) {
         const file = values.avatar[0].originFileObj;
         try {

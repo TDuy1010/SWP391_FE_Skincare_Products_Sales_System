@@ -143,12 +143,13 @@ export const submitQuizAnswers = async (quizId, answers) => {
     // Lấy token từ localStorage
     const token = localStorage.getItem("token");
 
-    // Format dữ liệu câu trả lời theo yêu cầu của API
+    // Format dữ liệu câu trả lời theo yêu cầu mới của API
+    // Truyền trực tiếp id câu hỏi và id câu trả lời
     const formattedAnswers = {};
 
-    // Đánh số additionalProp từ 1 đến n, không phụ thuộc vào ID câu hỏi
-    Object.keys(answers).forEach((questionId, index) => {
-      formattedAnswers[`additionalProp${index + 1}`] = answers[questionId];
+    // Chuyển đổi từ {questionId: answerId} thành cấu trúc mới
+    Object.keys(answers).forEach((questionId) => {
+      formattedAnswers[questionId] = answers[questionId];
     });
 
     const requestData = {

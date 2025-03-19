@@ -35,7 +35,6 @@ import CategoryDetail from "../page/Admin/Category/CategoryDetail";
 import BrandDetail from "../page/Admin/Brand/BrandDetail";
 import VoucherManagement from "../page/Admin/Voucher/VoucherManagement";
 import AddNewVoucher from "../page/Admin/Voucher/AddNewVoucher";
-import EditVoucher from "../page/Admin/Voucher/EditVoucher";
 import OrderSuccess from "../components/Order/OrderSuccess";
 import OrderFailed from "../components/Order/OrderFailed";
 import OrderDetail from "../page/Admin/Order/OrderDetail";
@@ -232,17 +231,14 @@ export const router = createBrowserRouter([
             element: <AddBlog />,
           },
           {
-            path: "vouchers",
+            path: "voucher",
             element: <VoucherManagement />,
           },
           {
-            path: "vouchers/add",
+            path: "voucher/add",
             element: <AddNewVoucher />,
           },
-          {
-            path: "vouchers/edit/:id",
-            element: <EditVoucher />,
-          },
+
           {
             path: "quiz",
             element: <QuizManagement />,

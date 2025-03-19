@@ -50,11 +50,18 @@ export const verifyVNPayPayment = async (queryString) => {
   }
 };
 
-export const confirmPaymentSuccess = async (paymentData) => {
+export const confirmPaymentSuccess = async (queryString) => {
   try {
+    // Đảm bảo queryString bắt đầu bằng dấu ?
+    if (queryString && !queryString.startsWith("?")) {
+      queryString = `?${queryString}`;
+    }
+
+    console.log(`Calling API: /orders/payment-success${queryString}`);
+
     const response = await instance.post(
-      "/orders/payment-success",
-      paymentData,
+      `/orders/payment-success${queryString}`,
+      {}, // Empty request body
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -64,19 +71,17 @@ export const confirmPaymentSuccess = async (paymentData) => {
 
     return {
       error: false,
-      code: response.data?.code || 200,
-      message: response.data?.message || "Xác nhận thanh toán thành công",
-      result: response.data?.result,
-      redirectUrl: response.data?.redirectUrl,
+      code: response.code || 200,
+      message: response.message || "Xác nhận thanh toán thành công",
+      result: response.result,
     };
   } catch (error) {
     console.error("Payment success confirmation error:", error);
     return {
       error: true,
-      code: error.response?.data?.code || 500,
+      code: error.response?.code || 500,
       message:
-        error.response?.data?.message ||
-        "Có lỗi xảy ra khi xác nhận thanh toán",
+        error.response?.message || "Có lỗi xảy ra khi xác nhận thanh toán",
     };
   }
 };
