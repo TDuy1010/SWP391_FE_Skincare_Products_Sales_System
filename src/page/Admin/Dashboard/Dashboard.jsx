@@ -56,12 +56,17 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [error, setError] = useState(null);
+  const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        const response = await getDashboardData();
+        // Pass the date range to the API call
+        const response = await getDashboardData(
+          dateRange?.[0]?.format("DD/MM/YYYY"),
+          dateRange?.[1]?.format("DD/MM/YYYY")
+        );
         if (response.error) {
           setError(response.message || "Failed to fetch dashboard data");
         } else {
@@ -76,7 +81,7 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [dateRange]); // Add dateRange as a dependency
 
   // Chuẩn bị dữ liệu cho biểu đồ doanh thu theo thời gian
   const prepareRevenueData = () => {
@@ -181,8 +186,7 @@ const Dashboard = () => {
   };
 
   const handleDateChange = (dates) => {
-    // Xử lý khi thay đổi khoảng thời gian
-    console.log("Date range changed:", dates);
+    setDateRange(dates);
   };
 
   // Chuẩn bị dữ liệu biểu đồ

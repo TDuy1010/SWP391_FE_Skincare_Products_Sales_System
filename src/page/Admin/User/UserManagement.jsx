@@ -152,6 +152,12 @@ const UserManagement = () => {
       title: "Role",
       dataIndex: "roleName",
       key: "roleName",
+      sorter: (a, b) => {
+        if (a.roleName < b.roleName) return -1;
+        if (a.roleName > b.roleName) return 1;
+        return 0;
+      },
+      defaultSortOrder: "ascend",
     },
     {
       title: "Status",

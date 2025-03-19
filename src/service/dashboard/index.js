@@ -1,11 +1,19 @@
 import { instance } from "../instance";
 
-export const getDashboardData = async () => {
+export const getDashboardData = async (startDate, endDate) => {
   try {
     // Lấy token từ localStorage
     const token = localStorage.getItem("token");
 
-    const response = await instance.get(`/admin/dashboard`, {
+    // Build URL with query parameters if dates are provided
+    let url = "/admin/dashboard";
+    if (startDate && endDate) {
+      url += `?startDate=${encodeURIComponent(
+        startDate
+      )}&endDate=${encodeURIComponent(endDate)}`;
+    }
+
+    const response = await instance.get(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
