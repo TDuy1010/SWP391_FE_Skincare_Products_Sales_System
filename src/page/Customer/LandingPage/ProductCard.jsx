@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import LoginModal from "../LoginPage/LoginPage";
+import { FiShoppingBag,  } from "react-icons/fi";
 import { addItemToCart } from "../../../service/cart/cart";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -13,9 +14,8 @@ const ProductCard = ({
   size,
   price,
   thumbnail,
-  slug,
 }) => {
-  const navigate = useNavigate();
+ 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -98,7 +98,7 @@ const ProductCard = ({
               }}
               className="bg-white text-gray-900 p-2 rounded-full shadow-lg hover:shadow-xl transition-all"
             >
-              <FiEye size={18} />
+
             </button>
             
             <button

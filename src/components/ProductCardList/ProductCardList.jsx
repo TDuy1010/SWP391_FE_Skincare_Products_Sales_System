@@ -1,5 +1,5 @@
 import { GoHeart, GoHeartFill } from "react-icons/go";
-import { FiShoppingBag, FiEye } from "react-icons/fi";
+import { FiShoppingBag,  } from "react-icons/fi";
 import { addItemToCart } from "../../service/cart/cart";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
