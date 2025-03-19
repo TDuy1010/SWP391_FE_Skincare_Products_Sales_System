@@ -269,9 +269,6 @@ const VoucherManagement = () => {
             <Descriptions.Item label="Points Required">
               {voucherDetail.point}
             </Descriptions.Item>
-            <Descriptions.Item label="Quantity">
-              {voucherDetail.quantity}
-            </Descriptions.Item>
           </Descriptions>
         ) : (
           <p>No voucher details available</p>
