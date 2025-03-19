@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Spin, Image } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { getBlogById } from "../../../service/blog/index.js"; // Thay thế đường dẫn tương đối bằng alias @
+import { getBlogById } from "../../../service/blog/index"; // Thay thế đường dẫn tương đối bằng alias @
 import { toast } from "react-toastify";
 
 const BlogDetail = () => {
