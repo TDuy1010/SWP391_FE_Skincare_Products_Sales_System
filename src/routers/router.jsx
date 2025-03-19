@@ -36,12 +36,16 @@ import CategoryDetail from "../page/Admin/Category/CategoryDetail";
 import BrandDetail from "../page/Admin/Brand/BrandDetail";
 import VoucherManagement from "../page/Admin/Voucher/VoucherManagement";
 import AddNewVoucher from "../page/Admin/Voucher/AddNewVoucher";
-import EditVoucher from "../page/Admin/Voucher/EditVoucher";
 import OrderSuccess from "../components/Order/OrderSuccess";
 import OrderFailed from "../components/Order/OrderFailed";
 import OrderDetail from "../page/Admin/Order/OrderDetail";
 import AddUser from "../page/Admin/User/AddUser";
 import EditUser from "../page/Admin/User/EditUser";
+import QuizManagement from "../page/Admin/Quiz/QuizManagement";
+import AddQuiz from "../page/Admin/Quiz/AddQuiz";
+import EditQuiz from "../page/Admin/Quiz/EditQuiz";
+import PaymentSuccess from "../page/Customer/PaymentPage/Paid/PaymentSuccess";
+import QuizDetail from "../page/Admin/Quiz/QuizDetail";
 
 export const router = createBrowserRouter([
   //Customer
@@ -111,7 +115,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/payment-success",
-        element: <OrderSuccess />,
+        element: <PaymentSuccess />,
       },
     ],
   },
@@ -232,16 +236,29 @@ export const router = createBrowserRouter([
             element: <AddBlog />,
           },
           {
-            path: "vouchers",
+            path: "voucher",
             element: <VoucherManagement />,
           },
           {
-            path: "vouchers/add",
+            path: "voucher/add",
             element: <AddNewVoucher />,
           },
+
           {
-            path: "vouchers/edit/:id",
-            element: <EditVoucher />,
+            path: "quiz",
+            element: <QuizManagement />,
+          },
+          {
+            path: "quiz/add",
+            element: <AddQuiz />,
+          },
+          {
+            path: "quiz/edit/:id",
+            element: <EditQuiz />,
+          },
+          {
+            path: "quiz/detail/:id",
+            element: <QuizDetail />,
           },
         ],
       },

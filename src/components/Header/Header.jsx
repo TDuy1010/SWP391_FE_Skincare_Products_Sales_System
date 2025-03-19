@@ -6,6 +6,7 @@ import ShopDropdown from "./ShopDropdown";
 import { FiUser } from "react-icons/fi";
 import { logout } from "../../service/logout";
 import { getCart } from "../../service/cart/cart";
+import { clearExpiredToken } from "../../service/login/index";
 import ChangePassword from "../../page/Customer/ChangePassword/ChangePassword";
 
 const Header = () => {
@@ -26,6 +27,9 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Kiểm tra token hết hạn mỗi khi component được render
+    clearExpiredToken("user");
+
     const storedUser = localStorage.getItem("username");
     if (storedUser) {
       setUser(storedUser); // Lưu vào state
@@ -194,10 +198,6 @@ const Header = () => {
 
             {/* Right Section: Icons */}
             <div className="flex-1 flex items-center justify-end">
-  
-
-             
-              
               {/* Login/User Button */}
               <div className="relative group" ref={menuRef}>
                 {user ? (

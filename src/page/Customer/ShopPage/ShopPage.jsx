@@ -6,22 +6,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { SiDeluge } from "react-icons/si";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
-import img3 from '../../../assets/img/Rectangle 24.png'; // Thêm import hình ảnh hero giống như BlogPage
+import img3 from "../../../assets/img/Rectangle 24.png"; // Thêm import hình ảnh hero giống như BlogPage
 
 const ShopPage = () => {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
-  
+
   const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   //product state
@@ -38,15 +38,39 @@ const ShopPage = () => {
   //search state
   const [searchKeyword, setSearchKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
-  
+
   // Thêm state để lưu trữ categories
   const [categories, setCategories] = useState([]);
-  
+
+  // Thêm state để lưu trữ brands
+  const [brands, setBrands] = useState([]);
+
   // Thêm state cho view mode (grid/list)
   const [viewMode, setViewMode] = useState("grid");
-  
+
   // Thêm state cho filter sidebar
   const [showFilters, setShowFilters] = useState(false);
+
+  // Thêm state cho filters và sorting
+  const [filters, setFilters] = useState({
+    categorySlug: "",
+    brandSlug: "",
+    sortBy: "",
+    order: "",
+    priceRange: "",
+    minPrice: null,
+    maxPrice: null,
+  });
+
+  // Thêm price ranges
+  const priceRanges = [
+    { label: "Dưới 200,000đ", value: "0-200000" },
+    { label: "200,000đ - 500,000đ", value: "200000-500000" },
+    { label: "500,000đ - 1,000,000đ", value: "500000-1000000" },
+    { label: "1,000,000đ - 5,000,000đ", value: "1000000-5000000" },
+    { label: "5,000,000đ - 10,000,000đ", value: "5000000-10000000" },
+    { label: "Trên 10,000,000đ", value: "10000000-999999999" },
+  ];
 
   // Thêm debounce effect để tránh gọi API quá nhiều
   useEffect(() => {
@@ -57,15 +81,22 @@ const ShopPage = () => {
     return () => clearTimeout(timer);
   }, [searchKeyword]);
 
-  // Hàm để lấy unique categories từ products
-  const extractUniqueCategories = (products) => {
+  // Hàm để lấy unique categories và brands từ products
+  const extractUniqueFilters = (products) => {
     const uniqueCategories = new Map();
+    const uniqueBrands = new Map();
+
     products.forEach((product) => {
       if (product.category) {
         uniqueCategories.set(product.category.id, product.category);
       }
+      if (product.brand) {
+        uniqueBrands.set(product.brand.id, product.brand);
+      }
     });
-    return Array.from(uniqueCategories.values());
+
+    setCategories(Array.from(uniqueCategories.values()));
+    setBrands(Array.from(uniqueBrands.values()));
   };
 
   const fetchProduct = async () => {
@@ -75,6 +106,22 @@ const ShopPage = () => {
         size: pageSize,
         keyword: debouncedKeyword,
       };
+
+      // Thêm các filter vào params (nhưng không thêm sort params)
+      if (filters.categorySlug) {
+        params.categorySlug = filters.categorySlug;
+      }
+
+      if (filters.brandSlug) {
+        params.brandSlug = filters.brandSlug;
+      }
+
+      // Xử lý price range
+      if (filters.priceRange && filters.priceRange !== "") {
+        const [min, max] = filters.priceRange.split("-").map(Number);
+        params.minPrice = min;
+        params.maxPrice = max;
+      }
 
       if (slug) {
         if (window.location.pathname.includes("/shop/brand/")) {
@@ -88,13 +135,61 @@ const ShopPage = () => {
       if (data.error) {
         setErrors(data.message);
       } else {
-        setProducts(data.result.productResponses);
+        let filteredProducts = data.result.productResponses;
+
+        // Client-side price filtering if needed
+        if (params.minPrice || params.maxPrice) {
+          filteredProducts = filteredProducts.filter((product) => {
+            const price = product.price || 0;
+            const minPriceMatch = params.minPrice
+              ? price >= params.minPrice
+              : true;
+            const maxPriceMatch = params.maxPrice
+              ? price <= params.maxPrice
+              : true;
+            return minPriceMatch && maxPriceMatch;
+          });
+        }
+
+        // Xử lý sort trên client-side
+        if (filters.sortBy && filters.order) {
+          filteredProducts = [...filteredProducts].sort((a, b) => {
+            let valueA, valueB;
+
+            // Lấy giá trị cần so sánh dựa trên sortBy
+            if (filters.sortBy === "price") {
+              valueA = a.price || 0;
+              valueB = b.price || 0;
+            } else if (filters.sortBy === "name") {
+              valueA = a.name || "";
+              valueB = b.name || "";
+            } else if (filters.sortBy === "createdAt") {
+              valueA = new Date(a.createdAt || 0).getTime();
+              valueB = new Date(b.createdAt || 0).getTime();
+            } else {
+              valueA = a[filters.sortBy] || "";
+              valueB = b[filters.sortBy] || "";
+            }
+
+            // So sánh dựa trên order
+            if (filters.order === "asc") {
+              if (typeof valueA === "string") {
+                return valueA.localeCompare(valueB);
+              }
+              return valueA - valueB;
+            } else {
+              if (typeof valueA === "string") {
+                return valueB.localeCompare(valueA);
+              }
+              return valueB - valueA;
+            }
+          });
+        }
+
+        setProducts(filteredProducts);
         setTotalItems(data.result.totalElements);
-        // Cập nhật categories
-        const uniqueCategories = extractUniqueCategories(
-          data.result.productResponses
-        );
-        setCategories(uniqueCategories);
+        // Cập nhật categories và brands
+        extractUniqueFilters(data.result.productResponses);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -107,7 +202,7 @@ const ShopPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProduct();
-  }, [slug, currentPage, pageSize, debouncedKeyword]);
+  }, [slug, currentPage, pageSize, debouncedKeyword, filters]);
 
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -115,6 +210,52 @@ const ShopPage = () => {
 
   const onShowSizeChange = (current, size) => {
     setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  // Thêm hàm xử lý filter change
+  const handleFilterChange = (type, value) => {
+    setFilters((prev) => ({ ...prev, [type]: value }));
+    setCurrentPage(1); // Reset về trang 1 khi thay đổi filter
+  };
+
+  // Thêm hàm xử lý price range
+  const handlePriceRangeChange = (value) => {
+    setFilters((prev) => ({ ...prev, priceRange: value }));
+    setCurrentPage(1);
+  };
+
+  // Thêm hàm xử lý sort
+  const handleSortChange = (value) => {
+    let sortBy = "";
+    let order = "";
+
+    switch (value) {
+      case "price_asc":
+        sortBy = "price";
+        order = "asc";
+        break;
+      case "price_desc":
+        sortBy = "price";
+        order = "desc";
+        break;
+      case "name_asc":
+        sortBy = "name";
+        order = "asc";
+        break;
+      case "name_desc":
+        sortBy = "name";
+        order = "desc";
+        break;
+      case "newest":
+        sortBy = "createdAt";
+        order = "desc";
+        break;
+      default:
+        break;
+    }
+
+    setFilters((prev) => ({ ...prev, sortBy, order }));
     setCurrentPage(1);
   };
 
@@ -134,11 +275,14 @@ const ShopPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-white text-5xl font-light">Sản Phẩm Chăm Sóc Da</h1>
+              <h1 className="text-white text-5xl font-light">
+                Sản Phẩm Chăm Sóc Da
+              </h1>
               <p className="text-white mt-4 max-w-xl">
-                Khám phá bộ sưu tập các sản phẩm chăm sóc da cao cấp của chúng tôi, 
-                được thiết kế để nuôi dưỡng và làm đẹp làn da của bạn. Mỗi sản phẩm 
-                đều được nghiên cứu kỹ lưỡng để mang lại hiệu quả tối ưu cho mọi loại da.
+                Khám phá bộ sưu tập các sản phẩm chăm sóc da cao cấp của chúng
+                tôi, được thiết kế để nuôi dưỡng và làm đẹp làn da của bạn. Mỗi
+                sản phẩm đều được nghiên cứu kỹ lưỡng để mang lại hiệu quả tối
+                ưu cho mọi loại da.
               </p>
             </motion.div>
           </div>
@@ -148,7 +292,7 @@ const ShopPage = () => {
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Search & Filter Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -168,14 +312,16 @@ const ShopPage = () => {
                 <FiSearch className="h-5 w-5" />
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4 w-full md:w-auto">
               {/* Items per page selector */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Hiển thị:</span>
                 <select
                   value={pageSize}
-                  onChange={(e) => onShowSizeChange(currentPage, parseInt(e.target.value))}
+                  onChange={(e) =>
+                    onShowSizeChange(currentPage, parseInt(e.target.value))
+                  }
                   className="border rounded-md p-1 text-sm bg-white"
                 >
                   <option value="4">4</option>
@@ -184,25 +330,29 @@ const ShopPage = () => {
                   <option value="16">16</option>
                 </select>
               </div>
-              
+
               {/* View Mode Selector */}
               <div className="flex items-center border rounded-md overflow-hidden">
-                <button 
+                <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-gray-200' : 'bg-white'}`}
+                  className={`p-2 ${
+                    viewMode === "grid" ? "bg-gray-200" : "bg-white"
+                  }`}
                 >
                   <FiGrid className="h-4 w-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-gray-200' : 'bg-white'}`}
+                  className={`p-2 ${
+                    viewMode === "list" ? "bg-gray-200" : "bg-white"
+                  }`}
                 >
                   <FiList className="h-4 w-4" />
                 </button>
               </div>
-              
+
               {/* Filter Toggle Button */}
-              <button 
+              <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
               >
@@ -211,12 +361,12 @@ const ShopPage = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Filter Section (conditionally rendered) */}
           {showFilters && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="mt-4 pt-4 border-t border-gray-200"
             >
@@ -224,29 +374,54 @@ const ShopPage = () => {
                 {/* Price Range */}
                 <div>
                   <h3 className="text-sm font-medium mb-2">Khoảng Giá</h3>
-                  <div className="flex items-center gap-2">
-                    <input type="range" className="w-full" />
-                  </div>
+                  <select
+                    className="w-full border rounded-md p-2 text-sm bg-white"
+                    onChange={(e) => handlePriceRangeChange(e.target.value)}
+                    value={filters.priceRange}
+                  >
+                    <option value="">Tất cả giá</option>
+                    {priceRanges.map((range) => (
+                      <option key={range.value} value={range.value}>
+                        {range.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                
-                {/* Brands */}
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Thương Hiệu</h3>
-                  <div className="space-y-1">
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      <span className="text-sm">Tất cả thương hiệu</span>
-                    </label>
+
+                {/* Brand Filter */}
+                {brands.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Thương Hiệu</h3>
+                    <select
+                      className="w-full border rounded-md p-2 text-sm bg-white"
+                      onChange={(e) =>
+                        handleFilterChange("brandSlug", e.target.value)
+                      }
+                      value={filters.brandSlug}
+                    >
+                      <option value="">Tất cả thương hiệu</option>
+                      {brands.map((brand) => (
+                        <option key={brand.id} value={brand.slug}>
+                          {brand.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                </div>
-                
+                )}
+
                 {/* Sort By */}
                 <div>
                   <h3 className="text-sm font-medium mb-2">Sắp Xếp Theo</h3>
-                  <select className="w-full border rounded-md p-2 text-sm bg-white">
-                    <option value="popularity">Phổ biến nhất</option>
+                  <select
+                    className="w-full border rounded-md p-2 text-sm bg-white"
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    value={`${filters.sortBy}_${filters.order}`}
+                  >
+                    <option value="">Mặc định</option>
                     <option value="price_asc">Giá: Thấp đến cao</option>
                     <option value="price_desc">Giá: Cao đến thấp</option>
+                    <option value="name_asc">Tên: A-Z</option>
+                    <option value="name_desc">Tên: Z-A</option>
                     <option value="newest">Mới nhất</option>
                   </select>
                 </div>
@@ -256,7 +431,7 @@ const ShopPage = () => {
         </motion.div>
 
         {/* Categories Navigation */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -265,8 +440,8 @@ const ShopPage = () => {
           <div className="flex flex-wrap items-center gap-2">
             <a
               className={`px-4 py-2 rounded-full transition-colors duration-200 ${
-                !slug 
-                  ? "bg-black text-white" 
+                !slug
+                  ? "bg-black text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
               onClick={() => {
@@ -279,8 +454,8 @@ const ShopPage = () => {
               <a
                 key={category.id}
                 className={`px-4 py-2 rounded-full transition-colors duration-200 ${
-                  slug === category.slug 
-                    ? "bg-black text-white" 
+                  slug === category.slug
+                    ? "bg-black text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
                 onClick={() => {
@@ -307,32 +482,41 @@ const ShopPage = () => {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className={viewMode === "grid" 
-              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" 
-              : "space-y-4"
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                : "space-y-4"
             }
           >
             {products.map((product, index) => (
               <motion.div
                 key={index}
                 variants={fadeIn}
-                className={viewMode === "list" ? "bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4" : ""}
+                className={
+                  viewMode === "list"
+                    ? "bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4"
+                    : ""
+                }
               >
                 {viewMode === "list" ? (
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="w-full md:w-1/3">
                       <div className="aspect-square overflow-hidden rounded-md">
-                        <img 
-                          src={product.thumbnail} 
-                          alt={product.name} 
+                        <img
+                          src={product.thumbnail}
+                          alt={product.name}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     </div>
                     <div className="w-full md:w-2/3 flex flex-col justify-between">
                       <div>
-                        <h3 className="text-lg font-medium mb-2">{product.name}</h3>
-                        <p className="text-gray-600 mb-4 line-clamp-3">{product.description}</p>
+                        <h3 className="text-lg font-medium mb-2">
+                          {product.name}
+                        </h3>
+                        <p className="text-gray-600 mb-4 line-clamp-3">
+                          {product.description}
+                        </p>
                         <div className="text-sm text-gray-500 mb-2">
                           {product.category && (
                             <span className="inline-block bg-gray-100 rounded-full px-3 py-1 mr-2">
@@ -342,7 +526,9 @@ const ShopPage = () => {
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-medium">{product.price} VND</span>
+                        <span className="text-lg font-medium">
+                          {product.price} VND
+                        </span>
                         <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
                           Thêm vào giỏ hàng
                         </button>
@@ -357,16 +543,16 @@ const ShopPage = () => {
           </motion.div>
         ) : (
           <div className="py-20">
-            <Empty 
-              description="Không tìm thấy sản phẩm nào" 
-              image={Empty.PRESENTED_IMAGE_SIMPLE} 
+            <Empty
+              description="Không tìm thấy sản phẩm nào"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           </div>
         )}
 
         {/* Pagination */}
         {!loading && products.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}

@@ -33,7 +33,7 @@ function AddNewVoucher({ fetchVouchers }) {
         if (fetchVouchers) {
           await fetchVouchers();
         }
-        navigate("/admin/vouchers");
+        navigate("/admin/voucher");
       }
     } catch (error) {
       console.error("Error:", error);

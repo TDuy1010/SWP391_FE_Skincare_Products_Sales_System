@@ -47,17 +47,22 @@ const OrderDetail = () => {
 
       if (
         (userRole === "DELIVERY_STAFF" || userRole === "ADMIN") &&
-        (newStatus === "DONE" || newStatus === "DELIVERY_FAIL")
+        newStatus === "DONE"
       ) {
         if (!deliveryImage) {
           toast.error("Please upload delivery image");
           return;
         }
-
-        // Upload image to Cloudinary first
         const image = await uploadToCloudinary(deliveryImage);
-
-        // Send the image URL to BE instead of file
+        response = await updateDeliveryStatus(id, newStatus, image);
+      } else if (
+        (userRole === "DELIVERY_STAFF" || userRole === "ADMIN") &&
+        newStatus === "DELIVERY_FAIL"
+      ) {
+        let image = null;
+        if (deliveryImage) {
+          image = await uploadToCloudinary(deliveryImage);
+        }
         response = await updateDeliveryStatus(id, newStatus, image);
       } else if (newStatus === "DELIVERING") {
         response = await changeToDelivery(id, newStatus);
@@ -81,7 +86,6 @@ const OrderDetail = () => {
   };
 
   const getAvailableStatuses = (currentStatus) => {
-    // Chỉ DELIVERY STAFF mới có thể chuyển sang DONE hoặc DELIVERY_FAIL
     if (currentStatus === "DELIVERING") {
       if (userRole === "DELIVERY_STAFF" || userRole === "ADMIN") {
         return [
@@ -89,7 +93,7 @@ const OrderDetail = () => {
           { value: "DELIVERY_FAIL", label: "Delivery Fail" },
         ];
       }
-      return []; // Admin không thể thay đổi trạng thái khi đang delivering
+      return [];
     }
 
     switch (currentStatus) {

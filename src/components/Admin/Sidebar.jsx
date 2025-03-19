@@ -42,55 +42,55 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       key: "/admin",
       icon: <DashboardOutlined />,
       label: <Link to="/admin">Dashboard</Link>,
-      roles: ["ADMIN"] // Không hiển thị cho DELIVERY
+      roles: ["ADMIN"], // Không hiển thị cho DELIVERY
     },
     {
       key: "/admin/user",
       icon: <UserOutlined />,
       label: <Link to="/admin/user">User Management</Link>,
-      roles: ["ADMIN", "MANAGER"] // Chỉ ADMIN mới có quyền quản lý user
+      roles: ["ADMIN", "MANAGER"], // Chỉ ADMIN mới có quyền quản lý user
     },
     {
       key: "/admin/order",
       icon: <ShoppingCartOutlined />,
       label: <Link to="/admin/order">Order Management</Link>,
-      roles: ["ADMIN", "STAFF", "MANAGER", "DELIVERY"] // Tất cả các role đều thấy
+      roles: ["ADMIN", "STAFF", "MANAGER", "DELIVERY"], // Tất cả các role đều thấy
     },
     {
       key: "/admin/product",
       icon: <InboxOutlined />,
       label: <Link to="/admin/product">Products</Link>,
-      roles: ["ADMIN", "STAFF", "MANAGER"] // STAFF chỉ xem, không thêm/sửa/xóa
+      roles: ["ADMIN", "STAFF", "MANAGER"], // STAFF chỉ xem, không thêm/sửa/xóa
     },
     {
       key: "/admin/category",
       icon: <InboxOutlined />,
       label: <Link to="/admin/category">Category Management</Link>,
-      roles: ["ADMIN", "MANAGER"] // Chỉ ADMIN và MANAGER có quyền quản lý category
+      roles: ["ADMIN", "MANAGER"], // Chỉ ADMIN và MANAGER có quyền quản lý category
     },
     {
       key: "/admin/brand",
       icon: <BarChartOutlined />,
       label: <Link to="/admin/brand">Brand Management</Link>,
-      roles: ["ADMIN", "MANAGER"] // Chỉ ADMIN và MANAGER có quyền quản lý brand
+      roles: ["ADMIN", "MANAGER"], // Chỉ ADMIN và MANAGER có quyền quản lý brand
     },
     {
-      key: "/admin/vouchers",
+      key: "/admin/voucher",
       icon: <GiftOutlined />,
-      label: <Link to="/admin/vouchers">Vouchers</Link>,
-      roles: ["ADMIN", "MANAGER"] // Chỉ ADMIN và MANAGER có quyền quản lý voucher
+      label: <Link to="/admin/voucher">Vouchers</Link>,
+      roles: ["ADMIN", "MANAGER"], // Chỉ ADMIN và MANAGER có quyền quản lý voucher
     },
     {
       key: "/admin/blog",
-      icon: <BookOutlined />, 
+      icon: <BookOutlined />,
       label: <Link to="/admin/blog">Blog</Link>,
-      roles: ["ADMIN", "STAFF", "MANAGER"] // STAFF được quản lý blog
+      roles: ["ADMIN", "STAFF", "MANAGER"], // STAFF được quản lý blog
     },
     {
       key: "/admin/quiz",
       icon: <QuestionCircleOutlined />,
       label: <Link to="/admin/quiz">Quiz</Link>,
-      roles: ["ADMIN", "STAFF"] // STAFF được quản lý quiz
+      roles: ["ADMIN", "STAFF"], // STAFF được quản lý quiz
     },
     {
       key: "logout",
@@ -99,15 +99,15 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       className: "mt-auto",
       danger: true,
       onClick: handleLogout,
-      roles: ["ADMIN", "STAFF", "MANAGER", "DELIVERY"] // Tất cả đều có nút logout
+      roles: ["ADMIN", "STAFF", "MANAGER", "DELIVERY"], // Tất cả đều có nút logout
     },
   ];
 
   // Lọc menu items dựa trên role
   useEffect(() => {
     if (userRole) {
-      const filteredItems = allMenuItems.filter(item => 
-        item.roles && item.roles.includes(userRole)
+      const filteredItems = allMenuItems.filter(
+        (item) => item.roles && item.roles.includes(userRole)
       );
       setVisibleMenuItems(filteredItems);
     }
@@ -124,7 +124,7 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
         height: "100vh",
         position: "fixed",
         left: 0,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
       }}
     >
       <div className="p-4 flex items-center justify-center">
@@ -151,8 +151,12 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
       </div>
 
       {userRole && (
-        <div className={`px-4 py-2 ${collapsed ? 'text-center' : ''}`}>
-          <span className={`text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full ${collapsed ? 'hidden' : ''}`}>
+        <div className={`px-4 py-2 ${collapsed ? "text-center" : ""}`}>
+          <span
+            className={`text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full ${
+              collapsed ? "hidden" : ""
+            }`}
+          >
             {userRole}
           </span>
         </div>

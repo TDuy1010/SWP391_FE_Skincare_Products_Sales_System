@@ -57,17 +57,50 @@ const Orders = () => {
                     <span className="font-semibold text-gray-800">
                       Đơn hàng #{order.orderId}
                     </span>
-                    <span
-                      className={`px-2 py-1 text-white rounded ${
-                        order.status === "COMPLETED"
-                          ? "bg-green-600"
-                          : "bg-yellow-500"
-                      }`}
-                    >
-                      {order.status === "COMPLETED"
-                        ? "Hoàn thành"
-                        : "Đang xử lý"}
-                    </span>
+                    <div className="flex gap-2">
+                      <span
+                        className={`px-2 py-1 text-white rounded ${
+                          order.status === "DONE"
+                            ? "bg-green-600"
+                            : order.status === "DELIVERING"
+                            ? "bg-blue-500"
+                            : order.status === "PENDING"
+                            ? "bg-yellow-500"
+                            : order.status === "PROCESSING"
+                            ? "bg-indigo-500"
+                            : order.status === "CANCELLED"
+                            ? "bg-red-600"
+                            : order.status === "DELIVERING_FAIL"
+                            ? "bg-orange-600"
+                            : "bg-gray-500"
+                        }`}
+                      >
+                        {order.status === "DONE"
+                          ? "Hoàn thành"
+                          : order.status === "DELIVERING"
+                          ? "Đang giao hàng"
+                          : order.status === "PENDING"
+                          ? "Đang xử lý"
+                          : order.status === "PROCESSING"
+                          ? "Đang chuẩn bị"
+                          : order.status === "CANCELLED"
+                          ? "Đã hủy"
+                          : order.status === "DELIVERING_FAIL"
+                          ? "Giao hàng thất bại"
+                          : order.status}
+                      </span>
+                      <span
+                        className={`px-2 py-1 text-white rounded ${
+                          order.paymentStatus === "PAID"
+                            ? "bg-green-600"
+                            : "bg-orange-500"
+                        }`}
+                      >
+                        {order.paymentStatus === "PAID"
+                          ? "Đã thanh toán"
+                          : "Chưa thanh toán"}
+                      </span>
+                    </div>
                   </div>
                   <p className="text-gray-600">
                     📅 {format(new Date(order.orderDate), "dd/MM/yyyy HH:mm")}

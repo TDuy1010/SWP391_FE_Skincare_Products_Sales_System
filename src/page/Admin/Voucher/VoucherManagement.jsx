@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Tooltip, Modal } from "antd";
+import {
+  Table,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Descriptions,
+  Tag,
+  Spin,
+} from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   LoadingOutlined,
-  EyeOutlined, // 👁️ Import View Icon
+  EyeOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { getAllVouchers, deleteVoucher } from "../../../service/voucher/index";
+import {
+  getAllVouchers,
+  deleteVoucher,
+  getVoucherById,
+} from "../../../service/voucher/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import dayjs from "dayjs";
 
 const VoucherManagement = () => {
   const navigate = useNavigate();
@@ -24,7 +38,9 @@ const VoucherManagement = () => {
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletingVoucherId, setDeletingVoucherId] = useState(null);
-  const [viewModalVisible, setViewModalVisible] = useState(false); // 👁️ View Details Modal State
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [voucherDetail, setVoucherDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   // Fetch vouchers from API
   const fetchVouchers = async (page = 0, pageSize = 10) => {
@@ -54,7 +70,7 @@ const VoucherManagement = () => {
   }, []);
 
   const handleTableChange = (newPagination) => {
-    fetchVouchers(newPagination.current, newPagination.pageSize);
+    fetchVouchers(newPagination.current - 1, newPagination.pageSize);
   };
 
   const showDeleteConfirm = (voucher) => {
@@ -62,9 +78,23 @@ const VoucherManagement = () => {
     setDeleteModalVisible(true);
   };
 
-  const showVoucherDetails = (voucher) => {
+  const showVoucherDetails = async (voucher) => {
     setSelectedVoucher(voucher);
     setViewModalVisible(true);
+    setLoadingDetail(true);
+
+    try {
+      const response = await getVoucherById(voucher.id);
+      if (!response.error) {
+        setVoucherDetail(response.result);
+      } else {
+        toast.error(response.message || "Failed to fetch voucher details");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch voucher details");
+    } finally {
+      setLoadingDetail(false);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -128,7 +158,9 @@ const VoucherManagement = () => {
       title: "Actions",
       key: "actions",
       render: (_, record) =>
-        deletingVoucherId === record.id ? null : (
+        deletingVoucherId === record.id ? (
+          <LoadingOutlined />
+        ) : (
           <Space>
             <Tooltip title="View Details">
               <Button
@@ -136,24 +168,10 @@ const VoucherManagement = () => {
                 onClick={() => showVoucherDetails(record)}
               />
             </Tooltip>
-            <Tooltip title="Edit">
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => navigate(`/admin/voucher/edit/${record.id}`)}
-                disabled={deletingVoucherId === record.id}
-              />
-            </Tooltip>
             <Tooltip title="Delete">
               <Button
                 danger
-                icon={
-                  deletingVoucherId === record.id ? (
-                    <LoadingOutlined />
-                  ) : (
-                    <DeleteOutlined />
-                  )
-                }
+                icon={<DeleteOutlined />}
                 onClick={() => showDeleteConfirm(record)}
                 disabled={deletingVoucherId === record.id}
               />
@@ -170,7 +188,7 @@ const VoucherManagement = () => {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => navigate("/admin/vouchers/add")}
+          onClick={() => navigate("/admin/voucher/add")}
         >
           Add New Voucher
         </Button>
@@ -183,6 +201,8 @@ const VoucherManagement = () => {
         loading={loading}
         onChange={handleTableChange}
       />
+
+      {/* Delete Confirmation Modal */}
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
@@ -200,6 +220,64 @@ const VoucherManagement = () => {
         </p>
         <p>This action cannot be undone.</p>
       </Modal>
+
+      {/* Voucher Detail Modal */}
+      <Modal
+        title="Voucher Details"
+        open={viewModalVisible}
+        onCancel={() => {
+          setViewModalVisible(false);
+          setVoucherDetail(null);
+        }}
+        footer={[
+          <Button
+            key="close"
+            onClick={() => {
+              setViewModalVisible(false);
+              setVoucherDetail(null);
+            }}
+          >
+            Close
+          </Button>,
+        ]}
+        width={700}
+      >
+        {loadingDetail ? (
+          <div className="flex justify-center items-center py-10">
+            <Spin size="large" />
+          </div>
+        ) : voucherDetail ? (
+          <Descriptions bordered column={1}>
+            <Descriptions.Item label="ID">{voucherDetail.id}</Descriptions.Item>
+            <Descriptions.Item label="Code">
+              {voucherDetail.code}
+            </Descriptions.Item>
+            <Descriptions.Item label="Description">
+              {voucherDetail.description || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Discount Type">
+              {voucherDetail.discountType}
+            </Descriptions.Item>
+            <Descriptions.Item label="Discount">
+              {voucherDetail.discountType === "PERCENTAGE"
+                ? `${voucherDetail.discount}%`
+                : `${voucherDetail.discount.toLocaleString()}đ`}
+            </Descriptions.Item>
+            <Descriptions.Item label="Minimum Order Value">
+              {voucherDetail.minOrderValue.toLocaleString()}đ
+            </Descriptions.Item>
+            <Descriptions.Item label="Points Required">
+              {voucherDetail.point}
+            </Descriptions.Item>
+            <Descriptions.Item label="Quantity">
+              {voucherDetail.quantity}
+            </Descriptions.Item>
+          </Descriptions>
+        ) : (
+          <p>No voucher details available</p>
+        )}
+      </Modal>
+
       <ToastContainer />
     </div>
   );

@@ -11,16 +11,19 @@ import {
   DatePicker,
   Table,
   Space,
+  Popconfirm,
 } from "antd";
 import {
   ArrowLeftOutlined,
   InboxOutlined,
   PlusCircleOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { getProductById } from "../../../service/productManagement";
 import {
   addNewBatch,
   getBatches,
+  deleteBatch,
 } from "../../../service/productManagement/index";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
@@ -36,6 +39,7 @@ const ProductDetail = () => {
   const [viewBatchesModalVisible, setViewBatchesModalVisible] = useState(false);
   const [batches, setBatches] = useState([]);
   const [batchesLoading, setBatchesLoading] = useState(false);
+  const [deletingBatch, setDeletingBatch] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -106,6 +110,25 @@ const ProductDetail = () => {
     fetchBatches();
   };
 
+  const handleDeleteBatch = async (batchId) => {
+    setDeletingBatch(true);
+    try {
+      const response = await deleteBatch(batchId);
+      if (!response.error) {
+        toast.success("Batch deleted successfully");
+        // Refresh batches list
+        fetchBatches();
+      } else {
+        toast.error(response.message || "Failed to delete batch");
+      }
+    } catch (error) {
+      toast.error("Failed to delete batch");
+      console.error("Delete batch error:", error);
+    } finally {
+      setDeletingBatch(false);
+    }
+  };
+
   const batchColumns = [
     {
       title: "Batch Code",
@@ -128,6 +151,29 @@ const ProductDetail = () => {
       dataIndex: "expirationDate",
       key: "expirationDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Popconfirm
+          title="Delete this batch?"
+          description="Are you sure you want to delete this batch? This action cannot be undone."
+          onConfirm={() => handleDeleteBatch(record.id)}
+          okText="Yes"
+          cancelText="No"
+          okButtonProps={{ loading: deletingBatch }}
+        >
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            size="small"
+            loading={deletingBatch}
+          >
+            Delete
+          </Button>
+        </Popconfirm>
+      ),
     },
   ];
 

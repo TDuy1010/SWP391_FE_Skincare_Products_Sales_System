@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import LoginModal from "../LoginPage/LoginPage";
 import { addItemToCart } from "../../../service/cart/cart";
 import { toast } from "react-toastify";
-import { FiShoppingBag, FiEye } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
@@ -14,7 +13,9 @@ const ProductCard = ({
   size,
   price,
   thumbnail,
+  slug,
 }) => {
+  const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -29,9 +30,14 @@ const ProductCard = ({
     }).format(price);
   };
 
+  const handleCardClick = () => {
+    navigate(`/product/${slug}`);
+  };
+
   const handleAddToCart = async (e) => {
-    e?.stopPropagation();
-    
+    // Stop propagation to prevent navigation when clicking the button
+    e.stopPropagation();
+
     const token = localStorage.getItem("token");
     if (!token) {
       setShowLoginModal(true);
@@ -40,9 +46,6 @@ const ProductCard = ({
 
     setIsLoading(true);
     try {
-      if (!id) {
-        throw new Error("Product ID is missing");
-      }
       const response = await addItemToCart(id, 1);
       if (response.error) {
         toast.error(response.message);
@@ -62,16 +65,11 @@ const ProductCard = ({
 
   return (
     <>
-      <div 
-        className="group relative flex flex-col bg-white overflow-hidden rounded-lg transition-all duration-300 ease-out"
-        style={{
-          boxShadow: isHovered ? '0 10px 30px rgba(0,0,0,0.08)' : '0 2px 10px rgba(0,0,0,0.05)'
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={handleViewDetail}
+      <div
+        className="group cursor-pointer relative flex flex-col items-center text-center bg-white p-4 hover:shadow-xl transition duration-300 rounded-lg h-[500px] w-[300px]"
+        onClick={handleCardClick}
       >
-        {/* Tag Badge */}
+        {/* Tag */}
         {tag && (
           <span className="absolute top-3 left-3 z-10 text-xs font-medium bg-white text-gray-800 px-3 py-1 rounded-full shadow-sm">
             {tag}
@@ -139,9 +137,20 @@ const ProductCard = ({
           </h3>
           
           {/* Price */}
-          <p className="font-semibold text-black mt-auto">
-            {formatPrice(price)}
-          </p>
+          <div className="h-[40px] w-full flex items-center justify-center">
+            <p className="font-semibold text-black">${formatPrice(price)}</p>
+          </div>
+        </div>
+
+        {/* Button Section */}
+        <div className="w-full mt-2">
+          <button
+            className="w-full bg-black text-white py-2 px-6 rounded-md text-sm opacity-0 group-hover:opacity-100 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleAddToCart}
+            disabled={isLoading}
+          >
+            {isLoading ? "Adding..." : "Add to your Cart"}
+          </button>
         </div>
       </div>
 

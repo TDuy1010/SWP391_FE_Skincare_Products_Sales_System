@@ -9,6 +9,9 @@ import {
   Switch,
   Input,
   Select,
+  InputNumber,
+  Row,
+  Col,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
@@ -44,9 +47,21 @@ const ProductManagement = () => {
     originSlug: "",
     sortBy: "",
     order: "",
+    priceRange: "",
+    minPrice: null,
+    maxPrice: null,
   });
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+
+  const priceRanges = [
+    { label: "Dưới 200,000đ", value: "0-200000" },
+    { label: "200,000đ - 500,000đ", value: "200000-500000" },
+    { label: "500,000đ - 1,000,000đ", value: "500000-1000000" },
+    { label: "1,000,000đ - 5,000,000đ", value: "1000000-5000000" },
+    { label: "5,000,000đ - 10,000,000đ", value: "5000000-10000000" },
+    { label: "Trên 10,000,000đ", value: "10000000-999999999" },
+  ];
 
   const extractFilters = (products) => {
     const categoriesMap = new Map();
@@ -80,6 +95,14 @@ const ProductManagement = () => {
         ...params,
       };
 
+      // Handle price range selection
+      if (params.priceRange && params.priceRange !== "") {
+        const [min, max] = params.priceRange.split("-").map(Number);
+        queryParams.minPrice = min;
+        queryParams.maxPrice = max;
+        delete queryParams.priceRange; // Remove priceRange as it's not needed for API
+      }
+
       Object.keys(queryParams).forEach(
         (key) =>
           (queryParams[key] === undefined || queryParams[key] === "") &&
@@ -88,11 +111,30 @@ const ProductManagement = () => {
 
       const response = await getAllProducts(queryParams);
       if (!response.error) {
-        setProducts(response.result.productResponses);
+        let filteredProducts = response.result.productResponses;
+
+        // Client-side price filtering
+        if (queryParams.minPrice || queryParams.maxPrice) {
+          filteredProducts = filteredProducts.filter((product) => {
+            const price = product.price || 0;
+            const minPriceMatch = queryParams.minPrice
+              ? price >= queryParams.minPrice
+              : true;
+            const maxPriceMatch = queryParams.maxPrice
+              ? price <= queryParams.maxPrice
+              : true;
+            return minPriceMatch && maxPriceMatch;
+          });
+        }
+
+        setProducts(filteredProducts);
         setPagination({
           current: response.result.pageNumber + 1,
           pageSize: response.result.pageSize,
-          total: response.result.totalElements,
+          total:
+            queryParams.minPrice || queryParams.maxPrice
+              ? filteredProducts.length
+              : response.result.totalElements,
         });
         extractFilters(response.result.productResponses);
       } else {
@@ -157,6 +199,16 @@ const ProductManagement = () => {
 
   const handleFilterChange = (type, value) => {
     const newFilters = { ...filters, [type]: value };
+    setFilters(newFilters);
+    fetchProducts({
+      ...newFilters,
+      page: 1,
+      pageSize: pagination.pageSize,
+    });
+  };
+
+  const handlePriceRangeChange = (value) => {
+    const newFilters = { ...filters, priceRange: value };
     setFilters(newFilters);
     fetchProducts({
       ...newFilters,
@@ -292,7 +344,7 @@ const ProductManagement = () => {
           Add New Product
         </Button>
       </div>
-      <div className="mb-4 flex gap-4">
+      <div className="mb-4 flex gap-4 flex-wrap">
         <Input.Search
           placeholder="Search by keyword"
           onSearch={(value) => handleFilterChange("keyword", value)}
@@ -325,6 +377,18 @@ const ProductManagement = () => {
             ))}
           </Select>
         )}
+        <Select
+          placeholder="Price Range"
+          style={{ width: 200 }}
+          allowClear
+          onChange={handlePriceRangeChange}
+        >
+          {priceRanges.map((range) => (
+            <Select.Option key={range.value} value={range.value}>
+              {range.label}
+            </Select.Option>
+          ))}
+        </Select>
       </div>
       <Table
         columns={columns}

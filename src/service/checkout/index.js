@@ -49,3 +49,39 @@ export const verifyVNPayPayment = async (queryString) => {
     };
   }
 };
+
+export const confirmPaymentSuccess = async (queryString) => {
+  try {
+    // Đảm bảo queryString bắt đầu bằng dấu ?
+    if (queryString && !queryString.startsWith("?")) {
+      queryString = `?${queryString}`;
+    }
+
+    console.log(`Calling API: /orders/payment-success${queryString}`);
+
+    const response = await instance.post(
+      `/orders/payment-success${queryString}`,
+      {}, // Empty request body
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    return {
+      error: false,
+      code: response.code || 200,
+      message: response.message || "Xác nhận thanh toán thành công",
+      result: response.result,
+    };
+  } catch (error) {
+    console.error("Payment success confirmation error:", error);
+    return {
+      error: true,
+      code: error.response?.code || 500,
+      message:
+        error.response?.message || "Có lỗi xảy ra khi xác nhận thanh toán",
+    };
+  }
+};
