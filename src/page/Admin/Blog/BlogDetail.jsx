@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Spin, Image } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { getBlogById } from "../../../service/Blog/index";
+import { getBlogById } from "../../../service/blog/index";
 import { toast } from "react-toastify";
 
 const BlogDetail = () => {
