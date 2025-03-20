@@ -6,10 +6,10 @@ export const getPublicBlogs = async (params) => {
       params: {
         page: params?.page || 0,
         size: params?.size || 10,
-        status: "ACTIVE"
-      }
+        status: "ACTIVE",
+      },
     });
-    
+
     if (response.code === 200) {
       return {
         error: false,
@@ -34,7 +34,7 @@ export const getPublicBlogs = async (params) => {
 export const getBlogDetail = async (blogId) => {
   try {
     const response = await instance.get(`/blogs/${blogId}`);
-    
+
     if (response.code === 200) {
       return {
         error: false,
@@ -54,4 +54,4 @@ export const getBlogDetail = async (blogId) => {
       message: error.response?.data?.message || "Không thể kết nối đến server",
     };
   }
-}; 
+};

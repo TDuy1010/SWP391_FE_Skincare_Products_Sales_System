@@ -10,7 +10,7 @@ export const getAllBlogs = async (params) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    
+
     // Kiểm tra response từ API
     if (response.code === 200) {
       return {
@@ -42,7 +42,7 @@ export const getBlogById = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    
+
     // Kiểm tra response từ API
     if (response.code === 200) {
       return {
@@ -68,14 +68,15 @@ export const getBlogById = async (id) => {
 export const addBlog = async (formData) => {
   try {
     const token = localStorage.getItem("token");
-    
+
     // Lấy và tối ưu dữ liệu
     const title = formData.get("title");
     const content = formData.get("content");
     const imageFile = formData.get("image");
-    
+
     // Kiểm tra kích thước content
-    if (content && content.length > 1000000) { // Ví dụ giới hạn 1MB
+    if (content && content.length > 1000000) {
+      // Ví dụ giới hạn 1MB
       return {
         error: true,
         message: "Nội dung blog quá lớn, vui lòng giảm kích thước",
@@ -97,7 +98,7 @@ export const addBlog = async (formData) => {
     const payload = {
       title,
       content,
-      image: imageUrl
+      image: imageUrl,
     };
 
     const response = await instance.post("admin/blogs", payload, {
@@ -107,7 +108,8 @@ export const addBlog = async (formData) => {
       },
     });
 
-    if (response.code === 201) { // Kiểm tra mã 201 Created
+    if (response.code === 201) {
+      // Kiểm tra mã 201 Created
       return {
         error: false,
         result: response.result,
@@ -136,12 +138,12 @@ export const addBlog = async (formData) => {
 export const updateBlog = async (id, formData) => {
   try {
     const token = localStorage.getItem("token");
-    
+
     // Lấy và tối ưu dữ liệu
     const title = formData.get("title");
     const content = formData.get("content");
     const imageFile = formData.get("image");
-    
+
     // Kiểm tra kích thước content
     if (content && content.length > 1000000) {
       return {
@@ -149,7 +151,7 @@ export const updateBlog = async (id, formData) => {
         message: "Nội dung blog quá lớn, vui lòng giảm kích thước",
       };
     }
-    
+
     // Upload ảnh lên Cloudinary nếu có file ảnh mới
     let imageUrl = null;
     if (imageFile) {
@@ -160,13 +162,13 @@ export const updateBlog = async (id, formData) => {
         throw new Error("Không thể tải ảnh lên");
       }
     }
-    
+
     // Tạo payload theo cấu trúc API yêu cầu
     const payload = {
       title,
       content,
       image: imageUrl, // Sử dụng URL ảnh từ Cloudinary
-      status: "INACTIVE"
+      status: "INACTIVE",
     };
 
     const response = await instance.put(`admin/blogs/${id}`, payload, {
@@ -222,40 +224,43 @@ export const deleteBlog = async (id) => {
 export const changeBlogStatus = async (blogId, status) => {
   try {
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
       return {
         error: true,
-        message: "Vui lòng đăng nhập lại"
+        message: "Vui lòng đăng nhập lại",
       };
     }
 
-    await instance.patch(`admin/blogs/change-status/${blogId}?status=${status}`, null, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await instance.patch(
+      `admin/blogs/change-status/${blogId}?status=${status}`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     // Trả về kết quả thành công mà không cần kiểm tra response.data
     return {
       error: false,
-      message: "Thay đổi trạng thái blog thành công"
+      message: "Thay đổi trạng thái blog thành công",
     };
-
   } catch (error) {
     console.error("Change blog status error:", error);
-    
+
     if (error.response?.status === 401 || error.response?.data?.code === 1201) {
       localStorage.removeItem("token");
       return {
         error: true,
-        message: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại"
+        message: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại",
       };
     }
 
     return {
       error: true,
-      message: "Không thể thay đổi trạng thái blog"
+      message: "Không thể thay đổi trạng thái blog",
     };
   }
 };
