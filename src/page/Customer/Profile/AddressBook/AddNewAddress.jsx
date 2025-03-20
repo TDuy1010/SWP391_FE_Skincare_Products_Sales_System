@@ -9,7 +9,7 @@ const AddNewAddress = ({ onClose, defaultValues, onAddAddress }) => {
       district: "",
       ward: "",
       street: "",
-      default: false,
+      isDefault: false,
     }
   );
 
@@ -138,8 +138,8 @@ const AddNewAddress = ({ onClose, defaultValues, onAddAddress }) => {
           <input
             id="defaultAddress"
             type="checkbox"
-            name="default"
-            checked={form.default}
+            name="isDefault"
+            checked={form.isDefault}
             onChange={handleChange}
             className="w-4 h-4"
           />

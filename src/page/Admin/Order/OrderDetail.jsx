@@ -57,7 +57,7 @@ const OrderDetail = () => {
         response = await updateDeliveryStatus(id, newStatus, image);
       } else if (
         (userRole === "DELIVERY_STAFF" || userRole === "ADMIN") &&
-        newStatus === "DELIVERY_FAIL"
+        newStatus === "DELIVERING_FAIL"
       ) {
         let image = null;
         if (deliveryImage) {
@@ -90,7 +90,7 @@ const OrderDetail = () => {
       if (userRole === "DELIVERY_STAFF" || userRole === "ADMIN") {
         return [
           { value: "DONE", label: "Done" },
-          { value: "DELIVERY_FAIL", label: "Delivery Fail" },
+          { value: "DELIVERING_FAIL", label: "Delivering Fail" },
         ];
       }
       return [];
@@ -137,7 +137,8 @@ const OrderDetail = () => {
               {(currentStatus === "DELIVERING" ||
                 availableStatuses.some(
                   (status) =>
-                    status.value === "DONE" || status.value === "DELIVERY_FAIL"
+                    status.value === "DONE" ||
+                    status.value === "DELIVERING_FAIL"
                 )) &&
                 (userRole === "DELIVERY_STAFF" || userRole === "ADMIN") && (
                   <input
