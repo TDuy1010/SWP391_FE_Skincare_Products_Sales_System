@@ -182,6 +182,41 @@ const Dashboard = () => {
       legend: {
         position: "top",
       },
+      tooltip: {
+        callbacks: {
+          // Hiển thị đầy đủ tên sản phẩm trong tooltip
+          title: function (tooltipItems) {
+            return tooltipItems[0].label;
+          },
+        },
+      },
+    },
+  };
+
+  // Cấu hình riêng cho biểu đồ Bar (top sản phẩm)
+  const barChartOptions = {
+    ...chartOptions,
+    indexAxis: "y", // Chuyển sang dạng bar chart ngang
+    scales: {
+      x: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Số lượng bán ra",
+        },
+      },
+      y: {
+        ticks: {
+          callback: function (value) {
+            // Cắt ngắn tên sản phẩm nếu quá dài
+            const label = this.getLabelForValue(value);
+            if (label.length > 20) {
+              return label.substring(0, 20) + "...";
+            }
+            return label;
+          },
+        },
+      },
     },
   };
 
@@ -318,7 +353,7 @@ const Dashboard = () => {
               >
                 <div style={{ height: "300px" }}>
                   {topProductsData ? (
-                    <Bar data={topProductsData} options={chartOptions} />
+                    <Bar data={topProductsData} options={barChartOptions} />
                   ) : (
                     <div className="flex justify-center items-center h-full">
                       <p>Không có dữ liệu sản phẩm bán chạy</p>
