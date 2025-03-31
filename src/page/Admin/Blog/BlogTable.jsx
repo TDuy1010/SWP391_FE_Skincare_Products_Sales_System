@@ -10,7 +10,7 @@ const BlogTable = ({
   blogs,
   loading,
   pagination,
-  onTableChange,
+  onPageChange,
   onStatusChange,
   onEditBlog,
   onDeleteBlog,
@@ -114,15 +114,16 @@ const BlogTable = ({
     <Table
       columns={columns}
       dataSource={blogs}
-      rowKey="id"
-      pagination={{
-        ...pagination,
-        showSizeChanger: true,
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-        pageSizeOptions: ["10", "20", "50", "100"],
-      }}
       loading={loading}
-      onChange={onTableChange}
+      pagination={{
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+        total: pagination.total,
+        onChange: onPageChange,
+        showSizeChanger: false,
+        showTotal: (total) => `Tổng cộng ${total} bài viết`
+      }}
+      rowKey="id"
     />
   );
 };

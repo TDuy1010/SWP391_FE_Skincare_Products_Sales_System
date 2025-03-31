@@ -8,6 +8,7 @@ import { logout } from "../../service/logout";
 import { getCart } from "../../service/cart/cart";
 import { clearExpiredToken } from "../../service/login/index";
 import ChangePassword from "../../page/Customer/ChangePassword/ChangePassword";
+import { useCart } from '../../context/CartContext';
 
 const Header = () => {
   const [showSearch, setShowSearch] = useState(false);
@@ -25,6 +26,7 @@ const Header = () => {
   const [error, setError] = useState(null);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const navigate = useNavigate();
+  const { cartItemCount, updateCartItemCount } = useCart();
 
   useEffect(() => {
     // Kiểm tra token hết hạn mỗi khi component được render
@@ -35,6 +37,22 @@ const Header = () => {
       setUser(storedUser); // Lưu vào state
     }
   }, []);
+
+  // Thêm useEffect để lấy số lượng giỏ hàng khi component được mount và khi có thay đổi
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const response = await getCart();
+        if (!response.error && response.result) {
+          updateCartItemCount(response.result.items);
+        }
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    };
+
+    fetchCartCount();
+  }, [updateCartItemCount]);
 
   const handleClickOutside = (event) => {
     if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -257,6 +275,11 @@ const Header = () => {
                       size={20}
                       className="cursor-pointer text-gray-700 hover:text-black transition-colors"
                     />
+                    {cartItemCount > 0 && (
+                      <div className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {cartItemCount}
+                      </div>
+                    )}
                   </div>
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-black transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
                 </Link>

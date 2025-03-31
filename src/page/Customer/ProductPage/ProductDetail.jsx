@@ -7,6 +7,7 @@ import {
 } from "../../../service/product";
 import { addItemToCart } from "../../../service/cart/cart";
 import { toast } from "react-toastify";
+import { useCart } from '../../../context/CartContext';
 
 // Add TabButton component definition
 const TabButton = ({ isActive, onClick, children }) => (
@@ -57,19 +58,54 @@ const ProductImages = ({ product, mainImage, setMainImage }) => (
   </div>
 );
 
-const RatingStars = ({ rating = 5, size = 16 }) => (
-  <div className="flex">
-    {[...Array(5)].map((_, i) => (
-      <Star
-        key={i}
-        size={size}
-        className={
-          i < rating ? "fill-amber-400 text-amber-400" : "text-gray-300"
-        }
-      />
-    ))}
-  </div>
-);
+const RatingStars = ({ rating = 5, totalRatings = 0, size = 16 }) => {
+  const roundedRating = Math.round(rating * 2) / 2; // Làm tròn đến 0.5
+
+  return (
+    <div className="flex items-center">
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((index) => {
+          const difference = roundedRating - index;
+          
+          // Sao đầy
+          if (difference >= 0) {
+            return (
+              <Star
+                key={index}
+                size={size}
+                className="fill-amber-400 text-amber-400"
+              />
+            );
+          }
+          // Nửa sao
+          else if (difference > -1 && difference < 0) {
+            return (
+              <div key={index} className="relative">
+                <Star size={size} className="text-gray-300" />
+                <div className="absolute top-0 left-0 w-1/2 overflow-hidden">
+                  <Star size={size} className="fill-amber-400 text-amber-400" />
+                </div>
+              </div>
+            );
+          }
+          // Sao rỗng
+          return (
+            <Star
+              key={index}
+              size={size}
+              className="text-gray-300"
+            />
+          );
+        })}
+      </div>
+      {totalRatings > 0 && (
+        <span className="ml-2 text-sm text-gray-600">
+          {roundedRating.toFixed(1)} ({totalRatings} đánh giá)
+        </span>
+      )}
+    </div>
+  );
+};
 
 // Add ReviewItem component definition
 const ReviewItem = ({ review, onHelpful }) => (
@@ -118,21 +154,16 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("description");
+  const { updateCartItemCount, refreshCart } = useCart();
 
-  // Update productSpecs to use data from API
+  // Cập nhật productSpecs để chỉ chứa cấu trúc rỗng
   const [productSpecs, setProductSpecs] = useState({
     parameters: [],
-    usage: [
-      "Thoa 2-3 giọt lên da sạch, khô",
-      "Nhẹ nhàng vỗ nhẹ lên mặt và cổ",
-      "Để thẩm thấu trước khi thoa kem dưỡng ẩm",
-      "Sử dụng buổi sáng và buổi tối để có kết quả tốt nhất",
-      "Tránh tiếp xúc trực tiếp với mắt",
-    ],
+    usage: [],
     ingredients: "",
   });
 
-  // Add states for reviews
+  // Cập nhật state reviews thành mảng rỗng
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewForm, setReviewForm] = useState({
     name: "",
@@ -140,25 +171,7 @@ const ProductDetail = () => {
     content: "",
     rating: 5,
   });
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "Nguyễn Văn A",
-      rating: 5,
-      date: "2025-01-15",
-      content: "Sản phẩm rất tốt, làm da mình mềm mịn hơn sau 2 tuần sử dụng.",
-      helpful: 12,
-    },
-    {
-      id: 2,
-      name: "Trần Thị B",
-      rating: 4,
-      date: "2025-02-01",
-      content:
-        "Mình khá hài lòng với sản phẩm này. Chỉ tiếc là giá hơi cao một chút.",
-      helpful: 5,
-    },
-  ]);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -211,6 +224,7 @@ const ProductDetail = () => {
     try {
       const response = await addItemToCart(product.id, quantity);
       if (!response.error) {
+        await refreshCart();
         toast.success("Thêm vào giỏ hàng thành công!");
       } else {
         toast.error(response.message);
@@ -224,6 +238,7 @@ const ProductDetail = () => {
     try {
       const response = await addItemToCart(product.id, quantity);
       if (!response.error) {
+        await refreshCart();
         navigate("/cart");
       } else {
         toast.error(response.message);
@@ -323,10 +338,10 @@ const ProductDetail = () => {
 
               {/* Ratings */}
               <div className="flex items-center">
-                <RatingStars rating={product.rating || 5} />
-                <span className="ml-2 text-sm text-gray-600">
-                  {product.feedBacks?.length || 0} đánh giá
-                </span>
+                <RatingStars 
+                  rating={product.rating || 0} 
+                  totalRatings={product.feedBacks?.length || 0}
+                />
               </div>
             </div>
 
@@ -532,19 +547,6 @@ const ProductDetail = () => {
                 {/* Reviews Tab */}
                 {activeTab === "reviews" && (
                   <div className="space-y-6">
-                    {/* Review Form Button */}
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-medium">
-                        Đánh giá từ khách hàng
-                      </h3>
-                      <button
-                        onClick={() => setShowReviewForm(!showReviewForm)}
-                        className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                      >
-                        {showReviewForm ? "Hủy đánh giá" : "Viết đánh giá"}
-                      </button>
-                    </div>
-
                     {/* Review Form */}
                     {showReviewForm && (
                       <form
@@ -629,10 +631,7 @@ const ProductDetail = () => {
                                   {feedback.userResponse.lastName}
                                 </p>
                                 <div className="mt-1">
-                                  <RatingStars
-                                    rating={feedback.rating}
-                                    size={14}
-                                  />
+                                  <RatingStars rating={feedback.rating} size={14} />
                                 </div>
                               </div>
                             </div>
