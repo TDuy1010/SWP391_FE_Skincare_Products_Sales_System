@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Modal, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { addBlog } from "../../../service/blog/index";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import { addBlog } from "../../../service/blogService/index";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
   const [form] = Form.useForm();
@@ -13,42 +13,48 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
   // Cấu hình cho React Quill
   const modules = {
     toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      ['link', 'image'],
-      ['clean']
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
     ],
     clipboard: {
-      matchVisual: false
-    }
+      matchVisual: false,
+    },
   };
 
   const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet',
-    'color', 'background',
-    'align',
-    'link', 'image'
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "color",
+    "background",
+    "align",
+    "link",
+    "image",
   ];
 
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      
+
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("content", content);
-      
+
       if (values.image?.[0]?.originFileObj) {
         formData.append("image", values.image[0].originFileObj);
       }
 
       const response = await addBlog(formData);
-      
+
       if (!response.error) {
         showToast("success", "Tạo blog thành công!");
         form.resetFields();
@@ -111,21 +117,25 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
             { required: true, message: "Vui lòng nhập nội dung" },
             {
               validator: (_, value) => {
-                const textContent = value ? value.replace(/<[^>]*>/g, "").trim() : "";
+                const textContent = value
+                  ? value.replace(/<[^>]*>/g, "").trim()
+                  : "";
                 return textContent.length >= 10
                   ? Promise.resolve()
-                  : Promise.reject(new Error("Nội dung phải có ít nhất 10 ký tự"));
+                  : Promise.reject(
+                      new Error("Nội dung phải có ít nhất 10 ký tự")
+                    );
               },
             },
           ]}
         >
-          <ReactQuill 
+          <ReactQuill
             theme="snow"
             value={content}
             onChange={handleContentChange}
             modules={modules}
             formats={formats}
-            style={{ height: '300px', marginBottom: '50px' }}
+            style={{ height: "300px", marginBottom: "50px" }}
           />
         </Form.Item>
 
@@ -153,11 +163,7 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
           <Button onClick={onCancel} className="mr-2">
             Hủy
           </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-          >
+          <Button type="primary" htmlType="submit" loading={loading}>
             Tạo Blog
           </Button>
         </Form.Item>

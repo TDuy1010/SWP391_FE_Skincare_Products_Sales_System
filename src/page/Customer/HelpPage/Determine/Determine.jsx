@@ -532,7 +532,7 @@ const Determine = () => {
                 Làm Bài Kiểm Tra Lại
               </motion.button>
 
-              <motion.button
+              {/* <motion.button
                 className="px-8 py-3 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -542,7 +542,7 @@ const Determine = () => {
                 }}
               >
                 Tìm Sản Phẩm Phù Hợp Với Da Của Bạn
-              </motion.button>
+              </motion.button> */}
             </div>
           </div>
         </motion.div>

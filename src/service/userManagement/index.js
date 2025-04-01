@@ -8,7 +8,7 @@ export const getUsersAdmin = async (page = 1, pageSize = 10) => {
         Authorization: `Bearer ${token}`,
       },
       params: {
-        page: page - 1,
+        page: page,
         size: pageSize,
       },
     });

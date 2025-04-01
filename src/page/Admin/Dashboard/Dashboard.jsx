@@ -236,13 +236,7 @@ const Dashboard = () => {
           <AntTitle level={2} className="mb-1">
             Dashboard
           </AntTitle>
-          <div className="text-gray-600">
-            <HomeOutlined />{" "}
-            <a href="/admin" className="text-blue-500 hover:underline">
-              Admin
-            </a>{" "}
-            / <span>Dashboard</span>
-          </div>
+          
         </div>
         <div>
           <RangePicker onChange={handleDateChange} />

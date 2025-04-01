@@ -128,6 +128,8 @@ const EditModal = React.memo(
   }
 );
 
+EditModal.displayName = 'EditModal';
+
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);

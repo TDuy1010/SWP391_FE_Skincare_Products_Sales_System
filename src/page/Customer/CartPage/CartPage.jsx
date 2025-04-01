@@ -4,26 +4,31 @@ import { getCart, removeCart, updateCart } from "../../../service/cart/cart";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { FaArrowLeft } from "react-icons/fa";
+import { useCart } from '../../../context/CartContext';
 
 function Cart() {
   const [cart, setCart] = useState(null);
   const [errors, setErrors] = useState(null);
   const navigate = useNavigate();
+  const { updateCartItemCount } = useCart();
 
   const fetchCart = async () => {
     try {
       const response = await getCart();
       if (response.error) {
         setErrors(response.message);
-        toast.error(response.message || "Failed to fetch cart"); // Thông báo lỗi bằng toast
+        toast.error(response.message || "Failed to fetch cart");
         setCart(null);
+        updateCartItemCount([]);
       } else {
         setErrors(null);
         setCart(response.result);
+        updateCartItemCount(response.result.items);
       }
     } catch (error) {
       setErrors("Failed to fetch cart");
-      toast.error("Failed to fetch cart"); // Thông báo lỗi bất ngờ
+      toast.error("Failed to fetch cart");
+      updateCartItemCount([]);
     }
   };
 
@@ -32,7 +37,7 @@ function Cart() {
       const response = await removeCart({ productId });
       if (response.error) {
         setErrors(response.message || "Failed to delete item");
-        toast.error(response.message || "Failed to delete item"); // Thông báo lỗi bằng toast
+        toast.error(response.message || "Failed to delete item");
       } else {
         setErrors(null);
         toast.success(
@@ -54,7 +59,7 @@ function Cart() {
       });
       if (response.error) {
         setErrors(response.message);
-        toast.error(response.message || "Failed to update quantity"); // Thông báo lỗi bằng toast
+        toast.error(response.message || "Failed to update quantity");
       } else {
         setErrors(null);
         await fetchCart();
@@ -70,12 +75,11 @@ function Cart() {
   }, []);
 
   const handleGoBack = () => {
-    navigate(-1); // Quay lại trang trước đó trong lịch sử điều hướng
+    navigate(-1);
   };
 
   return (
     <>
-      {/* Cart Header */}
       <div className="flex justify-center items-center flex-col mt-10 mb-8 relative">
         <h1 className="text-3xl font-bold mb-3">Giỏ Hàng</h1>
         <h5 className="text-gray-600 text-center">
@@ -85,7 +89,6 @@ function Cart() {
             *Tự động áp dụng ở trang tiếp theo
           </span>
         </h5>
-        {/* Nút quay lại ở góc trên bên trái */}
         <button
           onClick={handleGoBack}
           className="absolute top-0 left-24 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded-md px-4 py-2 flex items-center space-x-2 shadow-sm"
@@ -190,7 +193,6 @@ function Cart() {
               </tbody>
             </table>
 
-            {/* Total Section */}
             <div className="mt-8 border-t pt-6">
               <div className="flex justify-end items-center space-x-8">
                 <div className="text-lg font-semibold text-gray-700">
@@ -208,7 +210,6 @@ function Cart() {
                 Phí vận chuyển sẽ được tính khi thanh toán
               </p>
 
-              {/* Checkout Button */}
               <div className="flex justify-end mt-6">
                 <Link to="/payment">
                   <button className="bg-black text-white py-3 px-8 rounded-md hover:bg-gray-800 transition-colors w-full md:w-[21rem]">

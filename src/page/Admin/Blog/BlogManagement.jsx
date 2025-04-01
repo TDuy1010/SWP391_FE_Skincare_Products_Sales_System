@@ -6,7 +6,7 @@ import {
   getAllBlogs,
   deleteBlog,
   changeBlogStatus,
-} from "../../../service/blog/index";
+} from "../../../service/blogService/index";
 import AddBlog from "./AddBlog";
 import EditBlog from "./EditBlog";
 import BlogTable from "./BlogTable";
@@ -17,10 +17,10 @@ import "react-toastify/dist/ReactToastify.css";
 const showToast = (type, message, options = {}) => {
   // Đóng tất cả toast hiện tại trước khi hiển thị toast mới
   toast.dismiss();
-  
+
   // Hiển thị toast mới với ID duy nhất
   const toastId = `toast-${Date.now()}`;
-  
+
   const defaultOptions = {
     position: "top-right",
     autoClose: 3000,
@@ -31,9 +31,9 @@ const showToast = (type, message, options = {}) => {
     progress: undefined,
     theme: "light",
     toastId: toastId,
-    ...options
+    ...options,
   };
-  
+
   switch (type) {
     case "success":
       toast.success(message, defaultOptions);
@@ -50,7 +50,7 @@ const showToast = (type, message, options = {}) => {
     default:
       toast(message, defaultOptions);
   }
-  
+
   return toastId;
 };
 
@@ -75,30 +75,21 @@ const BlogManagement = () => {
   const fetchBlogs = async (params = {}) => {
     try {
       setLoading(true);
-      const queryParams = {
-        page: params.page !== undefined ? params.page - 1 : 0,
-        size: params.pageSize || 10,
-      };
+      const apiPage = params.page ;
+      
+      const response = await getAllBlogs({
+        page: apiPage,
+        size: params.pageSize || pagination.pageSize
+      });
 
-      if (params.keyword) queryParams.keyword = params.keyword;
-
-      const response = await getAllBlogs(queryParams);
-
-      if (!response.error) {
-        const blogData = response.result.content || [];
-        const processedBlogs = blogData.map((blog) => ({
-          ...blog,
-          thumbnails: blog.thumbnails || [],
-        }));
-
-        setBlogs(processedBlogs);
-        setPagination({
-          current: (response.result.pageNumber || 0) + 1,
+      if (response && !response.error) {
+        setBlogs(response.result.content || []);
+        setPagination(prev => ({
+          ...prev,
+          current: params.page,
           pageSize: response.result.pageSize || 10,
-          total: response.result.totalElements || 0,
-        });
-      } else {
-        showToast("error", response.message);
+          total: response.result.totalElements || 0
+        }));
       }
     } catch (error) {
       console.error("Fetch blogs error:", error);
@@ -109,22 +100,14 @@ const BlogManagement = () => {
   };
 
   useEffect(() => {
-    fetchBlogs();
+    fetchBlogs({ page: 1 });
   }, []);
 
-  const handleTableChange = (newPagination, tableFilters, sorter) => {
-    const params = {
-      ...filters,
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    };
-
-    if (sorter.field) {
-      params.sortBy = sorter.field;
-      params.order = sorter.order ? sorter.order.replace("end", "") : undefined;
-    }
-
-    fetchBlogs(params);
+  const handlePageChange = (page, pageSize) => {
+    fetchBlogs({
+      page: page,
+      pageSize: pageSize
+    });
   };
 
   const showDeleteConfirm = (blog) => {
@@ -162,12 +145,12 @@ const BlogManagement = () => {
     setEditingBlog(blog);
     setIsEditModalVisible(true);
   };
-  
+
   const handleEditCancel = () => {
     setIsEditModalVisible(false);
     setEditingBlog(null);
   };
-  
+
   const handleEditSuccess = (msg) => {
     fetchBlogs();
     showToast("success", msg || "Cập nhật blog thành công");
@@ -201,7 +184,7 @@ const BlogManagement = () => {
         showToast("error", response.message);
         // Revert lại trạng thái switch nếu có lỗi
         record.status = !checked ? "ACTIVE" : "INACTIVE";
-        
+
         if (response.message.includes("đăng nhập lại")) {
           localStorage.removeItem("token");
           navigate("/login");
@@ -222,11 +205,7 @@ const BlogManagement = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Blog Management</h2>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={showAddModal}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
           Add New Blog
         </Button>
       </div>
@@ -234,7 +213,7 @@ const BlogManagement = () => {
         blogs={blogs}
         loading={loading}
         pagination={pagination}
-        onTableChange={handleTableChange}
+        onPageChange={handlePageChange}
         onStatusChange={handleStatusChange}
         onEditBlog={handleEditBlog}
         onDeleteBlog={showDeleteConfirm}
@@ -268,7 +247,7 @@ const BlogManagement = () => {
         onSuccess={handleEditSuccess}
         showToast={showToast}
       />
-      
+
       {/* Cấu hình ToastContainer */}
       <ToastContainer
         position="top-right"

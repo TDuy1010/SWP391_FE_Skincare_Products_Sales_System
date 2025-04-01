@@ -39,10 +39,10 @@ const Sidebar = ({ handleLogout, collapsed, toggleCollapsed }) => {
   // Danh sách tất cả các menu item
   const allMenuItems = [
     {
-      key: "/admin",
+      key: "/admin/dashboard",
       icon: <DashboardOutlined />,
-      label: <Link to="/admin">Dashboard</Link>,
-      roles: ["ADMIN"], // Không hiển thị cho DELIVERY
+      label: <Link to="/admin/dashboard">Dashboard</Link>,
+      roles: ["ADMIN"],
     },
     {
       key: "/admin/user",
