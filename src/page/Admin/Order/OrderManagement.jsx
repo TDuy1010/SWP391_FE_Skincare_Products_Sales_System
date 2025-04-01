@@ -29,14 +29,14 @@ const OrderManagement = () => {
     try {
       setLoading(true);
       const response = await getOrderAdmin({
-        page: page - 1, // BE thường expect page bắt đầu từ 0
+        page: page,
         size: pageSize,
       });
 
       if (response && response.code === 200) {
         setOrders(response.result.orderResponseList);
         setPagination({
-          current: response.result.pageNumber + 1, // BE trả về pageNumber từ 0
+          current: response.result.pageNumber + 1,
           pageSize: response.result.pageSize,
           total: response.result.totalElements,
         });
@@ -369,11 +369,10 @@ const OrderManagement = () => {
       </div>
       <Table
         columns={columns}
-        dataSource={getCurrentPageData().data}
+        dataSource={orders}
         rowKey="orderId"
         pagination={{
           ...pagination,
-          total: getCurrentPageData().total,
           showSizeChanger: true,
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} items`,

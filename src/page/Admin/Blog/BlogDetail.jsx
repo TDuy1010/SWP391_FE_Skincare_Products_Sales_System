@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Spin, Image } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { getBlogById } from "../../../service/blog/index";
+import { getBlogById } from "../../../service/blogService/index";
 import { toast } from "react-toastify";
 
 const BlogDetail = () => {
@@ -16,7 +16,7 @@ const BlogDetail = () => {
       try {
         setLoading(true);
         const response = await getBlogById(id);
-        
+
         if (!response.error) {
           setBlog(response.result);
         } else {
@@ -38,13 +38,13 @@ const BlogDetail = () => {
   }, [id, navigate]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -79,7 +79,7 @@ const BlogDetail = () => {
                   src={blog.image}
                   alt={blog.title}
                   className="object-cover rounded-lg shadow-md"
-                  style={{ maxHeight: '400px' }}
+                  style={{ maxHeight: "400px" }}
                 />
               ) : (
                 <div className="w-64 h-64 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
@@ -96,10 +96,8 @@ const BlogDetail = () => {
             </div>
 
             <div className="border-b pb-4">
-              <h3 className="font-bold text-lg mb-2 text-gray-800">
-                Author
-              </h3>
-              <p className="text-gray-700">{blog.createdBy || 'Unknown'}</p>
+              <h3 className="font-bold text-lg mb-2 text-gray-800">Author</h3>
+              <p className="text-gray-700">{blog.createdBy || "Unknown"}</p>
             </div>
 
             <div className="border-b pb-4">
@@ -110,15 +108,15 @@ const BlogDetail = () => {
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-2 text-gray-800">
-                Content
-              </h3>
-              <div 
-                dangerouslySetInnerHTML={{ __html: blog.content || '<p>No content available</p>' }} 
+              <h3 className="font-bold text-lg mb-2 text-gray-800">Content</h3>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: blog.content || "<p>No content available</p>",
+                }}
                 className="prose prose-sm md:prose-base lg:prose-lg max-w-none overflow-hidden"
                 style={{
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word'
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               />
             </div>
@@ -135,7 +133,7 @@ const BlogDetail = () => {
                       src={image}
                       alt={`Image ${index + 1}`}
                       className="object-cover rounded-lg shadow-md"
-                      style={{ height: '180px' }}
+                      style={{ height: "180px" }}
                     />
                   ))}
                 </div>
@@ -150,23 +148,23 @@ const BlogDetail = () => {
           max-width: 100%;
           height: auto;
         }
-        
+
         .prose pre {
           overflow-x: auto;
           white-space: pre-wrap;
           word-wrap: break-word;
         }
-        
+
         .prose table {
           width: 100%;
           table-layout: fixed;
           overflow-wrap: break-word;
         }
-        
+
         .prose * {
           max-width: 100%;
         }
-        
+
         .prose blockquote {
           margin-left: 0;
           padding-left: 1rem;

@@ -1,10 +1,10 @@
-import { motion } from 'framer-motion';
-import { featuredArticles } from './BlogPost';
-import img3 from '../../../assets/img/hero-landingPage.png';
+import { motion } from "framer-motion";
+import { featuredArticles } from "./BlogPost";
+import img3 from "../../../assets/img/hero-landingPage.png";
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import { getPublicBlogs } from '../../../service/Blog/customerBlog';
-import { Spin, message } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { getPublicBlogs } from "../../../service/blogService/customerBlog";
+import { Spin, message } from "antd";
 
 const BlogPage = () => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const BlogPage = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 8,
-    total: 0
+    total: 0,
   });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const BlogPage = () => {
 
   const containerAnimation = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -75,9 +75,10 @@ const BlogPage = () => {
           <div className="container mx-auto px-4">
             <h1 className="text-white text-5xl font-light">Chăm Sóc Da</h1>
             <p className="text-white mt-4 max-w-xl">
-              Làn da luôn thay đổi theo môi trường, lối sống và chế độ ăn uống. 
-              Dòng sản phẩm của chúng tôi được tạo ra với sự cân nhắc này, giải quyết các vấn đề 
-              phòng ngừa và nhu cầu khác nhau để giúp bạn đạt được sức khỏe da tối ưu.
+              Làn da luôn thay đổi theo môi trường, lối sống và chế độ ăn uống.
+              Dòng sản phẩm của chúng tôi được tạo ra với sự cân nhắc này, giải
+              quyết các vấn đề phòng ngừa và nhu cầu khác nhau để giúp bạn đạt
+              được sức khỏe da tối ưu.
             </p>
           </div>
         </div>
@@ -116,7 +117,7 @@ const BlogPage = () => {
                     />
                   </div>
                   <h3 className="text-lg mb-2 line-clamp-2">{blog.title}</h3>
-                  <div 
+                  <div
                     className="text-sm text-gray-600 mb-3 line-clamp-3"
                     dangerouslySetInnerHTML={{ __html: blog.content }}
                   />
@@ -206,8 +207,7 @@ const BlogPage = () => {
             )}
           </div>
         </div>
-      )
-      )}
+      ))}
     </motion.div>
   );
 };

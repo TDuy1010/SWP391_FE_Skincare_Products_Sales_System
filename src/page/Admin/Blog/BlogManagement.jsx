@@ -6,7 +6,7 @@ import {
   getAllBlogs,
   deleteBlog,
   changeBlogStatus,
-} from "../../../service/blog/index";
+} from "../../../service/blogService/index";
 import AddBlog from "./AddBlog";
 import EditBlog from "./EditBlog";
 import BlogTable from "./BlogTable";
@@ -17,10 +17,10 @@ import "react-toastify/dist/ReactToastify.css";
 const showToast = (type, message, options = {}) => {
   // Đóng tất cả toast hiện tại trước khi hiển thị toast mới
   toast.dismiss();
-  
+
   // Hiển thị toast mới với ID duy nhất
   const toastId = `toast-${Date.now()}`;
-  
+
   const defaultOptions = {
     position: "top-right",
     autoClose: 3000,
@@ -31,9 +31,9 @@ const showToast = (type, message, options = {}) => {
     progress: undefined,
     theme: "light",
     toastId: toastId,
-    ...options
+    ...options,
   };
-  
+
   switch (type) {
     case "success":
       toast.success(message, defaultOptions);
@@ -50,7 +50,7 @@ const showToast = (type, message, options = {}) => {
     default:
       toast(message, defaultOptions);
   }
-  
+
   return toastId;
 };
 
@@ -162,12 +162,12 @@ const BlogManagement = () => {
     setEditingBlog(blog);
     setIsEditModalVisible(true);
   };
-  
+
   const handleEditCancel = () => {
     setIsEditModalVisible(false);
     setEditingBlog(null);
   };
-  
+
   const handleEditSuccess = (msg) => {
     fetchBlogs();
     showToast("success", msg || "Cập nhật blog thành công");
@@ -201,7 +201,7 @@ const BlogManagement = () => {
         showToast("error", response.message);
         // Revert lại trạng thái switch nếu có lỗi
         record.status = !checked ? "ACTIVE" : "INACTIVE";
-        
+
         if (response.message.includes("đăng nhập lại")) {
           localStorage.removeItem("token");
           navigate("/login");
@@ -222,11 +222,7 @@ const BlogManagement = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Blog Management</h2>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={showAddModal}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
           Add New Blog
         </Button>
       </div>
@@ -268,7 +264,7 @@ const BlogManagement = () => {
         onSuccess={handleEditSuccess}
         showToast={showToast}
       />
-      
+
       {/* Cấu hình ToastContainer */}
       <ToastContainer
         position="top-right"
