@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import img1 from "../../../assets/img/hero-photo.png";
 import RegisterForm from "./RegisterForm";
-import ForgotPasswordForm from "./ForgotPasswordForm";
 import { login, clearExpiredToken } from "../../../service/login/index"; // Import API login
 
 const LoginModal = ({ isOpen, onClose }) => {
@@ -107,10 +106,6 @@ const LoginModal = ({ isOpen, onClose }) => {
   const renderForm = () => {
     if (activeForm === "register")
       return <RegisterForm onBackToLogin={() => handleFormChange("login")} />;
-    if (activeForm === "forgotPassword")
-      return (
-        <ForgotPasswordForm onBackToLogin={() => handleFormChange("login")} />
-      );
 
     return (
       <div className="space-y-6">
@@ -152,15 +147,6 @@ const LoginModal = ({ isOpen, onClose }) => {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
-          </div>
-          <div className="text-right">
-            <button
-              type="button"
-              onClick={() => handleFormChange("forgotPassword")}
-              className="text-sm text-gray-600 hover:text-gray-900"
-            >
-              Quên mật khẩu?
-            </button>
           </div>
           <button
             type="submit"
