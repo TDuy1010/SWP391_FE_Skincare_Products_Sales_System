@@ -10,7 +10,7 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
-  // Cấu hình cho React Quill
+  // React Quill configuration
   const modules = {
     toolbar: [
       [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -56,7 +56,7 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
       const response = await addBlog(formData);
 
       if (!response.error) {
-        showToast("success", "Tạo blog thành công!");
+        showToast("success", "Blog created successfully!");
         form.resetFields();
         setContent("");
         onSuccess(response.message);
@@ -65,7 +65,7 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
       }
     } catch (error) {
       console.error("Error:", error);
-      showToast("error", "Không thể tạo blog");
+      showToast("error", "Unable to create blog");
     } finally {
       setLoading(false);
     }
@@ -80,14 +80,14 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
 
   const handleContentChange = (value) => {
     if (value.length > 1000000) {
-      showToast("warning", "Nội dung quá dài, có thể gây lỗi khi lưu");
+      showToast("warning", "Content is too long, may cause errors when saving");
     }
     setContent(value);
   };
 
   return (
     <Modal
-      title="Tạo Blog Mới"
+      title="Create New Blog"
       open={visible}
       onCancel={onCancel}
       footer={null}
@@ -102,19 +102,19 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
       >
         <Form.Item
           name="title"
-          label="Tiêu đề Blog"
+          label="Blog Title"
           rules={[
-            { required: true, message: "Vui lòng nhập tiêu đề blog" },
-            { min: 3, message: "Tiêu đề phải có ít nhất 3 ký tự" },
+            { required: true, message: "Please enter a blog title" },
+            { min: 3, message: "Title must be at least 3 characters long" },
           ]}
         >
-          <Input placeholder="Nhập tiêu đề blog" className="h-10 text-base" />
+          <Input placeholder="Enter blog title" className="h-10 text-base" />
         </Form.Item>
 
         <Form.Item
-          label="Nội dung"
+          label="Content"
           rules={[
-            { required: true, message: "Vui lòng nhập nội dung" },
+            { required: true, message: "Please enter content" },
             {
               validator: (_, value) => {
                 const textContent = value
@@ -123,7 +123,7 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
                 return textContent.length >= 10
                   ? Promise.resolve()
                   : Promise.reject(
-                      new Error("Nội dung phải có ít nhất 10 ký tự")
+                      new Error("Content must be at least 10 characters long")
                     );
               },
             },
@@ -141,10 +141,10 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
 
         <Form.Item
           name="image"
-          label="Hình ảnh"
+          label="Image"
           valuePropName="fileList"
           getValueFromEvent={normFile}
-          rules={[{ required: true, message: "Vui lòng tải lên hình ảnh" }]}
+          rules={[{ required: true, message: "Please upload an image" }]}
         >
           <Upload
             beforeUpload={() => false}
@@ -154,17 +154,17 @@ const AddBlog = ({ visible, onCancel, onSuccess, showToast }) => {
           >
             <div>
               <UploadOutlined />
-              <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+              <div style={{ marginTop: 8 }}>Upload</div>
             </div>
           </Upload>
         </Form.Item>
 
         <Form.Item className="flex justify-end mb-0">
           <Button onClick={onCancel} className="mr-2">
-            Hủy
+            Cancel
           </Button>
           <Button type="primary" htmlType="submit" loading={loading}>
-            Tạo Blog
+            Create Blog
           </Button>
         </Form.Item>
       </Form>

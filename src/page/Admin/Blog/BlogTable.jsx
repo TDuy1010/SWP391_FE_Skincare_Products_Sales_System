@@ -67,7 +67,7 @@ const BlogTable = ({
       },
     },
     {
-      title: "Trạng thái",
+      title: "Status",
       dataIndex: "status",
       key: "status",
       render: (status, record) => (

@@ -153,7 +153,7 @@ export const updateBlog = async (id, formData) => {
     }
 
     // Upload ảnh lên Cloudinary nếu có file ảnh mới
-    let imageUrl = null;
+    let imageUrl = formData.get("currentImage"); // Lấy ảnh hiện tại
     if (imageFile) {
       try {
         imageUrl = await uploadToCloudinary(imageFile);
@@ -167,8 +167,7 @@ export const updateBlog = async (id, formData) => {
     const payload = {
       title,
       content,
-      image: imageUrl, // Sử dụng URL ảnh từ Cloudinary
-      status: "INACTIVE",
+      image: imageUrl,
     };
 
     const response = await instance.put(`admin/blogs/${id}`, payload, {

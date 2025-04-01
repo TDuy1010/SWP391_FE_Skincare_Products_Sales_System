@@ -10,7 +10,7 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
-  // Cấu hình cho React Quill
+  // React Quill configuration
   const modules = {
     toolbar: [
       [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -46,6 +46,14 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
       form.setFieldsValue({
         title: blogData.title,
         content: blogData.content,
+        image: blogData.image ? [
+          {
+            uid: '-1',
+            name: 'image.png',
+            status: 'done',
+            url: blogData.image,
+          }
+        ] : []
       });
       setContent(blogData.content || "");
     }
@@ -58,6 +66,7 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("content", content);
+      formData.append("currentImage", blogData.image || "");
 
       if (values.image?.[0]?.originFileObj) {
         formData.append("image", values.image[0].originFileObj);
@@ -66,7 +75,7 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
       const response = await updateBlog(blogData.id, formData);
 
       if (!response.error) {
-        showToast("success", "Cập nhật blog thành công!");
+        showToast("success", "Blog updated successfully!");
         onSuccess(response.message);
         onCancel();
       } else {
@@ -74,7 +83,7 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
       }
     } catch (error) {
       console.error("Error:", error);
-      showToast("error", "Không thể cập nhật blog");
+      showToast("error", "Unable to update blog");
     } finally {
       setLoading(false);
     }
@@ -89,14 +98,14 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
 
   const handleContentChange = (value) => {
     if (value.length > 1000000) {
-      showToast("warning", "Nội dung quá dài, có thể gây lỗi khi lưu");
+      showToast("warning", "Content is too long, may cause errors when saving");
     }
     setContent(value);
   };
 
   return (
     <Modal
-      title="Chỉnh sửa Blog"
+      title="Edit Blog"
       open={visible}
       onCancel={onCancel}
       footer={null}
@@ -111,20 +120,20 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
       >
         <Form.Item
           name="title"
-          label="Tiêu đề Blog"
+          label="Blog Title"
           rules={[
-            { required: true, message: "Vui lòng nhập tiêu đề blog" },
-            { min: 3, message: "Tiêu đề phải có ít nhất 3 ký tự" },
+            { required: true, message: "Please enter a blog title" },
+            { min: 3, message: "Title must be at least 3 characters long" },
           ]}
         >
-          <Input placeholder="Nhập tiêu đề blog" className="h-10 text-base" />
+          <Input placeholder="Enter blog title" className="h-10 text-base" />
         </Form.Item>
 
         <Form.Item
-          label="Nội dung"
+          label="Content"
           name="content"
           rules={[
-            { required: true, message: "Vui lòng nhập nội dung" },
+            { required: true, message: "Please enter content" },
             {
               validator: (_, value) => {
                 const textContent = value
@@ -133,7 +142,7 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
                 return textContent.length >= 10
                   ? Promise.resolve()
                   : Promise.reject(
-                      new Error("Nội dung phải có ít nhất 10 ký tự")
+                      new Error("Content must be at least 10 characters long")
                     );
               },
             },
@@ -151,7 +160,7 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
 
         <Form.Item
           name="image"
-          label="Hình ảnh"
+          label="Image"
           valuePropName="fileList"
           getValueFromEvent={normFile}
         >
@@ -163,17 +172,17 @@ const EditBlog = ({ visible, onCancel, onSuccess, blogData, showToast }) => {
           >
             <div>
               <PlusOutlined />
-              <div style={{ marginTop: 8 }}>Tải ảnh lên</div>
+              <div style={{ marginTop: 8 }}>Upload</div>
             </div>
           </Upload>
         </Form.Item>
 
         <Form.Item className="flex justify-end mb-0">
           <Button onClick={onCancel} className="mr-2">
-            Hủy
+            Cancel
           </Button>
           <Button type="primary" htmlType="submit" loading={loading}>
-            Cập nhật Blog
+            Update Blog
           </Button>
         </Form.Item>
       </Form>

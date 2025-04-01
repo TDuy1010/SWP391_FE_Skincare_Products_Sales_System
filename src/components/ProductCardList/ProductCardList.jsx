@@ -139,20 +139,7 @@ function ProductCardList({
           {/* Price */}
           <p className="font-semibold text-gray-900 mt-1">{formattedPrice}</p>
           
-          {/* Optional rating stars */}
-          <div className="flex items-center mt-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <svg 
-                key={star} 
-                xmlns="http://www.w3.org/2000/svg" 
-                className={`h-3.5 w-3.5 ${star <= 4 ? "text-yellow-400" : "text-gray-300"}`}
-                fill="currentColor" 
-                viewBox="0 0 24 24">
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-              </svg>
-            ))}
-            <span className="text-xs text-gray-500 ml-1">(12)</span>
-          </div>
+          
         </div>
       </div>
 

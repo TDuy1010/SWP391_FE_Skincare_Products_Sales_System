@@ -22,12 +22,12 @@ const BlogDetail = () => {
         if (!response.error) {
           setBlog(response.result);
         } else {
-          toast.error(response.message || "Không thể lấy thông tin blog");
+          toast.error(response.message || "Unable to retrieve blog information");
           navigate("/admin/blog");
         }
       } catch (error) {
         console.error("Error fetching blog:", error);
-        toast.error("Có lỗi xảy ra khi tải thông tin blog");
+        toast.error("An error occurred while loading blog information");
         navigate("/admin/blog");
       } finally {
         setLoading(false);
@@ -41,7 +41,7 @@ const BlogDetail = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("vi-VN", {
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
