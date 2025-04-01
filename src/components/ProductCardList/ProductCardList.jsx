@@ -6,6 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LoginModal from "../../page/Customer/LoginPage/LoginPage";
 
+// Thêm hàm xử lý HTML content
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
+
 function ProductCardList({
   id,
   slug,
@@ -62,6 +70,9 @@ function ProductCardList({
   }).format(price).replace('₫', 'VND');
   // Kết quả: "123.456 VND" thay vì "123.456 ₫"
 
+  // Xử lý description để loại bỏ HTML tags
+  const cleanDescription = stripHtmlTags(description);
+
   return (
     <>
       <div 
@@ -113,12 +124,17 @@ function ProductCardList({
         {/* Product info */}
         <div className="px-4 pt-3 pb-4 flex flex-col flex-grow" onClick={handleCardClick}>
           {/* Size info */}
-          <p className="text-xs text-gray-500 mb-1">{size}</p>
+          <p className="text-xs text-gray-500 mb-1">{stripHtmlTags(size)}</p>
           
           {/* Product name */}
           <h3 className="font-medium text-gray-900 line-clamp-2 mb-1 cursor-pointer hover:text-pink-500 transition-colors">
-            {name}
+            {stripHtmlTags(name)}
           </h3>
+          
+          {/* Description - nếu cần hiển thị */}
+          {description && (
+            <div className="text-sm text-gray-600 line-clamp-2">{cleanDescription}</div>
+          )}
           
           {/* Price */}
           <p className="font-semibold text-gray-900 mt-1">{formattedPrice}</p>

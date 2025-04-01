@@ -27,9 +27,6 @@ const AdminHeader = ({ collapsed, toggleCollapsed, adminUser }) => {
           color: '#000000',
         }}
       />
-      <span style={{ marginLeft: '16px', color: '#000000' }}>
-        Welcome, {adminUser?.fullName}
-      </span>
     </Header>
   );
 };
