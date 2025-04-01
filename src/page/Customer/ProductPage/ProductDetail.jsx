@@ -132,14 +132,7 @@ const ProductDetail = () => {
     ingredients: "",
   });
 
-  // Add states for reviews
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewForm, setReviewForm] = useState({
-    name: "",
-    email: "",
-    content: "",
-    rating: 5,
-  });
+  // Remove review form states
   const [reviews, setReviews] = useState([
     {
       id: 1,
@@ -238,39 +231,7 @@ const ProductDetail = () => {
     return { __html: htmlContent };
   };
 
-  // Add handlers for reviews
-  const handleReviewChange = (e) => {
-    const { name, value } = e.target;
-    setReviewForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmitReview = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await createProductFeedback(product.id, {
-        content: reviewForm.content,
-        rating: reviewForm.rating,
-      });
-
-      if (!response.error) {
-        // Refresh product details to get updated feedback
-        const updatedProduct = await getProductDetail(slug);
-        if (!updatedProduct.error) {
-          setProduct(updatedProduct.result);
-        }
-
-        // Reset form and hide it
-        setReviewForm({ name: "", email: "", content: "", rating: 5 });
-        setShowReviewForm(false);
-        toast.success("Cảm ơn bạn đã đánh giá sản phẩm!");
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi gửi đánh giá");
-    }
-  };
-
+  // Remove review submission handlers
   const handleHelpful = (id) => {
     setReviews(
       reviews.map((review) =>
@@ -532,87 +493,11 @@ const ProductDetail = () => {
                 {/* Reviews Tab */}
                 {activeTab === "reviews" && (
                   <div className="space-y-6">
-                    {/* Review Form Button */}
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-medium">
                         Đánh giá từ khách hàng
                       </h3>
-                      <button
-                        onClick={() => setShowReviewForm(!showReviewForm)}
-                        className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                      >
-                        {showReviewForm ? "Hủy đánh giá" : "Viết đánh giá"}
-                      </button>
                     </div>
-
-                    {/* Review Form */}
-                    {showReviewForm && (
-                      <form
-                        onSubmit={handleSubmitReview}
-                        className="space-y-4 bg-gray-50 p-4 rounded-lg"
-                      >
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Tên
-                          </label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={reviewForm.name}
-                            onChange={handleReviewChange}
-                            className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300 sm:text-sm py-2"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Đánh giá
-                          </label>
-                          <div className="flex mt-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <button
-                                key={star}
-                                type="button"
-                                onClick={() =>
-                                  setReviewForm((prev) => ({
-                                    ...prev,
-                                    rating: star,
-                                  }))
-                                }
-                              >
-                                <Star
-                                  size={28}
-                                  className={
-                                    reviewForm.rating >= star
-                                      ? "fill-amber-400 text-amber-400"
-                                      : "text-gray-300"
-                                  }
-                                />
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Nội dung
-                          </label>
-                          <textarea
-                            name="content"
-                            rows="5"
-                            value={reviewForm.content}
-                            onChange={handleReviewChange}
-                            className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-300 focus:ring-gray-300 sm:text-sm py-2"
-                            required
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 text-base"
-                        >
-                          Gửi đánh giá
-                        </button>
-                      </form>
-                    )}
 
                     {/* Reviews List - Use feedBacks from API */}
                     <div className="space-y-6">

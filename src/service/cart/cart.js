@@ -22,6 +22,16 @@ const getCart = async () => {
 const addItemToCart = async (productId, quantity = 1) => {
   try {
     const token = localStorage.getItem("token");
+
+    // Check if token exists
+    if (!token) {
+      return {
+        error: true,
+        message: "You need to log in first",
+        unauthorized: true,
+      };
+    }
+
     const res = await instance.post(
       `/carts?productId=${productId}&quantity=${quantity}`,
       {}, // empty body
@@ -35,6 +45,16 @@ const addItemToCart = async (productId, quantity = 1) => {
     return res;
   } catch (error) {
     console.error("Cant add item to cart: ", error);
+
+    // Check specifically for 401 unauthorized errors
+    if (error.response?.status === 401) {
+      return {
+        error: true,
+        message: "Your session has expired. Please log in again.",
+        unauthorized: true,
+      };
+    }
+
     return {
       error: true,
       message: error.response?.data?.message || "Failed to add item to cart",

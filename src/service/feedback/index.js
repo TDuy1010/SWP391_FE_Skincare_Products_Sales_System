@@ -2,48 +2,56 @@ import { instance } from "../instance";
 
 /**
  * Thêm đánh giá mới cho sản phẩm (yêu cầu xác thực)
+ * @param {string} productId - ID của sản phẩm cần đánh giá
  * @param {number} orderId - ID của đơn hàng
  * @param {number} orderItemId - ID của item trong đơn hàng
- * @param {string} productId - ID của sản phẩm cần đánh giá
  * @param {object} feedbackData - Dữ liệu đánh giá (description, rating)
  * @returns {Promise} - Promise chứa kết quả API
  */
-export const addProductFeedback = async (orderId, orderItemId, productId, feedbackData) => {
+export const addProductFeedback = async (
+  productId,
+  orderId,
+  orderItemId,
+  feedbackData
+) => {
   try {
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
       return {
         error: true,
         message: "Vui lòng đăng nhập để đánh giá sản phẩm",
-        requireAuth: true
+        requireAuth: true,
       };
     }
 
     // Kiểm tra dữ liệu đầu vào
-    if (!orderId || !orderItemId || !productId) {
+    if (!productId || !orderId || orderItemId === null) {
       return {
         error: true,
-        message: "Thiếu thông tin đơn hàng hoặc sản phẩm",
-        validationError: true
+        message: "Thiếu thông tin cần thiết để đánh giá",
+        validationError: true,
       };
     }
 
     // Chuẩn bị dữ liệu gửi đi
     const payload = {
       description: feedbackData.description?.trim(),
-      rating: Number(feedbackData.rating)
+      rating: Number(feedbackData.rating),
     };
 
-    // Gọi API với đầy đủ các ID
+    // Adjust orderItemId to be zero-based if needed
+    // This is based on the URL you shared showing orderItemId as 0 when the item.id is 1
+
+    // Gọi API theo đúng định dạng Swagger
     const response = await instance.post(
-      `/feedbacks/${orderId}/${orderItemId}/${productId}`, 
+      `/feedbacks/${orderId}/${orderItemId}/${productId}`,
       payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
 
@@ -51,25 +59,23 @@ export const addProductFeedback = async (orderId, orderItemId, productId, feedba
       return {
         error: false,
         result: response.result,
-        message: response.message || "Đánh giá sản phẩm thành công"
+        message: response.message || "Đánh giá sản phẩm thành công",
       };
     }
 
     return {
       error: true,
-      message: response.message || "Không thể gửi đánh giá"
+      message: response.message || "Không thể gửi đánh giá",
     };
-
   } catch (error) {
     console.error("Feedback API Error:", error);
-    
-    if (error.response?.status === 401 || 
-        error.response?.data?.code === 1201) {
+
+    if (error.response?.status === 401 || error.response?.data?.code === 1201) {
       localStorage.removeItem("token");
       return {
         error: true,
         message: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại",
-        requireAuth: true
+        requireAuth: true,
       };
     }
 
@@ -77,7 +83,7 @@ export const addProductFeedback = async (orderId, orderItemId, productId, feedba
       return {
         error: true,
         message: error.response.data?.message || "Dữ liệu không hợp lệ",
-        validationError: true
+        validationError: true,
       };
     }
 
@@ -85,15 +91,13 @@ export const addProductFeedback = async (orderId, orderItemId, productId, feedba
       return {
         error: true,
         message: "Bạn không có quyền thực hiện chức năng này",
-        forbidden: true
+        forbidden: true,
       };
     }
 
     return {
       error: true,
-      message: error.response?.data?.message || "Không thể kết nối đến server"
+      message: error.response?.data?.message || "Không thể kết nối đến server",
     };
   }
 };
-
-   
