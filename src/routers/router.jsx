@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../layout/RootLayout";
+import { Navigate } from "react-router-dom";
 
 import UserManagement from "../page/Admin/User/UserManagement";
 import Dashboard from "../page/Admin/Dashboard/Dashboard";
@@ -142,6 +143,10 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "",
+            element: <Navigate to="order" />,
+          },
+          {
+            path: "dashboard",
             element: <Dashboard />,
           },
           {

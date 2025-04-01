@@ -8,6 +8,13 @@ import { SiDeluge } from "react-icons/si";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
 import img3 from "../../../assets/img/Rectangle 24.png"; // Thêm import hình ảnh hero giống như BlogPage
 
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
+
 const ShopPage = () => {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -199,8 +206,13 @@ const ShopPage = () => {
     }
   };
 
+  // Thay đổi useEffect để chỉ scroll to top khi thay đổi slug
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [slug]);
+
+  // Tạo useEffect riêng cho việc fetch data
+  useEffect(() => {
     fetchProduct();
   }, [slug, currentPage, pageSize, debouncedKeyword, filters]);
 
@@ -512,15 +524,15 @@ const ShopPage = () => {
                     <div className="w-full md:w-2/3 flex flex-col justify-between">
                       <div>
                         <h3 className="text-lg font-medium mb-2">
-                          {product.name}
+                          {stripHtmlTags(product.name)}
                         </h3>
-                        <p className="text-gray-600 mb-4 line-clamp-3">
-                          {product.description}
-                        </p>
+                        <div className="text-gray-600 mb-4 line-clamp-3">
+                          {stripHtmlTags(product.description)}
+                        </div>
                         <div className="text-sm text-gray-500 mb-2">
                           {product.category && (
                             <span className="inline-block bg-gray-100 rounded-full px-3 py-1 mr-2">
-                              {product.category.name}
+                              {stripHtmlTags(product.category.name)}
                             </span>
                           )}
                         </div>

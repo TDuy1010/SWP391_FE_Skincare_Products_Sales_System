@@ -1,13 +1,15 @@
 import { Outlet } from "react-router-dom";
 import HeaderComponent from "../components/Header/Header";
 import FooterComponent from "../components/Footer/Footer";
+import { CartProvider } from '../context/CartContext';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Đừng quên import CSS của Toastify
 
 function RootLayout() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <HeaderComponent />
+    <CartProvider>
+      <div className="min-h-screen flex flex-col">
+        <HeaderComponent />
 
       <main className="flex-1">
         <Outlet />
@@ -28,6 +30,7 @@ function RootLayout() {
         pauseOnHover // Tạm dừng khi hover
       />
     </div>
+    </CartProvider>
   );
 }
 

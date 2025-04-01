@@ -2,6 +2,31 @@ import React, { useState, useEffect } from "react";
 import OrderDetail from "./MyOrderedDetail.jsx";
 import { getOrderHistory } from "../../../../service/order/index.js";
 import { format } from "date-fns";
+import { 
+  Spin, 
+  Empty, 
+  Tag, 
+  Card, 
+  Space, 
+  Button, 
+  Typography, 
+  Pagination,
+  Alert,
+  List,
+  Skeleton
+} from "antd";
+import {
+  ClockCircleOutlined,
+  CalendarOutlined,
+  CreditCardOutlined,
+  HomeOutlined,
+  DollarOutlined,
+  ShoppingOutlined,
+  LeftOutlined,
+  RightOutlined
+} from "@ant-design/icons";
+
+const { Title, Text } = Typography;
 
 const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -29,11 +54,49 @@ const Orders = () => {
     fetchOrders();
   }, [currentPage]);
 
-  if (loading) return <div className="p-6">Đang tải...</div>;
-  if (error) return <div className="p-6 text-red-500">{error}</div>;
+  const getOrderStatusConfig = (status) => {
+    switch (status) {
+      case "DONE":
+        return { color: "success", text: "Hoàn thành" };
+      case "DELIVERING":
+        return { color: "processing", text: "Đang giao hàng" };
+      case "PENDING":
+        return { color: "warning", text: "Đang xử lý" };
+      case "PROCESSING":
+        return { color: "blue", text: "Đang chuẩn bị" };
+      case "CANCELLED":
+        return { color: "error", text: "Đã hủy" };
+      case "DELIVERING_FAIL":
+        return { color: "orange", text: "Giao hàng thất bại" };
+      default:
+        return { color: "default", text: status };
+    }
+  };
+
+  const getPaymentStatusConfig = (status) => {
+    return status === "PAID" 
+      ? { color: "success", text: "Đã thanh toán" }
+      : { color: "warning", text: "Chưa thanh toán" };
+  };
+
+  if (loading && orders.length === 0) {
+    return (
+      <div className="p-6 bg-white w-full max-w-full border rounded-md flex justify-center items-center min-h-[300px]">
+        <Spin size="large" tip="Đang tải đơn hàng..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-white w-full max-w-full border rounded-md">
+        <Alert message="Lỗi" description={error} type="error" showIcon />
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 bg-white w-full max-w-full border rounded-md">
+    <div className="p-6 bg-white w-full max-w-full border rounded-md shadow-sm">
       {selectedOrder ? (
         <OrderDetail
           order={selectedOrder}
@@ -41,106 +104,102 @@ const Orders = () => {
         />
       ) : (
         <div>
+          <div className="flex items-center justify-between mb-6">
+            <Title level={4} className="m-0">
+              <ShoppingOutlined className="mr-2" />
+              Lịch sử đơn hàng
+            </Title>
+          </div>
+
           {orders.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              Bạn chưa có đơn hàng nào
-            </div>
+            <Empty 
+              description="Bạn chưa có đơn hàng nào" 
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              className="py-12" 
+            />
           ) : (
             <>
-              {orders.map((order) => (
-                <div
-                  key={order.orderId}
-                  className="border-b pb-4 mb-4 last:border-0 cursor-pointer hover:bg-gray-100 p-4"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-800">
-                      Đơn hàng #{order.orderId}
-                    </span>
-                    <div className="flex gap-2">
-                      <span
-                        className={`px-2 py-1 text-white rounded ${
-                          order.status === "DONE"
-                            ? "bg-green-600"
-                            : order.status === "DELIVERING"
-                            ? "bg-blue-500"
-                            : order.status === "PENDING"
-                            ? "bg-yellow-500"
-                            : order.status === "PROCESSING"
-                            ? "bg-indigo-500"
-                            : order.status === "CANCELLED"
-                            ? "bg-red-600"
-                            : order.status === "DELIVERING_FAIL"
-                            ? "bg-orange-600"
-                            : "bg-gray-500"
-                        }`}
-                      >
-                        {order.status === "DONE"
-                          ? "Hoàn thành"
-                          : order.status === "DELIVERING"
-                          ? "Đang giao hàng"
-                          : order.status === "PENDING"
-                          ? "Đang xử lý"
-                          : order.status === "PROCESSING"
-                          ? "Đang chuẩn bị"
-                          : order.status === "CANCELLED"
-                          ? "Đã hủy"
-                          : order.status === "DELIVERING_FAIL"
-                          ? "Giao hàng thất bại"
-                          : order.status}
-                      </span>
-                      <span
-                        className={`px-2 py-1 text-white rounded ${
-                          order.paymentStatus === "PAID"
-                            ? "bg-green-600"
-                            : "bg-orange-500"
-                        }`}
-                      >
-                        {order.paymentStatus === "PAID"
-                          ? "Đã thanh toán"
-                          : "Chưa thanh toán"}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-gray-600">
-                    📅 {format(new Date(order.orderDate), "dd/MM/yyyy HH:mm")}
-                  </p>
-                  <div className="mt-2">
-                    <p className="text-gray-700">
-                      Phương thức thanh toán: {order.paymentMethod}
-                    </p>
-                    <p className="text-gray-700">
-                      Địa chỉ giao hàng: {order.address.addressLine}
-                    </p>
-                  </div>
-                  <p className="text-right font-semibold text-lg">
-                    Tổng tiền: {order.totalAmount.toLocaleString()} đ
-                  </p>
-                </div>
-              ))}
+              <div className="max-h-[600px] overflow-y-auto pr-2">
+                <List
+                  itemLayout="vertical"
+                  dataSource={orders}
+                  loading={loading}
+                  renderItem={order => (
+                    <Card 
+                      hoverable
+                      className="mb-4 overflow-hidden"
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <Skeleton loading={loading} active avatar={false}>
+                        <div className="flex justify-between items-center flex-wrap gap-2">
+                          <Title level={5} className="m-0 flex items-center">
+                            <ShoppingOutlined className="mr-2" />
+                            Đơn hàng #{order.orderId}
+                          </Title>
+                          <Space>
+                            <Tag 
+                              icon={<ClockCircleOutlined />}
+                              color={getOrderStatusConfig(order.status).color}
+                            >
+                              {getOrderStatusConfig(order.status).text}
+                            </Tag>
+                            <Tag 
+                              icon={<CreditCardOutlined />}
+                              color={getPaymentStatusConfig(order.paymentStatus).color}
+                            >
+                              {getPaymentStatusConfig(order.paymentStatus).text}
+                            </Tag>
+                          </Space>
+                        </div>
+
+                        <div className="mt-3">
+                          <Text className="flex items-center text-gray-600">
+                            <CalendarOutlined className="mr-2" />
+                            {format(new Date(order.orderDate), "dd/MM/yyyy HH:mm")}
+                          </Text>
+                          
+                          <Space direction="vertical" className="mt-2 w-full">
+                            <Text className="flex items-center text-gray-600">
+                              <CreditCardOutlined className="mr-2" />
+                              Phương thức thanh toán: {order.paymentMethod}
+                            </Text>
+                            
+                            <Text className="flex items-center text-gray-600">
+                              <HomeOutlined className="mr-2" />
+                              Địa chỉ giao hàng: {order.address.addressLine}
+                            </Text>
+                          </Space>
+                        </div>
+                        
+                        <div className="text-right mt-3">
+                          <Text strong className="flex items-center justify-end text-lg">
+                            <DollarOutlined className="mr-2" />
+                            Tổng tiền: {order.totalAmount.toLocaleString()} đ
+                          </Text>
+                        </div>
+                      </Skeleton>
+                    </Card>
+                  )}
+                />
+              </div>
+
               {totalPages > 1 && (
-                <div className="flex justify-between items-center mt-4">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
-                  >
-                    ← Trước
-                  </button>
-                  <span>
-                    Trang {currentPage} / {totalPages}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
-                  >
-                    Tiếp →
-                  </button>
+                <div className="flex justify-center mt-6 sticky bottom-0 bg-white py-4">
+                  <Pagination
+                    current={currentPage}
+                    total={totalPages * 10}
+                    onChange={setCurrentPage}
+                    showSizeChanger={false}
+                    itemRender={(page, type) => {
+                      if (type === 'prev') {
+                        return <Button icon={<LeftOutlined />} size="small">Trước</Button>;
+                      }
+                      if (type === 'next') {
+                        return <Button icon={<RightOutlined />} size="small">Tiếp</Button>;
+                      }
+                      return page;
+                    }}
+                  />
                 </div>
               )}
             </>

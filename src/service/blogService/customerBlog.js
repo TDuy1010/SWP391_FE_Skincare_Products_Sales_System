@@ -2,6 +2,12 @@ import { instance } from "../instance";
 
 export const getPublicBlogs = async (params) => {
   try {
+    console.log("API Request params:", {
+      page: params?.page,
+      size: params?.size,
+      status: "ACTIVE"
+    });
+
     const response = await instance.get("/blogs", {
       params: {
         page: params?.page || 0,
@@ -10,7 +16,10 @@ export const getPublicBlogs = async (params) => {
       },
     });
 
-    if (response.code === 200) {
+    console.log("Raw API response:", response);
+    console.log("Response data:", response.data);
+
+    if (response && response.code === 200) {
       return {
         error: false,
         result: response.result,
@@ -19,14 +28,14 @@ export const getPublicBlogs = async (params) => {
     } else {
       return {
         error: true,
-        message: response.message || "Có lỗi xảy ra khi lấy danh sách blog",
+        message: response?.message || "Có lỗi xảy ra khi lấy danh sách blog",
       };
     }
   } catch (error) {
     console.error("Get public blogs error:", error);
     return {
       error: true,
-      message: error.response?.data?.message || "Không thể kết nối đến server",
+      message: error.response?.message || "Không thể kết nối đến server",
     };
   }
 };

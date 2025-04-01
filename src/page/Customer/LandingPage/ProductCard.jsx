@@ -17,7 +17,6 @@ const ProductCard = ({
 }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
   // Format giá tiền theo định dạng Việt Nam
@@ -64,22 +63,22 @@ const ProductCard = ({
   return (
     <>
       <div
-        className="group cursor-pointer relative flex flex-col items-center text-center bg-white p-4 hover:shadow-xl transition duration-300 rounded-lg h-[500px] w-[300px]"
+        className="group cursor-pointer relative flex flex-col bg-white overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 h-[500px] w-[300px]"
         onClick={handleCardClick}
       >
         {/* Tag */}
         {tag && (
-          <span className="absolute top-3 left-3 z-10 text-xs font-medium bg-white text-gray-800 px-3 py-1 rounded-full shadow-sm">
+          <span className="absolute top-3 left-3 z-10 text-xs font-medium bg-pink-100 text-pink-800 px-3 py-1 rounded-full shadow-sm">
             {tag}
           </span>
         )}
 
         {/* Image Container */}
-        <div className="aspect-square overflow-hidden bg-gray-50 relative">
+        <div className="h-[280px] w-full overflow-hidden bg-gray-50 relative">
           <img
             src={thumbnail}
             alt={name}
-            className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
           />
 
           {/* Gradient Overlay on Hover */}
@@ -135,29 +134,42 @@ const ProductCard = ({
         </div>
 
         {/* Product Info */}
-        <div className="p-4 flex flex-col">
+        <div className="p-5 flex flex-col flex-grow">
           {/* Size */}
           <p className="text-xs text-gray-500 mb-1">{size}</p>
 
           {/* Name */}
-          <h3 className="font-medium text-gray-900 mb-1 line-clamp-2 group-hover:text-pink-600 transition-colors min-h-[48px]">
+          <h3 className="font-medium text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-pink-600 transition-colors">
             {name}
           </h3>
 
           {/* Price */}
-          <div className="h-[40px] w-full flex items-center justify-center">
-            <p className="font-semibold text-black">${formatPrice(price)}</p>
-          </div>
+          <p className="font-semibold text-lg text-black mt-auto">
+            {formatPrice(price)}
+          </p>
         </div>
 
-        {/* Button Section */}
-        <div className="w-full mt-2">
+        {/* Button Section - Single CTA at bottom */}
+        <div className="px-5 pb-5 mt-auto">
           <button
-            className="w-full bg-black text-white py-2 px-6 rounded-md text-sm opacity-0 group-hover:opacity-100 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-black text-white py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             onClick={handleAddToCart}
             disabled={isLoading}
           >
-            {isLoading ? "Adding..." : "Add to your Cart"}
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Đang thêm vào giỏ hàng...</span>
+              </>
+            ) : (
+              <>
+                <FiShoppingBag size={16} />
+                <span>Thêm vào giỏ hàng</span>
+              </>
+            )}
           </button>
         </div>
       </div>

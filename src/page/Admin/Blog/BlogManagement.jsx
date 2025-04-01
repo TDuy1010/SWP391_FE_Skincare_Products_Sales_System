@@ -75,30 +75,21 @@ const BlogManagement = () => {
   const fetchBlogs = async (params = {}) => {
     try {
       setLoading(true);
-      const queryParams = {
-        page: params.page !== undefined ? params.page - 1 : 0,
-        size: params.pageSize || 10,
-      };
+      const apiPage = params.page ;
+      
+      const response = await getAllBlogs({
+        page: apiPage,
+        size: params.pageSize || pagination.pageSize
+      });
 
-      if (params.keyword) queryParams.keyword = params.keyword;
-
-      const response = await getAllBlogs(queryParams);
-
-      if (!response.error) {
-        const blogData = response.result.content || [];
-        const processedBlogs = blogData.map((blog) => ({
-          ...blog,
-          thumbnails: blog.thumbnails || [],
-        }));
-
-        setBlogs(processedBlogs);
-        setPagination({
-          current: (response.result.pageNumber || 0) + 1,
+      if (response && !response.error) {
+        setBlogs(response.result.content || []);
+        setPagination(prev => ({
+          ...prev,
+          current: params.page,
           pageSize: response.result.pageSize || 10,
-          total: response.result.totalElements || 0,
-        });
-      } else {
-        showToast("error", response.message);
+          total: response.result.totalElements || 0
+        }));
       }
     } catch (error) {
       console.error("Fetch blogs error:", error);
@@ -109,22 +100,14 @@ const BlogManagement = () => {
   };
 
   useEffect(() => {
-    fetchBlogs();
+    fetchBlogs({ page: 1 });
   }, []);
 
-  const handleTableChange = (newPagination, tableFilters, sorter) => {
-    const params = {
-      ...filters,
-      page: newPagination.current,
-      pageSize: newPagination.pageSize,
-    };
-
-    if (sorter.field) {
-      params.sortBy = sorter.field;
-      params.order = sorter.order ? sorter.order.replace("end", "") : undefined;
-    }
-
-    fetchBlogs(params);
+  const handlePageChange = (page, pageSize) => {
+    fetchBlogs({
+      page: page,
+      pageSize: pageSize
+    });
   };
 
   const showDeleteConfirm = (blog) => {
@@ -230,7 +213,7 @@ const BlogManagement = () => {
         blogs={blogs}
         loading={loading}
         pagination={pagination}
-        onTableChange={handleTableChange}
+        onPageChange={handlePageChange}
         onStatusChange={handleStatusChange}
         onEditBlog={handleEditBlog}
         onDeleteBlog={showDeleteConfirm}
