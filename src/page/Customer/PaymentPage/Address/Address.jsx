@@ -6,6 +6,7 @@ import AddressModal from "./AddressModal";
 import {
   addNewAddress,
   updateAddress,
+  deleteAddress,
 } from "../../../../service/address/index";
 
 const Address = ({
@@ -82,6 +83,27 @@ const Address = ({
     }
   };
 
+  const handleDeleteAddress = async (addressId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) {
+      try {
+        const response = await deleteAddress(addressId);
+        if (!response.error) {
+          // Refresh addresses list
+          const addressesResponse = await getAddresses();
+          if (!addressesResponse.error) {
+            setAddresses(addressesResponse.result);
+            // If the deleted address was selected, clear the selection
+            if (selectedAddressId === addressId) {
+              setSelectedAddressId(null);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting address:", error);
+      }
+    }
+  };
+
   const openEditModal = (address) => {
     setEditingAddress(address);
     setIsModalOpen(true);
@@ -138,7 +160,13 @@ const Address = ({
                         >
                           Edit
                         </button>
-                        <button className="text-gray-900 font-semibold">
+                        <button
+                          className="text-gray-900 font-semibold"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDeleteAddress(address.id);
+                          }}
+                        >
                           Remove
                         </button>
                       </div>

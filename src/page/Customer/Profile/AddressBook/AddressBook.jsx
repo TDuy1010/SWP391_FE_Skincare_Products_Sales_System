@@ -6,6 +6,7 @@ import {
   getAddresses,
   updateAddress,
   setDefaultAddress,
+  deleteAddress,
 } from "../../../../service/address";
 import { toast } from "react-toastify";
 
@@ -14,6 +15,8 @@ const AddressBook = () => {
   const [editForm, setEditForm] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
 
   const [locationData, setLocationData] = useState({
     cities: [],
@@ -43,8 +46,36 @@ const AddressBook = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      if (!id) {
+        toast.error("ID địa chỉ không hợp lệ");
+        setShowDeleteModal(false);
+        return;
+      }
+
+      console.log("Deleting address with ID:", id);
+      const response = await deleteAddress(id);
+
+      // Kiểm tra response chi tiết hơn
+      if (response.error) {
+        toast.error(response.message || "Không thể xóa địa chỉ");
+        console.error("Delete error response:", response);
+        return;
+      }
+
+      toast.success("Địa chỉ đã được xóa thành công!");
+      fetchAddresses(); // Refresh the addresses list
+      setShowDeleteModal(false);
+    } catch (error) {
+      toast.error("Không thể xóa địa chỉ");
+      console.error("Error deleting address:", error);
+    }
+  };
+
+  const confirmDelete = (address) => {
+    setAddressToDelete(address);
+    setShowDeleteModal(true);
   };
 
   const handleEdit = (addr) => {
@@ -154,7 +185,7 @@ const AddressBook = () => {
                     {addresses.length > 1 && (
                       <button
                         className="text-red-600 hover:text-red-800"
-                        onClick={() => handleDelete(addr.id)}
+                        onClick={() => confirmDelete(addr)}
                       >
                         <Trash2 size={18} />
                       </button>
@@ -177,6 +208,43 @@ const AddressBook = () => {
             </button>
           </div>
         </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Xác nhận xóa địa chỉ</h3>
+            <p className="mb-6">Bạn có chắc chắn muốn xóa địa chỉ này?</p>
+            {addressToDelete && (
+              <div className="mb-4 p-3 bg-gray-50 rounded-md">
+                <p className="font-medium">
+                  {addressToDelete.name} - {addressToDelete.phone}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {addressToDelete.street}, {addressToDelete.ward},{" "}
+                  {addressToDelete.district}, {addressToDelete.city}
+                </p>
+              </div>
+            )}
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() =>
+                  addressToDelete && handleDelete(addressToDelete.id)
+                }
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Xóa địa chỉ
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

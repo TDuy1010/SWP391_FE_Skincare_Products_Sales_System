@@ -145,3 +145,40 @@ export const setDefaultAddress = async (addressId) => {
     };
   }
 };
+
+export const deleteAddress = async (addressId) => {
+  try {
+    const token = localStorage.getItem("token");
+    console.log("Deleting address with ID:", addressId);
+
+    const response = await instance.delete(`/addresses/${addressId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Delete response:", response);
+
+    if (response.status === 200) {
+      return {
+        code: 200,
+        message: "Address deleted successfully",
+      };
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Can't delete address: ", error);
+    console.error("Error details:", {
+      response: error.response,
+      message: error.message,
+      stack: error.stack,
+    });
+
+    return {
+      error: true,
+      message: error.response?.data?.message || "Failed to delete address",
+    };
+  }
+};
