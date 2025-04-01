@@ -137,10 +137,9 @@ const EditUser = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-4 max-w-4xl mx-auto">
         <Button 
-          type="text"
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate("/admin/user")}
-          className="hover:bg-gray-100 flex items-center"
+          className="mb-4 hover:bg-gray-100"
         >
           <span className="ml-1 text-base">Back to Users</span>
         </Button>
@@ -166,7 +165,7 @@ const EditUser = () => {
             layout="vertical"
             onFinish={onFinish}
             className="mt-4"
-            requiredMark="optional"
+           
           >
             <Row gutter={24}>
               <Col xs={24} md={8} className="text-center mb-6">
@@ -260,21 +259,7 @@ const EditUser = () => {
                   </Col>
                 </Row>
 
-                <Form.Item
-                  name="phone"
-                  label="Phone"
-                  rules={[
-                    { 
-                      pattern: /^[0-9]{10,11}$/, 
-                      message: "Please enter a valid phone number!" 
-                    }
-                  ]}
-                >
-                  <Input 
-                    prefix={<PhoneOutlined />} 
-                    placeholder="Phone number" 
-                  />
-                </Form.Item>
+               
                 
                 <Divider orientation="left">Account Details</Divider>
                 

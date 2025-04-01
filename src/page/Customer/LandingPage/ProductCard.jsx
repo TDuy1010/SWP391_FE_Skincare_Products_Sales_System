@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import LoginModal from "../LoginPage/LoginPage";
-import { FiShoppingBag } from "react-icons/fi";
+import { FiShoppingBag, FiEye } from "react-icons/fi";
 import { addItemToCart } from "../../../service/cart/cart";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useCart } from '../../../context/CartContext';
+
+// Thêm hàm xử lý HTML content
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
 
 const ProductCard = ({
   id,
@@ -18,6 +27,7 @@ const ProductCard = ({
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { refreshCart } = useCart();
 
   // Format giá tiền theo định dạng Việt Nam
   const formatPrice = (price) => {
@@ -25,7 +35,7 @@ const ProductCard = ({
       style: "currency",
       currency: "VND",
       maximumFractionDigits: 0,
-    }).format(price);
+    }).format(price).replace('₫', 'VND');
   };
 
   const handleCardClick = () => {
@@ -33,21 +43,19 @@ const ProductCard = ({
   };
 
   const handleAddToCart = async (e) => {
-    // Stop propagation to prevent navigation when clicking the button
     e.stopPropagation();
-
     setIsLoading(true);
     try {
       const response = await addItemToCart(id, 1);
 
       if (response.unauthorized) {
-        // Handle unauthorized specifically
         setShowLoginModal(true);
         toast.warning("Please log in to add items to your cart");
       } else if (response.error) {
         toast.error(response.message);
       } else {
         toast.success("Đã thêm vào giỏ hàng!");
+        await refreshCart();
       }
     } catch (error) {
       toast.error("Không thể thêm vào giỏ hàng");
@@ -56,121 +64,85 @@ const ProductCard = ({
     }
   };
 
-  const handleViewDetail = () => {
+  const handleViewDetail = (e) => {
+    e.stopPropagation();
     navigate(`/product/${slug}`);
   };
 
+  // Xử lý description để loại bỏ HTML tags
+  const cleanDescription = stripHtmlTags(description);
+  const cleanSize = stripHtmlTags(size);
+
   return (
     <>
-      <div
-        className="group cursor-pointer relative flex flex-col bg-white overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 h-[500px] w-[300px]"
+      <div 
         onClick={handleCardClick}
-      >
-        {/* Tag */}
-        {tag && (
-          <span className="absolute top-3 left-3 z-10 text-xs font-medium bg-pink-100 text-pink-800 px-3 py-1 rounded-full shadow-sm">
-            {tag}
-          </span>
-        )}
-
-        {/* Image Container */}
-        <div className="h-[280px] w-full overflow-hidden bg-gray-50 relative">
+        className="group bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0px_15px_35px_rgba(0,0,0,0.1)] h-full flex flex-col relative cursor-pointer max-w-[300px]">
+        
+        {/* Image container */}
+        <div className="relative overflow-hidden bg-gray-50 h-64">
+          {/* Main image */}
           <img
             src={thumbnail}
             alt={name}
-            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
           />
 
-          {/* Gradient Overlay on Hover */}
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
+          {/* Tag */}
+          {tag && (
+            <span className="absolute top-3 left-3 z-10 text-xs font-medium bg-black text-white px-3 py-1 rounded-sm">
+              {tag}
+            </span>
+          )}
 
-          {/* Action Buttons */}
-          <div className="absolute bottom-0 inset-x-0 p-4 flex justify-between opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+          {/* Gradient overlay on hover */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          {/* Action buttons container */}
+          <div className="absolute inset-x-0 bottom-0 p-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0 duration-300">
+            {/* Add to cart button */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewDetail();
-              }}
-              className="bg-white text-gray-900 p-2 rounded-full shadow-lg hover:shadow-xl transition-all"
-            ></button>
-
-            <button
-              onClick={(e) => handleAddToCart(e)}
+              onClick={handleAddToCart}
               disabled={isLoading}
-              className="bg-black text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-2 text-sm"
+              className="bg-black/90 hover:bg-black text-white px-4 py-2 rounded-full shadow-lg transition-all flex items-center gap-2 text-sm font-medium"
             >
               {isLoading ? (
                 <>
-                  <svg
-                    className="animate-spin h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>Đang thêm...</span>
+                  <span>Đang thêm…</span>
                 </>
               ) : (
                 <>
-                  <FiShoppingBag size={16} />
-                  <span>Thêm vào giỏ</span>
+                  <FiShoppingBag />
+                  <span>Thêm vào giỏ hàng </span>
                 </>
               )}
             </button>
           </div>
         </div>
-
-        {/* Product Info */}
-        <div className="p-5 flex flex-col flex-grow">
-          {/* Size */}
-          <p className="text-xs text-gray-500 mb-1">{size}</p>
-
-          {/* Name */}
-          <h3 className="font-medium text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-pink-600 transition-colors">
-            {name}
+        
+        {/* Product info */}
+        <div className="px-4 pt-3 pb-4 flex flex-col flex-grow">
+          {/* Size info */}
+          <p className="text-xs text-gray-500 mb-1">{cleanSize}</p>
+          
+          {/* Product name */}
+          <h3 className="font-medium text-gray-900 line-clamp-2 mb-1 cursor-pointer hover:text-black transition-colors">
+            {stripHtmlTags(name)}
           </h3>
-
+          
+          {/* Description - nếu cần hiển thị */}
+          {description && (
+            <div className="text-sm text-gray-600 line-clamp-2 mb-2">{cleanDescription}</div>
+          )}
+          
           {/* Price */}
-          <p className="font-semibold text-lg text-black mt-auto">
-            {formatPrice(price)}
-          </p>
-        </div>
-
-        {/* Button Section - Single CTA at bottom */}
-        <div className="px-5 pb-5 mt-auto">
-          <button
-            className="w-full bg-black text-white py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            onClick={handleAddToCart}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Đang thêm vào giỏ hàng...</span>
-              </>
-            ) : (
-              <>
-                <FiShoppingBag size={16} />
-                <span>Thêm vào giỏ hàng</span>
-              </>
-            )}
-          </button>
+          <p className="font-semibold text-gray-900 mt-1">{formatPrice(price)}</p>
+          
+          {/* Rating stars */}
         </div>
       </div>
 
