@@ -26,7 +26,7 @@ const staggerContainer = {
 };
 
 const HelpPage = () => {
-  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState('determine');
   const toolsRef = useRef(null);
 
   useEffect(() => {
@@ -34,41 +34,8 @@ const HelpPage = () => {
   }, []);
 
   const handleGetStarted = () => {
-    // Scroll đến phần công cụ chăm sóc da
     toolsRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  const topics = [
-    { 
-      icon: <FaSearch className="text-[#34825B] text-2xl" />, 
-      title: "Xác định loại da của bạn", 
-      id: "determine",
-      description: "Trả lời một vài câu hỏi để khám phá loại da của bạn và nhận được những khuyến nghị cá nhân hóa."
-    },
-    { 
-      icon: <FaSeedling className="text-[#34825B] text-2xl" />, 
-      title: "Tìm quy trình chăm sóc da", 
-      id: "findRoutine",
-      description: "Tạo một quy trình chăm sóc da tùy chỉnh dựa trên nhu cầu và vấn đề da riêng của bạn."
-    },
-  ];
-
-  const TopicItem = ({ topic, isSelected, onClick }) => (
-    <motion.div
-      className={`
-        border-2 rounded-xl p-6 cursor-pointer transition-all
-        ${isSelected ? 'border-[#34825B] bg-gray-50 shadow-md' : 'border-gray-200 hover:border-gray-400'}
-      `}
-      whileHover={{ y: -5 }}
-      onClick={onClick}
-    >
-      <div className="flex items-center space-x-3 mb-3">
-        <span>{topic.icon}</span>
-        <h3 className={`text-lg ${isSelected ? 'font-medium' : ''}`}>{topic.title}</h3>
-      </div>
-      <p className="text-gray-600 text-sm pl-9">{topic.description}</p>
-    </motion.div>
-  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -119,60 +86,14 @@ const HelpPage = () => {
           <span className="uppercase tracking-widest text-[#34825B] mb-4 block">
             Hướng Dẫn Cá Nhân Hóa
           </span>
-          <h2 className="text-4xl font-light mb-6">Tìm Giải Pháp Chăm Sóc Da Hoàn Hảo</h2>
+          <h2 className="text-4xl font-light mb-6">Xác Định Loại Da Của Bạn</h2>
           <p className="text-gray-600 text-lg">
-            Mỗi làn da đều độc đáo và cần được chăm sóc riêng biệt. Các công cụ tương tác của chúng tôi giúp bạn hiểu rõ hơn về làn da của mình và phát triển quy trình phù hợp.
+            Hãy cùng tìm hiểu về làn da của bạn thông qua bộ câu hỏi đơn giản dưới đây để nhận được những gợi ý chăm sóc da phù hợp nhất.
           </p>
         </motion.div>
 
-        {/* Lựa chọn chủ đề */}
-        <motion.div 
-          variants={fadeInUp}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
-        >
-          {topics.map((topic, index) => (
-            <TopicItem
-              key={index}
-              topic={topic}
-              isSelected={selectedTopic === topic.id}
-              onClick={() => setSelectedTopic(topic.id)}
-            />
-          ))}
-        </motion.div>
-
-        {/* Phần nội dung */}
         <motion.div variants={fadeInUp}>
-          {selectedTopic === 'findRoutine' ? (
-            <FindRoutine />
-          ) : selectedTopic === 'determine' ? (
-            <Determine />
-          ) : (
-            <div className="text-center text-gray-500 py-24 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <div className="max-w-md mx-auto">
-                <FaRegLightbulb className="text-5xl mx-auto mb-6 text-[#34825B]" />
-                <h3 className="text-2xl font-light mb-4">Chọn Một Công Cụ Để Bắt Đầu</h3>
-                <p className="text-gray-600 mb-6">
-                  Chọn một trong các lựa chọn bên trên để bắt đầu hành trình chăm sóc da cá nhân hóa của bạn. Các công cụ tương tác của chúng tôi sẽ hướng dẫn bạn từng bước.
-                </p>
-                <div className="flex justify-center space-x-10">
-                  <div 
-                    onClick={() => setSelectedTopic('determine')}
-                    className="flex flex-col items-center text-[#34825B] cursor-pointer hover:opacity-80 transition-opacity"
-                  >
-                    <FaSearch className="text-3xl mb-2" />
-                    <span className="text-sm">Loại Da</span>
-                  </div>
-                  <div 
-                    onClick={() => setSelectedTopic('findRoutine')}
-                    className="flex flex-col items-center text-[#34825B] cursor-pointer hover:opacity-80 transition-opacity"
-                  >
-                    <FaSeedling className="text-3xl mb-2" />
-                    <span className="text-sm">Quy Trình Da</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <Determine />
         </motion.div>
       </motion.div>
     </div>
